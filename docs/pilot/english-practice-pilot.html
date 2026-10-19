@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>English practice pilot</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#FFFCF6;--surface:#F4EFE4;--ink:#1D1B18;--muted:#5A554D;--line:#E4DED2;
+  --primary:#2C3E9E;--on-primary:#FFFFFF;--primary-soft:#E6E9F7;--primary-ink:#1F2D78;
+  --reward:#C25E00;--on-reward:#FFFFFF;--reward-soft:#FFF0DC;--reward-ink:#8A3F00;
+  --ok-soft:#E2F1E7;--ok-ink:#174F2F;--ok:#1E6B3F;
+  --bad-soft:#FCE4D6;--bad-ink:#8A2F08;--bad:#A33A0B;
+  --locked:#EFEAE0;--locked-ink:#6B655C;
+  color-scheme:light;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1A1814;--surface:#26231D;--ink:#F3EFE7;--muted:#B5AEA2;--line:#3A362E;
+  --primary:#8F9CF0;--on-primary:#10153A;--primary-soft:#262C52;--primary-ink:#C2C9FA;
+  --reward:#F5A54A;--on-reward:#2A1700;--reward-soft:#3A2A15;--reward-ink:#F7C98E;
+  --ok-soft:#183224;--ok-ink:#A9E4C1;--ok:#6CC793;
+  --bad-soft:#3B2016;--bad-ink:#F6B596;--bad:#F08A5D;
+  --locked:#24211B;--locked-ink:#9C958A;color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#1A1814;--surface:#26231D;--ink:#F3EFE7;--muted:#B5AEA2;--line:#3A362E;
+  --primary:#8F9CF0;--on-primary:#10153A;--primary-soft:#262C52;--primary-ink:#C2C9FA;
+  --reward:#F5A54A;--on-reward:#2A1700;--reward-soft:#3A2A15;--reward-ink:#F7C98E;
+  --ok-soft:#183224;--ok-ink:#A9E4C1;--ok:#6CC793;
+  --bad-soft:#3B2016;--bad-ink:#F6B596;--bad:#F08A5D;
+  --locked:#24211B;--locked-ink:#9C958A;color-scheme:dark;}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:Mukta,"Noto Sans Devanagari",system-ui,sans-serif;font-size:17px;line-height:1.35}
+button,input{font-family:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+#app{max-width:480px;min-height:100%;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cols{display:flex;flex-direction:column;gap:18px;flex:1}
+.col{display:flex;flex-direction:column;gap:16px}
+.iconbtn{width:48px;height:48px;flex:none;border-radius:24px;border:none;background:var(--primary-soft);color:var(--primary-ink);display:flex;align-items:center;justify-content:center}
+.iconbtn.plain{background:var(--surface);color:var(--ink)}
+.pill{display:flex;align-items:center;gap:6px;border-radius:24px;padding:6px 12px;font-weight:600;border:none;font-size:17px}
+.who{background:var(--surface);color:var(--ink)}
+.av{width:36px;height:36px;border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.hi{display:block;font-size:16px;color:var(--muted);font-weight:400}
+h1{margin:0;font-size:28px;line-height:1.2}
+.btn{width:100%;min-height:68px;border:none;border-radius:18px;background:var(--primary);color:var(--on-primary);font-size:21px;font-weight:700;line-height:1.15;padding:10px 16px}
+.btn .hi{color:inherit;opacity:.8}
+.btn2{min-height:60px;border-radius:16px;border:2px solid var(--primary);background:transparent;color:var(--primary-ink);font-size:18px;font-weight:700;line-height:1.15;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:left}
+.btn2 .hi{font-size:15px;color:inherit;opacity:.85}
+.ghost{border:none;background:none;color:var(--muted);font-size:17px;font-weight:600;min-height:48px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.goal{background:var(--primary);color:var(--on-primary);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.goal .hi{color:inherit;opacity:.8}
+.segs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.seg{height:12px;border-radius:6px;background:color-mix(in srgb,var(--on-primary) 25%,transparent)}
+.seg.on{background:var(--reward)}
+.goal .btn{background:var(--on-primary);color:var(--primary)}
+.row{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:18px;padding:12px 14px;border:none;color:var(--ink);text-align:left;width:100%;font-size:17px}
+.row.locked{background:var(--locked);color:var(--locked-ink)}
+.stars{display:inline-flex;color:var(--reward);margin-left:auto}
+.stars .off{color:var(--line)}
+.en{font-size:30px;font-weight:700;line-height:1.15}
+.progress{flex:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;min-width:120px}
+.progress div{height:10px;border-radius:5px;background:var(--line)}
+.progress .on{background:var(--primary)}
+.micwrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0 4px}
+.mic{width:112px;height:112px;border-radius:56px;border:none;background:var(--reward);color:var(--on-reward);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px var(--reward-soft)}
+.mic.live{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 18px var(--reward-soft)}}
+@media (prefers-reduced-motion:reduce){.mic.live{animation:none;box-shadow:0 0 0 16px var(--reward-soft)}}
+.center{text-align:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:12px;padding:6px 12px;font-size:22px;font-weight:600}
+.chip.ok{background:var(--ok-soft);color:var(--ok-ink)}
+.chip.wrong{background:var(--bad-soft);color:var(--bad-ink);border:2px solid var(--bad)}
+.chip.missing{background:transparent;color:var(--bad-ink);border:2px dashed var(--bad)}
+.tip{background:var(--reward-soft);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.tip b{color:var(--reward-ink)}
+.msg{border-radius:16px;padding:12px 14px;background:var(--surface);font-size:17px}
+.msg.bad{background:var(--bad-soft);color:var(--bad-ink)}
+.msg.ok{background:var(--ok-soft);color:var(--ok-ink)}
+.heard{font-size:15px;color:var(--muted)}
+.dots{display:flex;gap:8px}
+.dot{width:30px;height:30px;border-radius:15px;background:var(--line);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex:none}
+.dot.done{background:var(--ok);color:var(--bg)}
+.dot.now{background:var(--primary);color:var(--on-primary)}
+.steps{display:none;flex-direction:column;gap:10px;background:var(--surface);border-radius:20px;padding:16px}
+.step{display:flex;align-items:center;gap:12px;font-size:17px;line-height:1.2}
+.step.now{font-weight:700}
+.step.later{color:var(--muted)}
+.word{background:var(--surface);border-radius:24px;padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.word .big{font-size:56px;font-weight:700;line-height:1}
+.syl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.syl span{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:4px 12px;font-size:28px;font-weight:600}
+.stat{border-radius:18px;padding:16px;text-align:center}
+.students{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.stu{border:none;background:var(--surface);color:var(--ink);border-radius:20px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:19px;font-weight:600}
+.stu .av{width:72px;height:72px;border-radius:36px;font-size:30px}
+.field{display:flex;gap:10px;flex-wrap:wrap}
+.field input{flex:1;min-width:180px;min-height:60px;border-radius:16px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font-size:20px;padding:0 16px}
+.field input:focus{border-color:var(--primary);outline:none}
+.field .btn{width:auto;min-height:60px;padding:0 22px;font-size:18px}
+.tablewrap{overflow-x:auto;border-radius:16px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--surface);font-weight:600}
+.kbd-hints{display:none;gap:16px;justify-content:center;color:var(--muted);font-size:15px;flex-wrap:wrap}
+kbd{font-family:inherit;background:var(--surface);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:0 7px;font-weight:600;color:var(--ink)}
+.foot{font-size:14px;color:var(--muted);text-align:center;margin-top:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (min-width:900px){
+  #app{max-width:1080px;padding:28px 40px;gap:24px}
+  .cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;align-items:start;flex:none}
+  .en{font-size:46px}
+  .hi.big-hi{font-size:24px}
+  .mic{width:136px;height:136px;border-radius:68px}
+  .panel{background:var(--surface);border-radius:28px;padding:28px}
+  .panel .msg{background:var(--bg)}
+  .steps{display:flex}
+  .kbd-hints{display:flex}
+  .chip{font-size:26px}
+  .word .big{font-size:72px}
+  .narrow{max-width:620px;margin:0 auto;width:100%}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="live" class="sr" aria-live="polite"></div>
+<script>
+// ---------- Content (seed; Hindi lines and hints pending teacher review) ----------
+const LESSON = {
+  title_en: "Bus stand", title_hi: "बस स्टैंड",
+  sentences: [
+    { id: "bus_01", text: "Where is the bus stop?", hi: "बस स्टॉप कहाँ है?", chunks: ["Where is", "the bus stop"] },
+    { id: "bus_02", text: "When will the bus come?", hi: "बस कब आएगी?", chunks: ["When will", "the bus come"] },
+    { id: "bus_03", text: "One ticket to Patna, please.", hi: "पटना का एक टिकट दीजिए।", chunks: ["One ticket", "to Patna", "please"] },
+    { id: "bus_04", text: "How much is the ticket?", hi: "टिकट कितने का है?", chunks: ["How much", "is the ticket"] },
+    { id: "bus_05", text: "Does this bus go to Bettiah?", hi: "क्या यह बस बेतिया जाती है?", chunks: ["Does this bus", "go to Bettiah"] }
+  ]
+};
+const WORDS = {
+  where: { syl: ["where"], hi: "वेयर", tag: "v_w" },
+  when: { syl: ["when"], hi: "वेन", tag: "v_w" },
+  will: { syl: ["will"], hi: "विल", tag: "v_w" },
+  bus: { syl: ["bus"], hi: "बस", tag: "short_vowel" },
+  stop: { syl: ["stop"], hi: "स्टॉप", tag: "s_cluster" },
+  come: { syl: ["come"], hi: "कम", tag: "short_vowel" },
+  much: { syl: ["much"], hi: "मच", tag: "short_vowel" },
+  ticket: { syl: ["tic", "ket"], hi: "टि-केट", tag: "generic" },
+  please: { syl: ["please"], hi: "प्लीज़", tag: "generic" },
+  does: { syl: ["does"], hi: "डज़", tag: "generic" },
+  this: { syl: ["this"], hi: "दिस", tag: "th" },
+  the: { syl: ["the"], hi: "द", tag: "th" },
+  patna: { syl: ["Pat", "na"], hi: "पट-ना", tag: "generic", accept: ["patna", "patana", "pattna", "patnaa"] },
+  bettiah: { syl: ["Bet", "ti", "ah"], hi: "बे-ति-या", tag: "generic", accept: ["bettiah", "betia", "bettia", "betiya", "bettiya", "bethia"] }
+};
+const HINTS = {
+  v_w: "“w” बोलते समय होंठ गोल कीजिए, दाँत होंठ पर न लगाइए।",
+  th: "“th” में जीभ हल्की-सी दाँतों के बीच रखिए।",
+  s_cluster: "“स्ट” सीधे बोलिए, आगे “इ” मत जोड़िए (“इस्टॉप” नहीं)।",
+  short_vowel: "इस शब्द को छोटा और जल्दी बोलिए।",
+  generic: "फिर से सुनिए और धीरे-धीरे बोलिए।"
+};
+const CONFIG = { goal: 5, xpAttempt: 10, xpStar: 5, xpFixStep: 5, twoStarRatio: 0.6, slowRate: 0.6, normalRate: 0.9, leitnerDays: [1, 3, 7] };
+const AV = [["var(--reward-soft)", "var(--reward-ink)"], ["var(--ok-soft)", "var(--ok-ink)"], ["var(--primary-soft)", "var(--primary-ink)"], ["var(--bad-soft)", "var(--bad-ink)"]];
+
+// ---------- Icons ----------
+const I = {
+  speaker: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>',
+  mic: '<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>',
+  stop: '<svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+  star: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg>',
+  flame: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 2 1.5 3 2.5 3 0-3-1-5 0-8z"/></svg>',
+  check: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  retry: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4h4"/></svg>',
+  dash: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>',
+  close: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>',
+  play: '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>',
+  lock: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  chart: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>'
+};
+const stars = (n, size) => '<span class="stars" role="img" aria-label="' + n + ' of 3 stars">' +
+  [1, 2, 3].map(i => '<span class="' + (i <= n ? '' : 'off') + '">' + (size ? I.star.replace(/22/g, size) : I.star) + '</span>').join('') + '</span>';
+
+// ---------- Storage: one browser, many students ----------
+const KEY = "eb-pilot-v2";
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} }
+const D = Object.assign({ students: {}, order: [], current: null, log: [] }, load());
+const newStudent = name => ({ name, xpTotal: 0, xpByDay: {}, doneByDay: {}, streak: 0, lastDay: null, best: {}, revise: {} });
+const St = () => D.students[D.current];
+const ymd = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const today = () => ymd(new Date());
+const addDays = n => { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d); };
+const dayDiff = (a, b) => Math.round((new Date(b + "T00:00") - new Date(a + "T00:00")) / 86400000);
+const doneToday = () => St().doneByDay[today()] || [];
+const xpToday = () => St().xpByDay[today()] || 0;
+function addXP(n) { const s = St(); s.xpTotal += n; s.xpByDay[today()] = xpToday() + n; save(); }
+function markDone(id, starsN) {
+  const s = St(), t = today(), list = doneToday();
+  if (!list.includes(id)) list.push(id);
+  s.doneByDay[t] = list;
+  s.best[id] = Math.max(s.best[id] || 0, starsN);
+  if (s.lastDay !== t) { s.streak = !s.lastDay ? 1 : dayDiff(s.lastDay, t) <= 3 ? s.streak + 1 : 1; s.lastDay = t; }
+  save();
+}
+function updateRevision(results) {
+  const s = St(), t = today();
+  results.forEach(r => {
+    const w = r.word;
+    if (r.status !== "ok") s.revise[w] = { box: 1, due: addDays(CONFIG.leitnerDays[0]) };
+    else if (s.revise[w] && s.revise[w].due <= t) {
+      const box = s.revise[w].box + 1;
+      if (box > CONFIG.leitnerDays.length) delete s.revise[w];
+      else s.revise[w] = { box, due: addDays(CONFIG.leitnerDays[box - 1]) };
+    }
+  });
+  save();
+}
+function logAttempt(mode, target, heard, sc) {
+  D.log.push({ time: new Date().toISOString(), student: St().name, sentence: sent().id, mode, target, heard, correct: sc.c, total: sc.n, stars: sc.stars || "" });
+  save();
+}
+
+// ---------- Text matching ----------
+const NUM = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+function normTok(t) { t = t.toLowerCase().replace(/[^a-z0-9']/g, ""); return /^\d+$/.test(t) && +t <= 10 ? NUM[+t] : t; }
+function normText(s) { return s.toLowerCase().replace(/-/g, " ").split(/\s+/).map(normTok).filter(Boolean); }
+function same(t, h) { return t === h || ((WORDS[t] && WORDS[t].accept) || []).includes(h); }
+function align(T, H) {
+  const n = T.length, m = H.length, d = [];
+  for (let i = 0; i <= n; i++) { d.push(new Array(m + 1).fill(0)); d[i][0] = i; }
+  for (let j = 0; j <= m; j++) d[0][j] = j;
+  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++)
+    d[i][j] = Math.min(d[i - 1][j - 1] + (same(T[i - 1], H[j - 1]) ? 0 : 1), d[i - 1][j] + 1, d[i][j - 1] + 1);
+  const res = T.map(w => ({ word: w, status: "missing" })), extra = [];
+  let i = n, j = m;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && d[i][j] === d[i - 1][j - 1] + (same(T[i - 1], H[j - 1]) ? 0 : 1)) { res[i - 1].status = same(T[i - 1], H[j - 1]) ? "ok" : "wrong"; i--; j--; }
+    else if (i > 0 && d[i][j] === d[i - 1][j] + 1) { res[i - 1].status = "missing"; i--; }
+    else { extra.unshift(H[j - 1]); j--; }
+  }
+  return { res, extra };
+}
+function score(res) { const c = res.filter(r => r.status === "ok").length, n = res.length; return { c, n, stars: c === n ? 3 : c / n >= CONFIG.twoStarRatio ? 2 : 1 }; }
+
+// ---------- Speech ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+function listen() {
+  return new Promise(resolve => {
+    if (!SR) return resolve({ error: "unsupported" });
+    let finished = false, text = "";
+    rec = new SR(); rec.lang = "en-IN"; rec.interimResults = false; rec.maxAlternatives = 1; rec.continuous = false;
+    rec.onresult = e => { text = e.results[0][0].transcript; };
+    rec.onerror = e => { if (!finished) { finished = true; resolve({ error: e.error }); } };
+    rec.onend = () => { if (!finished) { finished = true; resolve(text ? { text } : { error: "no-speech" }); } };
+    try { rec.start(); } catch (e) { finished = true; resolve({ error: "start-failed" }); }
+  });
+}
+let hindiWarned = false;
+function speak(text, lang, rate) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang; u.rate = rate || CONFIG.normalRate;
+  const vs = speechSynthesis.getVoices();
+  const v = vs.find(x => x.lang.replace("_", "-") === lang) || vs.find(x => x.lang.startsWith(lang.slice(0, 2)));
+  if (v) u.voice = v;
+  else if (lang.startsWith("hi") && vs.length && !hindiWarned) {
+    hindiWarned = true;
+    S.msg = { kind: "", html: "No Hindi voice is installed on this computer. On a Mac: System Settings › Accessibility › Spoken Content › System voice › Manage voices › Hindi.<span class='hi'>इस कंप्यूटर में हिंदी आवाज़ इंस्टॉल नहीं है।</span>" };
+    render();
+  }
+  speechSynthesis.speak(u);
+}
+if ("speechSynthesis" in window) speechSynthesis.getVoices();
+const ERR = {
+  "no-speech": ["Didn’t hear you. Press the mic and speak a little louder.", "आवाज़ नहीं आई। माइक दबाकर थोड़ा ज़ोर से बोलिए।"],
+  "not-allowed": ["The microphone is blocked. Allow it for this page in the browser’s address bar, then try again.", "ब्राउज़र में इस पेज को माइक की अनुमति दीजिए।"],
+  "service-not-allowed": ["Speech checking isn’t allowed in this browser. Use Google Chrome.", "Google Chrome में खोलिए।"],
+  "audio-capture": ["No microphone found. Check that the mic is connected and selected.", "माइक नहीं मिला। माइक जाँचिए।"],
+  "network": ["Speech checking needs internet. Check the connection and try again.", "इसके लिए इंटरनेट चाहिए।"],
+  "unsupported": ["This browser can’t check speech. Open this page in Google Chrome.", "यह पेज Google Chrome में खोलिए।"]
+};
+function errMsg(code) { const e = ERR[code] || ["Something stopped the recording. Press the mic and try again.", "माइक दबाकर फिर कोशिश कीजिए।"]; return { kind: "bad", html: e[0] + "<span class='hi'>" + e[1] + "</span>" }; }
+
+// ---------- Downloads (claude.ai capability, or a normal browser download when self-hosted) ----------
+let DL = null;
+const inClaude = !!(window.claude && window.claude.use);
+if (inClaude) window.claude.use("downloads").then(ns => { DL = ns; if (S.screen === "results") render(); }).catch(() => {});
+
+// ---------- State and rendering ----------
+const S = { screen: D.current && D.students[D.current] ? "home" : "students", idx: 0, result: null, fix: null, listening: false, msg: null };
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const sent = () => LESSON.sentences[S.idx];
+const tokens = s => s.text.split(/\s+/);
+const label = (en, hi) => en + "<span class='hi'>" + hi + "</span>";
+const avatar = (id, cls) => { const k = D.order.indexOf(id) % AV.length, nm = D.students[id].name; return '<span class="av ' + (cls || "") + '" style="background:' + AV[k][0] + ';color:' + AV[k][1] + '" aria-hidden="true">' + esc(nm.trim().charAt(0).toUpperCase()) + '</span>'; };
+const helpBtn = '<button class="iconbtn" data-act="help" aria-label="Hear instructions in Hindi">' + I.speaker + '</button>';
+const whoPill = () => '<button class="pill who" data-act="students" aria-label="Change student">' + avatar(D.current) + esc(St().name) + '</button>';
+const msgBox = () => S.msg ? '<div class="msg ' + S.msg.kind + '" role="status">' + S.msg.html + '</div>' : "";
+const kbd = items => '<div class="kbd-hints">' + items.map(x => '<span><kbd>' + x[0] + '</kbd> ' + x[1] + '</span>').join("") + '</div>';
+const micBlock = () => '<div class="micwrap"><button class="mic ' + (S.listening ? "live" : "") + '" data-act="mic" aria-label="' + (S.listening ? "Stop listening" : "Press and speak") + '">' + (S.listening ? I.stop : I.mic) + '</button><div class="center" style="font-size:20px;font-weight:700">' +
+  (S.listening ? label("Listening…", "सुन रहा है… बोलना बंद करते ही रुक जाएगा") : label("Press and speak", "दबाइए और बोलिए")) + '</div></div>';
+function firstWrong() { const r = S.result && S.result.res.find(x => x.status !== "ok"); return r ? r.word : null; }
+
+function helpText() {
+  switch (S.screen) {
+    case "students": return "आपका नाम चुनिए। नया नाम हो तो नीचे लिखकर जोड़िए।";
+    case "home": return "नमस्ते! आज के पाँच वाक्य पूरे कीजिए। शुरू करने के लिए बड़ा बटन दबाइए।";
+    case "practice": return "पहले वाक्य सुनिए। फिर नारंगी माइक बटन दबाइए और वाक्य बोलिए।";
+    case "feedback": { const r = S.result; let t = r.n + " में से " + r.c + " शब्द सही। "; const w = firstWrong(); if (w) t += HINTS[(WORDS[w] || {}).tag || "generic"]; return t; }
+    case "fix": return ["", "यह शब्द धीरे सुनिए, फिर आगे दबाइए।", "शब्द को टुकड़ों में देखिए और सुनिए।", "माइक दबाइए और सिर्फ़ यह शब्द बोलिए।", "माइक दबाइए और यह हिस्सा बोलिए।", "माइक दबाइए और पूरा वाक्य बोलिए।"][S.fix.step];
+    case "done": return "बहुत बढ़िया! आज का लक्ष्य पूरा हुआ। कल फिर आइए।";
+    case "results": return "यहाँ सभी छात्रों के नतीजे हैं।";
+  }
+  return "";
+}
+
+function render() {
+  const f = { students: vStudents, home: vHome, practice: vPractice, feedback: vFeedback, fix: vFix, done: vDone, results: vResults }[S.screen];
+  app.innerHTML = f();
+  if (S.msg) document.getElementById("live").textContent = S.msg.html.replace(/<[^>]+>/g, " ");
+}
+
+function vStudents() {
+  const list = D.order.filter(id => D.students[id]);
+  return '<div class="top"><h1 style="flex:1">' + label("Who is practising?", "कौन सीख रहा है?") + '</h1>' +
+    '<button class="btn2" data-act="results" style="min-height:48px">' + I.chart + '<span>' + label("Results", "नतीजे") + '</span></button>' + helpBtn + '</div>' + msgBox() +
+    (list.length ? '<div class="students">' + list.map(id => { const s = D.students[id]; return '<button class="stu" data-act="pick" data-id="' + id + '">' + avatar(id) + esc(s.name) +
+      '<span style="font-size:15px;font-weight:400;color:var(--muted);display:flex;align-items:center;gap:4px">' + (s.streak ? I.flame.replace(/20/g, 16) + s.streak + (s.streak === 1 ? " day" : " days") : "New · नया") + '</span></button>'; }).join("") + '</div>'
+      : '<div class="msg">' + label("No students yet. Type a name below and press Add student.", "अभी कोई छात्र नहीं है। नीचे नाम लिखकर जोड़िए।") + '</div>') +
+    '<div class="col" style="margin-top:8px"><label for="newname" style="font-weight:600">' + label("New student", "नया छात्र") + '</label>' +
+    '<div class="field"><input id="newname" autocomplete="off" maxlength="40" placeholder="Name · नाम"><button class="btn" data-act="add">' + label("Add student", "जोड़ें") + '</button></div></div>' +
+    '<div class="foot">Pilot version. Works in Google Chrome with internet. Progress is saved in this browser only.<span class="hi" style="font-size:14px">पायलट संस्करण: Chrome और इंटरनेट ज़रूरी है।</span></div>';
+}
+
+function vHome() {
+  const s = St(), done = doneToday().length;
+  const rows = LESSON.sentences.map((x, i) =>
+    '<button class="row" data-act="open" data-i="' + i + '"><span style="flex:1;line-height:1.25"><span style="font-weight:600">' + esc(x.text) + '</span><span class="hi">' + x.hi + '</span></span>' + (s.best[x.id] ? stars(s.best[x.id], 18) : "") + '</button>').join("");
+  return '<div class="top">' + whoPill() +
+    '<div class="pill" style="background:var(--reward-soft);color:var(--reward-ink)">' + I.flame + s.streak + ' ' + (s.streak === 1 ? "day" : "days") + '</div>' +
+    '<div class="pill" style="background:var(--primary-soft);color:var(--primary-ink)">' + s.xpTotal + ' XP</div>' +
+    '<span style="margin-left:auto"></span>' + helpBtn + '</div>' + msgBox() +
+    '<div class="cols"><div class="col"><div class="goal"><div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:22px;font-weight:700">' + label("Today’s goal", "आज का लक्ष्य") + '</div><div style="font-size:32px;font-weight:700">' + Math.min(done, CONFIG.goal) + ' / ' + CONFIG.goal + '</div></div>' +
+    '<div class="segs">' + Array.from({ length: CONFIG.goal }, (_, i) => '<div class="seg ' + (i < done ? "on" : "") + '"></div>').join("") + '</div>' +
+    '<button class="btn" data-act="start" data-primary>' + (done >= CONFIG.goal ? label("Practise more", "और अभ्यास करें") : label("Start practice", "अभ्यास शुरू करें")) + '</button></div></div>' +
+    '<div class="col"><div style="font-size:20px;font-weight:700">' + label(LESSON.title_en, LESSON.title_hi) + '</div>' + rows +
+    '<div class="row locked"><span style="flex:1">' + label("Bank", "बैंक") + '</span>' + I.lock + '</div>' +
+    '<div class="row locked"><span style="flex:1">' + label("Hospital", "अस्पताल") + '</span>' + I.lock + '</div></div></div>' +
+    kbd([["Enter", "start"]]);
+}
+
+function topBar() {
+  return '<div class="top"><button class="iconbtn plain" data-act="home" aria-label="Close and go home">' + I.close + '</button>' +
+    '<div class="progress" role="img" aria-label="Sentence ' + (S.idx + 1) + ' of ' + LESSON.sentences.length + '">' + LESSON.sentences.map((x, i) => '<div class="' + (i <= S.idx ? "on" : "") + '"></div>').join("") + '</div>' + whoPill() + helpBtn + '</div>';
+}
+
+function vPractice() {
+  const s = sent();
+  return topBar() + '<div class="cols"><div class="col"><div style="font-size:16px;color:var(--muted)">' + LESSON.title_en + ', sentence ' + (S.idx + 1) + ' (वाक्य ' + (S.idx + 1) + ')</div>' +
+    '<div><div class="en">' + esc(s.text) + '</div><div class="hi big-hi" style="font-size:20px">' + s.hi + '</div></div>' +
+    '<div class="grid2"><button class="btn2" data-act="say" data-rate="n">' + I.speaker + '<span>' + label("Listen", "सुनिए") + '</span></button>' +
+    '<button class="btn2" data-act="say" data-rate="s"><span style="font-size:15px;background:var(--primary-soft);border-radius:8px;padding:2px 6px">0.6×</span><span>' + label("Slowly", "धीरे सुनिए") + '</span></button></div></div>' +
+    '<div class="col panel">' + micBlock() + msgBox() + '</div></div>' + kbd([["Space", "speak"], ["L", "listen"], ["S", "slowly"]]);
+}
+
+function chip(tok, r) {
+  const ic = r.status === "ok" ? I.check : r.status === "wrong" ? I.retry : I.dash;
+  return '<span class="chip ' + r.status + '">' + ic + esc(tok.replace(/[.,?!]/g, "")) + '</span>';
+}
+
+function vFeedback() {
+  const r = S.result, toks = tokens(sent()), w = firstWrong(), info = w ? (WORDS[w] || {}) : null;
+  const praise = r.stars === 3 ? label("Excellent!", "शानदार!") : r.stars === 2 ? label("Very good!", "बहुत अच्छा!") : label("Good try!", "अच्छी कोशिश!");
+  return '<div class="top"><div style="font-size:16px;color:var(--muted);flex:1">' + LESSON.title_en + ', sentence ' + (S.idx + 1) + '</div>' + whoPill() + helpBtn + '</div>' +
+    '<div class="cols"><div class="col">' + stars(r.stars, 48).replace('margin-left:auto', '') +
+    '<div style="font-size:28px;font-weight:700">' + praise + '</div>' +
+    '<div style="font-size:19px">' + label(r.c + " of " + r.n + " words correct", r.n + " में से " + r.c + " शब्द सही") + '</div>' +
+    '<div class="chips">' + toks.map((t, i) => chip(t, r.res[i])).join("") + '</div>' +
+    '<div class="heard">We heard: “' + esc(r.heard) + '” (हमने सुना)</div></div>' +
+    '<div class="col panel">' +
+    (w ? '<div class="tip"><b>Tip · सुझाव</b><div style="font-size:19px"><strong>' + esc(w) + '</strong>' + (info.hi ? ' (' + info.hi + ')' : "") + ': ' + HINTS[info.tag || "generic"] + '</div></div>' : "") +
+    '<button class="btn2" data-act="say" data-rate="n">' + I.play + '<span>' + label("Hear the correct sentence", "सही वाक्य सुनिए") + '</span></button>' +
+    '<div style="font-size:17px;font-weight:600;color:var(--primary-ink)">+' + r.xp + ' XP</div>' +
+    (w ? '<button class="btn" data-act="fix" data-primary>' + label("Fix “" + esc(w) + "”", "इसे ठीक करें") + '</button><button class="ghost" data-act="next">Skip for now · अभी आगे बढ़ें</button>'
+       : '<button class="btn" data-act="next" data-primary>' + label("Next sentence", "अगला वाक्य") + '</button>') + '</div></div>' +
+    kbd([["Enter", w ? "fix it" : "next"], ["L", "listen"]]);
+}
+
+const FIX_TITLES = [null, ["Listen slowly", "यह शब्द धीरे सुनिए"], ["Break it into parts", "टुकड़ों में सुनिए"], ["Say the word", "सिर्फ़ यह शब्द बोलिए"], ["Say the phrase", "यह हिस्सा बोलिए"], ["Say the full sentence", "पूरा वाक्य बोलिए"]];
+function fixTarget() { const f = S.fix; return f.step === 3 ? f.word : f.step === 4 ? f.chunk : sent().text; }
+function vFix() {
+  const f = S.fix, info = WORDS[f.word] || { syl: [f.word], tag: "generic" };
+  const dots = [1, 2, 3, 4, 5].map(n => '<div class="dot ' + (n < f.step ? "done" : n === f.step ? "now" : "") + '">' + (n < f.step ? I.check.replace(/18/g, 16) : n) + '</div>').join("");
+  const steps = [1, 2, 3, 4, 5].map(n => '<div class="step ' + (n === f.step ? "now" : n > f.step ? "later" : "") + '"><div class="dot ' + (n < f.step ? "done" : n === f.step ? "now" : "") + '">' + (n < f.step ? I.check.replace(/18/g, 16) : n) + '</div><span>' + label(FIX_TITLES[n][0], FIX_TITLES[n][1]) + '</span></div>').join("");
+  let body;
+  if (f.step <= 3) {
+    body = '<div class="word"><div class="big">' + esc(f.word) + '</div>' + (info.hi ? '<div style="font-size:26px;color:var(--muted)">' + info.hi + '</div>' : "") +
+      (f.step === 2 ? '<div class="syl" style="margin-top:10px">' + info.syl.map(x => '<span>' + esc(x) + '</span>').join("") + '</div><div style="font-size:18px;margin-top:8px;text-align:center">' + HINTS[info.tag || "generic"] + '</div>' : "") +
+      '<button class="btn2" data-act="sayword" style="margin-top:12px"><span style="font-size:15px;background:var(--primary-soft);border-radius:8px;padding:2px 6px">0.6×</span><span>' + label("Listen slowly", "धीरे सुनिए") + '</span></button></div>';
+  } else {
+    body = '<div class="word"><div class="en" style="text-align:center">' + esc(fixTarget()) + '</div><button class="btn2" data-act="saytarget" style="margin-top:12px">' + I.speaker + '<span>' + label("Listen", "सुनिए") + '</span></button></div>';
+  }
+  const action = f.step <= 2 ? '<button class="btn" data-act="fixnext" data-primary>' + label("Next", "आगे") + '</button>' : micBlock();
+  return '<div class="top"><button class="iconbtn plain" data-act="back" aria-label="Back to feedback">' + I.back + '</button><div class="dots" role="img" aria-label="Step ' + f.step + ' of 5">' + dots + '</div><span style="flex:1"></span>' + whoPill() + helpBtn + '</div>' +
+    '<div class="cols"><div class="col"><div style="font-size:24px;font-weight:700">' + label("Step " + f.step + ": " + FIX_TITLES[f.step][0], FIX_TITLES[f.step][1]) + '</div>' + body + msgBox() + '</div>' +
+    '<div class="col"><div class="steps" aria-hidden="true">' + steps + '</div>' + action + '<button class="ghost" data-act="next">Skip for now · अभी आगे बढ़ें</button></div></div>' +
+    kbd(f.step <= 2 ? [["Enter", "next"], ["L", "listen"]] : [["Space", "speak"], ["L", "listen"], ["S", "slowly"]]);
+}
+
+function vDone() {
+  const s = St(), rv = Object.keys(s.revise);
+  return '<div class="top"><span style="flex:1"></span>' + whoPill() + helpBtn + '</div><div class="col narrow">' +
+    '<div class="center" style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:12px">' + stars(3, 56).replace('margin-left:auto', '') +
+    '<h1>Goal complete, ' + esc(s.name) + '!</h1><div class="hi" style="font-size:20px">आज का लक्ष्य पूरा!</div></div>' +
+    '<div class="grid2"><div class="stat" style="background:var(--primary-soft);color:var(--primary-ink)"><div style="font-size:32px;font-weight:700">+' + xpToday() + '</div>XP today<span class="hi" style="color:inherit">आज</span></div>' +
+    '<div class="stat" style="background:var(--reward-soft);color:var(--reward-ink)"><div style="font-size:32px;font-weight:700">' + s.streak + '</div>' + (s.streak === 1 ? "day" : "days in a row") + '<span class="hi" style="color:inherit">लगातार दिन</span></div></div>' +
+    (rv.length ? '<div class="msg"><div style="font-weight:700">' + label("Practise again tomorrow", "ये शब्द कल फिर आएँगे") + '</div><div class="chips" style="margin-top:8px">' + rv.map(w => '<span class="chip wrong" style="font-size:19px">' + esc(w) + '</span>').join("") + '</div></div>' : "") +
+    '<button class="btn" data-act="more" data-primary>' + label("One more sentence", "एक वाक्य और") + '</button>' +
+    '<div class="grid2"><button class="ghost" data-act="students">Next student · अगला छात्र</button><button class="ghost" data-act="home">Done for today · आज के लिए बस</button></div></div>';
+}
+
+function summary() {
+  const by = {};
+  D.log.filter(e => e.mode === "sentence").forEach(e => {
+    const b = by[e.student] || (by[e.student] = { attempts: 0, correct: 0, total: 0, sentences: new Set(), three: new Set() });
+    b.attempts++; b.correct += e.correct; b.total += e.total; b.sentences.add(e.sentence); if (e.stars === 3) b.three.add(e.sentence);
+  });
+  return by;
+}
+function vResults() {
+  const by = summary(), names = Object.keys(by), recent = D.log.slice(-200).reverse();
+  const canSave = DL || !inClaude;
+  return '<div class="top"><button class="iconbtn plain" data-act="students" aria-label="Back to students">' + I.back + '</button><h1 style="flex:1">' + label("Results", "नतीजे") + '</h1>' +
+    (canSave && D.log.length ? '<button class="btn2" data-act="csv" style="min-height:48px">' + label("Download CSV", "फ़ाइल सेव करें") + '</button>' : "") + '</div>' + msgBox() +
+    (!D.log.length ? '<div class="msg">' + label("No attempts yet. Results appear here after students practise.", "अभी कोई नतीजा नहीं है।") + '</div>' :
+    '<div class="tablewrap"><table><thead><tr><th>Student</th><th>Sentence attempts</th><th>Sentences tried</th><th>Sentences with 3 stars</th><th>Words correct</th></tr></thead><tbody>' +
+    names.map(n => { const b = by[n]; return '<tr><td>' + esc(n) + '</td><td>' + b.attempts + '</td><td>' + b.sentences.size + ' / ' + LESSON.sentences.length + '</td><td>' + b.three.size + '</td><td>' + b.correct + ' of ' + b.total + '</td></tr>'; }).join("") +
+    '</tbody></table></div>' +
+    '<div style="font-size:20px;font-weight:700">' + label("Every attempt (newest first)", "हर कोशिश") + '</div>' +
+    '<div class="tablewrap"><table><thead><tr><th>Time</th><th>Student</th><th>Step</th><th>Target</th><th>We heard</th><th>Correct</th></tr></thead><tbody>' +
+    recent.map(e => '<tr><td>' + new Date(e.time).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) + '</td><td>' + esc(e.student) + '</td><td>' + esc(e.mode) + '</td><td>' + esc(e.target) + '</td><td>' + esc(e.heard) + '</td><td>' + e.correct + ' / ' + e.total + '</td></tr>').join("") +
+    '</tbody></table></div>') +
+    (!canSave && D.log.length ? '<div class="foot">Saving files isn’t available in this view. Select the table and copy it instead.</div>' : "");
+}
+function toCSV() {
+  const cols = ["time", "student", "sentence", "mode", "target", "heard", "correct", "total", "stars"];
+  const q = v => { const s = String(v == null ? "" : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return "\uFEFF" + cols.join(",") + "\n" + D.log.map(e => cols.map(c => q(e[c])).join(",")).join("\n") + "\n";
+}
+async function exportCSV() {
+  const name = "english-pilot-results-" + today() + ".csv", csv = toCSV();
+  if (DL) {
+    try { await DL.save({ filename: name, data: csv }); S.msg = { kind: "ok", html: "Results saved.<span class='hi'>नतीजे सेव हो गए।</span>" }; }
+    catch (e) { S.msg = e && e.code === "declined" ? null : { kind: "bad", html: "The file couldn’t be saved here. Select the table and copy it instead.<span class='hi'>फ़ाइल सेव नहीं हुई।</span>" }; }
+    render(); return;
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+}
+
+// ---------- Flow ----------
+const celebrated = {};
+function go(screen) { S.screen = screen; S.msg = null; render(); window.scrollTo(0, 0); }
+function nextIndex() {
+  const d = doneToday();
+  for (let k = 1; k <= LESSON.sentences.length; k++) { const i = (S.idx + k) % LESSON.sentences.length; if (!d.includes(LESSON.sentences[i].id)) return i; }
+  return (S.idx + 1) % LESSON.sentences.length;
+}
+function afterSentence() {
+  if (doneToday().length >= CONFIG.goal && celebrated[D.current] !== today()) { celebrated[D.current] = today(); go("done"); return; }
+  S.idx = nextIndex(); go("practice");
+}
+function addStudent() {
+  const inp = document.getElementById("newname"), name = (inp && inp.value || "").trim();
+  if (!name) { S.msg = { kind: "bad", html: "Type the student’s name first.<span class='hi'>पहले नाम लिखिए।</span>" }; render(); const i = document.getElementById("newname"); if (i) i.focus(); return; }
+  const id = "s" + Date.now().toString(36);
+  D.students[id] = newStudent(name); D.order.push(id); D.current = id; save();
+  S.idx = 0; go("home");
+}
+async function onMic() {
+  if (S.listening) { try { rec && rec.stop(); } catch (e) {} return; }
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  S.listening = true; S.msg = null; render();
+  const out = await listen();
+  S.listening = false;
+  if (out.error) { S.msg = errMsg(out.error); render(); return; }
+  if (S.screen === "practice") handleAttempt(out.text);
+  else if (S.screen === "fix") handleFix(out.text);
+}
+function handleAttempt(heard) {
+  const s = sent(), a = align(tokens(s).map(normTok), normText(heard)), sc = score(a.res), xp = CONFIG.xpAttempt + CONFIG.xpStar * sc.stars;
+  addXP(xp); markDone(s.id, sc.stars); updateRevision(a.res); logAttempt("sentence", s.text, heard, sc);
+  S.result = Object.assign({ res: a.res, extra: a.extra, heard, xp }, sc);
+  go("feedback");
+}
+function startFix() {
+  const w = firstWrong(), s = sent();
+  S.fix = { word: w, chunk: s.chunks.find(c => normText(c).includes(w)) || s.text, step: 1, fails: 0 };
+  go("fix");
+}
+function handleFix(heard) {
+  const f = S.fix, target = fixTarget(), a = align(normText(target), normText(heard)), sc = score(a.res), ok = sc.c === sc.n;
+  logAttempt("fix step " + f.step, target, heard, { c: sc.c, n: sc.n });
+  if (ok) {
+    addXP(CONFIG.xpFixStep);
+    if (f.step === 5) { updateRevision(a.res); afterSentence(); return; }
+    f.step++; f.fails = 0;
+    S.msg = { kind: "ok", html: "Correct! +" + CONFIG.xpFixStep + " XP<span class='hi'>सही! अगला कदम</span>" };
+  } else {
+    f.fails++;
+    if (f.fails >= 2) { f.step = Math.max(1, f.step - 1); f.fails = 0; S.msg = { kind: "bad", html: "Let’s go back one step.<span class='hi'>एक कदम पीछे चलते हैं।</span>" }; }
+    else S.msg = { kind: "bad", html: "Try once more. We heard: “" + esc(heard) + "”<span class='hi'>एक बार और कोशिश कीजिए।</span>" };
+  }
+  render();
+}
+function listenNow(slow) {
+  const rate = slow ? CONFIG.slowRate : CONFIG.normalRate;
+  if (S.screen === "practice" || S.screen === "feedback") speak(sent().text, "en-IN", rate);
+  else if (S.screen === "fix") speak(S.fix.step <= 3 ? S.fix.word : fixTarget(), "en-IN", S.fix.step <= 3 ? CONFIG.slowRate : rate);
+}
+
+app.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  switch (b.dataset.act) {
+    case "help": speak(helpText(), "hi-IN", 0.95); break;
+    case "students": go("students"); setTimeout(() => { const i = document.getElementById("newname"); if (i && !D.order.length) i.focus(); }, 0); break;
+    case "pick": D.current = b.dataset.id; save(); S.idx = 0; go("home"); break;
+    case "add": addStudent(); break;
+    case "results": go("results"); break;
+    case "csv": exportCSV(); break;
+    case "start": case "more": S.idx = doneToday().length ? nextIndex() : 0; go("practice"); break;
+    case "open": S.idx = +b.dataset.i; go("practice"); break;
+    case "home": go("home"); break;
+    case "say": speak(sent().text, "en-IN", b.dataset.rate === "s" ? CONFIG.slowRate : CONFIG.normalRate); break;
+    case "sayword": speak(S.fix.word, "en-IN", CONFIG.slowRate); break;
+    case "saytarget": speak(fixTarget(), "en-IN", CONFIG.normalRate); break;
+    case "mic": onMic(); break;
+    case "fix": startFix(); break;
+    case "fixnext": S.fix.step++; S.msg = null; render(); break;
+    case "back": go("feedback"); break;
+    case "next": afterSentence(); break;
+  }
+});
+app.addEventListener("keydown", e => { if (e.target.id === "newname" && e.key === "Enter") { e.preventDefault(); addStudent(); } });
+document.addEventListener("keydown", e => {
+  if (e.target.closest && e.target.closest("input,textarea") || e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+  const k = e.key.toLowerCase(), canSpeak = S.screen === "practice" || (S.screen === "fix" && S.fix.step >= 3);
+  if (k === " " && canSpeak) { e.preventDefault(); onMic(); }
+  else if (k === "l" && ["practice", "feedback", "fix"].includes(S.screen)) listenNow(false);
+  else if (k === "s" && ["practice", "fix"].includes(S.screen)) listenNow(true);
+  else if (k === "enter" && (document.activeElement === document.body || !document.activeElement)) { const p = app.querySelector("[data-primary]"); if (p) { e.preventDefault(); p.click(); } }
+});
+render();
+</script>
+</body>
+</html>

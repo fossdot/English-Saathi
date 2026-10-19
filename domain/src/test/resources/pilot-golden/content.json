@@ -1,0 +1,195 @@
+{
+ "generatedBy": "tools/pilot-golden/generate.mjs",
+ "pilot": "docs/pilot/english-practice-pilot.html",
+ "config": {
+  "goal": 5,
+  "xpAttempt": 10,
+  "xpStar": 5,
+  "xpFixStep": 5,
+  "twoStarRatio": 0.6,
+  "slowRate": 0.6,
+  "normalRate": 0.9,
+  "leitnerDays": [
+   1,
+   3,
+   7
+  ]
+ },
+ "lesson": {
+  "title_en": "Bus stand",
+  "title_hi": "बस स्टैंड",
+  "sentences": [
+   {
+    "id": "bus_01",
+    "text": "Where is the bus stop?",
+    "hi": "बस स्टॉप कहाँ है?",
+    "chunks": [
+     "Where is",
+     "the bus stop"
+    ]
+   },
+   {
+    "id": "bus_02",
+    "text": "When will the bus come?",
+    "hi": "बस कब आएगी?",
+    "chunks": [
+     "When will",
+     "the bus come"
+    ]
+   },
+   {
+    "id": "bus_03",
+    "text": "One ticket to Patna, please.",
+    "hi": "पटना का एक टिकट दीजिए।",
+    "chunks": [
+     "One ticket",
+     "to Patna",
+     "please"
+    ]
+   },
+   {
+    "id": "bus_04",
+    "text": "How much is the ticket?",
+    "hi": "टिकट कितने का है?",
+    "chunks": [
+     "How much",
+     "is the ticket"
+    ]
+   },
+   {
+    "id": "bus_05",
+    "text": "Does this bus go to Bettiah?",
+    "hi": "क्या यह बस बेतिया जाती है?",
+    "chunks": [
+     "Does this bus",
+     "go to Bettiah"
+    ]
+   }
+  ]
+ },
+ "words": {
+  "where": {
+   "syl": [
+    "where"
+   ],
+   "hi": "वेयर",
+   "tag": "v_w"
+  },
+  "when": {
+   "syl": [
+    "when"
+   ],
+   "hi": "वेन",
+   "tag": "v_w"
+  },
+  "will": {
+   "syl": [
+    "will"
+   ],
+   "hi": "विल",
+   "tag": "v_w"
+  },
+  "bus": {
+   "syl": [
+    "bus"
+   ],
+   "hi": "बस",
+   "tag": "short_vowel"
+  },
+  "stop": {
+   "syl": [
+    "stop"
+   ],
+   "hi": "स्टॉप",
+   "tag": "s_cluster"
+  },
+  "come": {
+   "syl": [
+    "come"
+   ],
+   "hi": "कम",
+   "tag": "short_vowel"
+  },
+  "much": {
+   "syl": [
+    "much"
+   ],
+   "hi": "मच",
+   "tag": "short_vowel"
+  },
+  "ticket": {
+   "syl": [
+    "tic",
+    "ket"
+   ],
+   "hi": "टि-केट",
+   "tag": "generic"
+  },
+  "please": {
+   "syl": [
+    "please"
+   ],
+   "hi": "प्लीज़",
+   "tag": "generic"
+  },
+  "does": {
+   "syl": [
+    "does"
+   ],
+   "hi": "डज़",
+   "tag": "generic"
+  },
+  "this": {
+   "syl": [
+    "this"
+   ],
+   "hi": "दिस",
+   "tag": "th"
+  },
+  "the": {
+   "syl": [
+    "the"
+   ],
+   "hi": "द",
+   "tag": "th"
+  },
+  "patna": {
+   "syl": [
+    "Pat",
+    "na"
+   ],
+   "hi": "पट-ना",
+   "tag": "generic",
+   "accept": [
+    "patna",
+    "patana",
+    "pattna",
+    "patnaa"
+   ]
+  },
+  "bettiah": {
+   "syl": [
+    "Bet",
+    "ti",
+    "ah"
+   ],
+   "hi": "बे-ति-या",
+   "tag": "generic",
+   "accept": [
+    "bettiah",
+    "betia",
+    "bettia",
+    "betiya",
+    "bettiya",
+    "bethia"
+   ]
+  }
+ },
+ "hints": {
+  "v_w": "“w” बोलते समय होंठ गोल कीजिए, दाँत होंठ पर न लगाइए।",
+  "th": "“th” में जीभ हल्की-सी दाँतों के बीच रखिए।",
+  "s_cluster": "“स्ट” सीधे बोलिए, आगे “इ” मत जोड़िए (“इस्टॉप” नहीं)।",
+  "short_vowel": "इस शब्द को छोटा और जल्दी बोलिए।",
+  "generic": "फिर से सुनिए और धीरे-धीरे बोलिए।"
+ }
+}
