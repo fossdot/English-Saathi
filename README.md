@@ -18,6 +18,8 @@ milestones. This README will grow into the full one at the end of v0.1.
 | `docs/later.md` | Ideas kept out of v0.1 |
 | `design/` | Screen designs (one HTML file with all six screens) |
 | `tools/pilot-golden/` | Records the pilot's behaviour as golden test cases for the Kotlin port |
+| `tools/asr-compare/` | Compares on-device speech models on the lesson sentences; builds the quantized Whisper decoder |
+| `docs/asr-model-comparison.md` | Which speech model the app uses, and why |
 
 ## Running the tests
 

@@ -1,0 +1,8 @@
+# Python 3.12. The quantized decoder checksums in fetch_models.py depend on the onnx and numpy versions.
+sherpa-onnx==1.13.8
+sherpa-onnx-core==1.13.8
+onnx==1.23.2
+onnxruntime==1.31.0
+numpy==2.5.4
+scipy==1.18.1
+soundfile==0.14.0

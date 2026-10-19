@@ -14,3 +14,8 @@ local.properties
 
 # Tool output (browser automation scratch)
 .playwright-mcp/
+
+# Speech model comparison: virtualenv, models, generated audio, results
+tools/asr-compare/.venv/
+tools/asr-compare/work/
+__pycache__/

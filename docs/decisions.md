@@ -22,6 +22,10 @@ the gaps between the spec, the design mockup (`design/`) and the web pilot
   Moonshine tiny) and a fully quantized Whisper decoder against Whisper
   tiny.en on the 5 bus-stand sentences. Report size, latency and accuracy side
   by side. Keep Whisper tiny.en unless something beats it.
+  - Done: see `docs/asr-model-comparison.md`. Whisper tiny.en with a fully
+    quantized decoder won under this rule. It is 44.3 MB instead of 103.6 MB,
+    with the same accuracy, so it is bundled in the app's assets (under the
+    spec's ~80 MB limit) instead of a Play Asset Delivery pack.
 - **Testing:** minSdk 26 must be tested (Android 26 emulator image approved).
 
 ## Build stack
@@ -32,8 +36,9 @@ the gaps between the spec, the design mockup (`design/`) and the web pilot
   - navigation-compose 2.9.8
   - lifecycle 2.10.0
   - core-ktx 1.18.0
-- Gradle 9.7.1, Kotlin 2.4.21, JDK 17. Android Gradle Plugin version to be
-  confirmed in milestone b.
+- Gradle 9.7.1, Kotlin 2.4.21, JDK 17, Android Gradle Plugin 9.3.3 (chosen
+  in milestone b). AGP 9.3 is the newest line Kotlin 2.4.21 lists as fully
+  supported. It needs Gradle 9.5 or later and supports up to API 37.
 - `:domain` is a plain Kotlin/JVM module, so it cannot import Android classes.
   Tests use JUnit 4.13.2.
 - No per-token confidence from sherpa-onnx Whisper, so the UNCLEAR label is
@@ -88,6 +93,17 @@ anyway.
 - **Missing word entries.** The pilot has no data for is, one, to, how and go,
   so their tip is generic and has no Hindi sound hint. The spec says to fill
   words for each sentence.
+- **Place names the model can't hear** (`docs/asr-model-comparison.md`).
+  - Whisper got "Patna" right in only 7–9 of 54 test clips, and "Bettiah" in
+    none. It mostly heard "Patna" as two words ("but now"), which a one-word
+    `accept` list cannot match.
+  - Options:
+    - single-word accept entries (partner, padna, betia, …);
+    - multi-word alternates (`docs/later.md`);
+    - not scoring place names;
+    - sentences without them.
+- **"to" heard as "two".** Whisper writes "to" as the digit 2 in "1 ticket 2
+  Patna", so "two" and "too" may belong in the `accept` list for "to".
 
 ## Open questions: wrong phone dates
 
