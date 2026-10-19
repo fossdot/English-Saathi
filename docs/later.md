@@ -49,9 +49,6 @@ Out of scope for v0.1. Collected here so they are not lost.
 - **Contractions.** "Where's the bus stop?" is marked wrong against "Where is
   the bus stop?". We could accept common contractions as equal to their
   expanded forms.
-- **Lesson-level word table.** Accept lists and hints are per sentence (spec
-  format). Words that recur across sentences (bus, the, ticket) need their
-  data repeated; a lesson-level table would remove the duplication.
 - **Words removed from the content.** Leitner entries are keyed by word. If
   a lesson edit removes a word, its entry stays in the box. Sentence choice
   already ignores such words, but they would still show in "Practise again

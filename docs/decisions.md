@@ -122,14 +122,41 @@ consequences are under "Domain rules" below, marked "not yet implemented".
   supply Whisper test clips. The owner will record a few students separately,
   with notes on what they said, and send them for `tools/asr-compare` (its
   README gives the manifest format).
+- **Word data scope:** one shared word list per lesson file, keyed by the
+  normalized word, like the pilot's `WORDS` table. Sentences reference words
+  by their text; there are no per-sentence word entries. A sentence may
+  override a word only to set `"score": false`.
+  - The lesson file (this replaces the spec's per-sentence `words`):
+
+    ```json
+    {
+      "id": "bus_stand",
+      "title_en": "Bus stand", "title_hi": "बस स्टैंड",
+      "words": {
+        "bus":   { "syllables": ["bus"], "hint_hi": "बस", "hint_tag": "short_vowel" },
+        "patna": { "syllables": ["Pat", "na"], "hint_hi": "पट-ना", "hint_tag": "generic", "score": false }
+      },
+      "sentences": [
+        {
+          "id": "bus_03",
+          "text": "One ticket to Patna, please.", "hi": "पटना का एक टिकट दीजिए।",
+          "chunks": ["One ticket", "to Patna", "please"], "picture": null
+        }
+      ]
+    }
+    ```
+
+    A sentence that must not score a word which is scored elsewhere lists it:
+    `"unscored": ["word"]` (proposed name). The override can only turn scoring
+    off. Field names stay the spec's: `syllables`, `hint_hi`, `hint_tag`,
+    `accept`, `score`.
+  - Domain (not yet implemented): the word table moves from `Sentence` to
+    `Lesson`, and a sentence keeps only its `unscored` list. A word is unscored
+    in a sentence when its entry says so or the sentence overrides it. A word
+    with no entry behaves as in the pilot: generic tip, no sound hint.
 
 ### Still open
 
-- **Word data scope.** The pilot has one word table for the whole lesson; the
-  spec puts word data inside each sentence. Default if it stays unanswered:
-  the spec's per-sentence format, with the data of repeated words (bus, the,
-  ticket) copied into each sentence. A lesson-level table stays in
-  `docs/later.md`.
 - **App name and package ID:** the owner will send them separately.
 
 ## Open questions: wrong phone dates
@@ -215,7 +242,9 @@ change.
 
   The loader should also flag:
   - accept entries that aren't one word (they are ignored);
-  - word keys not found in their sentence;
+  - a word entry that no sentence uses, and a sentence word with no entry
+    (allowed, but then the tip is generic with no sound hint);
+  - an `unscored` override naming a word not in its sentence;
   - a daily goal larger than the number of unlocked sentences, which makes
     the goal unreachable;
   - a sentence whose words are all unscored (nothing could be scored);
@@ -286,9 +315,9 @@ cases are re-recorded.
 
 ### Unscored words
 
-Decided after milestone b; not yet implemented. A word entry with
-`"score": false` (Patna, Bettiah) is one the recognizer can't be expected to
-hear.
+Decided after milestone b; not yet implemented. A word is unscored when its
+lesson entry says `"score": false` (Patna, Bettiah) or when the sentence lists
+it as `unscored`: a word the recognizer can't be expected to hear.
 
 - It stays in the alignment, so the words around it line up as before, but
   its status is not used: it is left out of the correct/total count and the
