@@ -124,6 +124,10 @@ words (exact sign test).
 
 ## Findings that affect the lesson content (milestone c)
 
+Decided after milestone b (`docs/decisions.md`, "Content decisions for
+milestone c"): place names are not scored, and to/two/too, for/four and
+one/won count as the same word.
+
 - **Place names.** Every model mostly failed on them. These will need the
   owner's decision before `bus_stand.json` is written.
   - **Patna** was right in only 7–9 of 54 clips with Whisper (3–4 with

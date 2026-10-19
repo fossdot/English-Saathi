@@ -1,17 +1,25 @@
 # v0.1 decisions
 
-Agreed with the product owner on 2026-10-19, before milestone a. These settle
-the gaps between the spec, the design mockup (`design/`) and the web pilot
+Agreed with the product owner on 2026-10-19: before milestone a, and again
+after milestone b ("Content decisions for milestone c"). These settle the
+gaps between the spec, the design mockup (`design/`) and the web pilot
 (`docs/pilot/english-practice-pilot.html`).
+
+**Status:** milestone c is on hold until this week's student pilots finish;
+their results may change the practice and feedback screens.
 
 ## Owner answers
 
 - **Profiles:** each learner picks a colour and one of about 8 drawn symbols.
   The name is recorded as audio (no typing); tapping the card plays it.
-- **App name and package ID:** not decided yet. Milestone a uses the
-  temporary Kotlin package `englishbolo.domain`, to be renamed in milestone b.
+- **App name and package ID:** still pending after milestone b; the owner
+  will send them separately. Until then the Kotlin packages are
+  `englishbolo.domain` and `englishbolo.app`.
 - **Place names:** lesson words get an optional `accept` list of alternate
   spellings. Fill it in after testing what Whisper actually hears.
+  - Changed after milestone b: place names are not scored at all, and have
+    no `accept` lists (see "Content decisions for milestone c"). The
+    `accept` mechanism stays for other words; nothing uses it yet.
 - **"To be checked by an English teacher" note:** shown in test builds only.
 - **Recordings:** keep only the latest recording per sentence per learner;
   delete older ones.
@@ -74,36 +82,55 @@ the gaps between the spec, the design mockup (`design/`) and the web pilot
 - **Content review:** lesson word data and Hindi instruction lines are drafted
   by us and marked for teacher review.
 
-## Open questions for milestone c (content)
+## Content decisions for milestone c
 
-The pilot and the spec also differ in their seed content. This doesn't affect
-the domain rules, so the owner will decide when bus_stand.json and
-hints.json are written. The pilot trials this week may change the content
-anyway.
+Answered by the owner on 2026-10-19, after milestone b. None of it is
+implemented yet: milestone c is on hold (see Status above). The domain
+consequences are under "Domain rules" below, marked "not yet implemented".
 
-- **Hint wording.** The pilot rewrote v_w, th and s_cluster in the polite
-  form, with bus-stand examples. It has no z_j. The spec's seed uses
-  "water", "think" and "school" examples.
-- **Accept lists.** The pilot ships guessed spellings for Patna and Bettiah,
-  taken from Chrome's recognizer. The owner said to fill them in after testing
-  Whisper. The domain tests use the pilot's lists as fixtures only.
+- **Place names are not scored.** A word entry gets an optional
+  `"score": false` flag in the lesson JSON, set for Patna and Bettiah. Such a
+  word:
+  - shows as a neutral chip: no check, no retry icon;
+  - is left out of the "n of m words correct" count and the stars;
+  - has no `accept` list. The guessed spellings the pilot shipped for Patna
+    and Bettiah are removed.
+
+  Background: Whisper got "Patna" right in only 7–9 of 54 test clips and
+  "Bettiah" in none (`docs/asr-model-comparison.md`), mostly hearing "Patna"
+  as two words ("but now"), which a one-word `accept` list cannot match.
+- **Homophones.** Whisper writes "to" as the digit 2 ("1 ticket 2 Patna").
+  Rather than an `accept` entry on "to", a general rule applied after number
+  normalization treats these as the same word: to/two/too, for/four, one/won.
+  The list lives in one place so it can grow after testing.
+- **Hint wording:** the pilot's templates, not the spec's. They work for any
+  word with that sound. All stay `"reviewed": false`. The pilot's five, as
+  in `docs/pilot`:
+  - `v_w`: “w” बोलते समय होंठ गोल कीजिए, दाँत होंठ पर न लगाइए।
+  - `th`: “th” में जीभ हल्की-सी दाँतों के बीच रखिए।
+  - `s_cluster`: “स्ट” सीधे बोलिए, आगे “इ” मत जोड़िए (“इस्टॉप” नहीं)।
+  - `short_vowel`: इस शब्द को छोटा और जल्दी बोलिए।
+  - `generic`: फिर से सुनिए और धीरे-धीरे बोलिए।
+
+  The pilot has no `z_j`, so the spec's `z_j` seed is not used. Default for
+  the drafted entries below: they use only these five tags. A z/j tip (for
+  "is", "does", "please") would be added only if a teacher review asks for
+  one.
+- **Missing word entries** (is, one, to, how, go): drafted by us, with
+  syllables, a Hindi sound hint and a tag, all marked `"reviewed": false`.
+- **Real learner recordings.** The web pilot doesn't save audio, so it can't
+  supply Whisper test clips. The owner will record a few students separately,
+  with notes on what they said, and send them for `tools/asr-compare` (its
+  README gives the manifest format).
+
+### Still open
+
 - **Word data scope.** The pilot has one word table for the whole lesson; the
-  spec puts word data inside each sentence. Decide whether entries apply
-  lesson-wide.
-- **Missing word entries.** The pilot has no data for is, one, to, how and go,
-  so their tip is generic and has no Hindi sound hint. The spec says to fill
-  words for each sentence.
-- **Place names the model can't hear** (`docs/asr-model-comparison.md`).
-  - Whisper got "Patna" right in only 7–9 of 54 test clips, and "Bettiah" in
-    none. It mostly heard "Patna" as two words ("but now"), which a one-word
-    `accept` list cannot match.
-  - Options:
-    - single-word accept entries (partner, padna, betia, …);
-    - multi-word alternates (`docs/later.md`);
-    - not scoring place names;
-    - sentences without them.
-- **"to" heard as "two".** Whisper writes "to" as the digit 2 in "1 ticket 2
-  Patna", so "two" and "too" may belong in the `accept` list for "to".
+  spec puts word data inside each sentence. Default if it stays unanswered:
+  the spec's per-sentence format, with the data of repeated words (bus, the,
+  ticket) copied into each sentence. A lesson-level table stays in
+  `docs/later.md`.
+- **App name and package ID:** the owner will send them separately.
 
 ## Open questions: wrong phone dates
 
@@ -190,7 +217,9 @@ change.
   - accept entries that aren't one word (they are ignored);
   - word keys not found in their sentence;
   - a daily goal larger than the number of unlocked sentences, which makes
-    the goal unreachable.
+    the goal unreachable;
+  - a sentence whose words are all unscored (nothing could be scored);
+  - an `accept` list on an unscored word (it would have no effect).
 - **Keep the Leitner box order in storage.** "Practise again tomorrow" lists
   words in the order they entered the box, as the pilot does. A word table
   read back by key loses that order, so it needs an order column (or the
@@ -201,6 +230,11 @@ change.
 Decided by the owner on 2026-10-19. Everything not listed here behaves exactly
 like the pilot. That is checked by `PilotGoldenTest`, using cases recorded from
 the pilot's own code (see `tools/pilot-golden/`).
+
+Two rules were decided after milestone b and are **not yet implemented**:
+"Homophones" and "Unscored words". When they are built, the overlay in
+`tools/pilot-golden/agreed-changes.mjs` gets the same rules and the golden
+cases are re-recorded.
 
 ### Text matching
 
@@ -236,6 +270,37 @@ the pilot's own code (see `tools/pilot-golden/`).
   count ("0000000001" → "one").
 - **Hint tag without a template:** gets the generic tip. The pilot showed
   "undefined".
+- **Homophones** (not yet implemented). Two normalized words match when they
+  are equal, when they are in the same homophone group, or when the heard
+  word is in the target word's `accept` list. The groups: to/two/too,
+  for/four, one/won. One table in the domain module holds them.
+  - "After number normalization": the digits are spelled out first, so "2"
+    becomes "two" and then matches "to"; "4" matches "for".
+  - The rule is symmetric: a lesson's "two tickets" is also matched by "to
+    tickets". That is accepted; the sounds are the same.
+  - It lives in the comparison, not the normalizer, so words keep their
+    written form everywhere else: chips, the word to fix, and the Leitner
+    box keys.
+  - It applies wherever words are compared: sentence attempts and fixing-loop
+    steps 3–5.
+
+### Unscored words
+
+Decided after milestone b; not yet implemented. A word entry with
+`"score": false` (Patna, Bettiah) is one the recognizer can't be expected to
+hear.
+
+- It stays in the alignment, so the words around it line up as before, but
+  its status is not used: it is left out of the correct/total count and the
+  stars. "All words correct" (3 stars) means all scored words.
+- It shows as a neutral chip: no check, no retry icon.
+- Consequences the owner has not been asked about yet; the defaults below
+  apply unless told otherwise:
+  - it is never the word to fix, so it gets no tip and no fixing loop;
+  - it never enters the Leitner box, and a step-5 pass skips it;
+  - a sentence must keep at least one scored word (a loader check).
+- The milestone-a test that passes "1 ticket to patana please" through
+  Patna's `accept` list becomes a test of the unscored flag.
 
 ### Fixing loop
 

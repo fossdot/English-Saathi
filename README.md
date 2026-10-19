@@ -9,7 +9,8 @@ and walks them through fixing them.
 - b: recording and on-device speech recognition, proven on test WAVs on the
   emulator. The app has one temporary "Speech check" screen.
 
-The practice screens come in milestones c–f. This README will grow into the
+The practice screens come in milestones c–f. Milestone c is on hold until
+the student pilots of the web version finish. This README will grow into the
 full one at the end of v0.1.
 
 ## Layout

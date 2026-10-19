@@ -11,9 +11,10 @@ Out of scope for v0.1. Collected here so they are not lost.
   (streaming transducers expose `ysProbs`). The aligner would then mark a
   CORRECT word with low confidence as UNCLEAR.
 - **Multi-word alternate spellings.** An `accept` entry is compared with one
-  heard word, so a place name heard as two words cannot be accepted. Whisper
-  usually hears "Patna" as "but now" (`docs/asr-model-comparison.md`).
-  Matching would need phrase-level alternatives in the aligner.
+  heard word, so a word heard as two words cannot be accepted. Whisper
+  usually hears "Patna" as "but now" (`docs/asr-model-comparison.md`); for
+  v0.1 the owner chose not to score place names instead. Matching would need
+  phrase-level alternatives in the aligner.
 - **End-of-speech detection with a model.** If the loudness-based detector
   stops too late or too early in noisy homes, sherpa-onnx's Silero VAD (a
   small extra model) could tell speech from noise.
