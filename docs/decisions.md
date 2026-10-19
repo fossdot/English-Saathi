@@ -122,6 +122,58 @@ phone whose date is wrong by several days. They are left as decided for now.
   - Possible fix: skip the pull-back on a date before the learner's last
     practice day.
 
+## Milestone b: recording and speech recognition
+
+Choices made while building, within the spec. Each is a setting or a small
+change.
+
+- **Model:** Whisper tiny.en with the fully quantized decoder
+  (`docs/asr-model-comparison.md`). It is bundled in the app's assets, and
+  `scripts/fetch_deps.sh` downloads and builds it; it is not kept in git.
+- **Recognizer settings:**
+  - 2 threads. On both emulators 2 threads were about 1.5× faster than 1,
+    and 4 were no faster.
+  - Tail padding 1000, greedy decoding, no prompt.
+- **Microphone:** the `VOICE_RECOGNITION` source at 16 kHz mono. Android's
+  compatibility rules require it to support that format, with noise
+  suppression and automatic gain off.
+- **End of speech:** detected from loudness, with no extra model.
+  - Audio counts as speech when it lasts 60 ms and is 12 dB above the
+    background level and above −55 dBFS.
+  - Recording stops after 1.2 s without speech once the learner has spoken,
+    or at 8 s.
+  - The 1.2 s of silence stays in the clip, as in the model comparison.
+  - The levels need checking on real phones (`docs/speech-on-device.md`).
+- **"Didn't hear you"**:
+  - When nothing counted as speech, the recognizer is not run at all.
+  - Otherwise, as decided in milestone a: the transcript has no words once
+    the non-speech tags are removed.
+- **Blocked microphone:** a recording of a second or more that is exactly
+  zero gets its own message: the microphone sends no sound, and may be
+  switched off in the phone's settings or taken by a call.
+- **The speech model is loaded once per app process** on its own thread, and
+  every recognition runs on that thread. Screens don't own it.
+- **Leaving the app stops listening.** A turned phone doesn't.
+- **Failures are shown on screen, never crash the app**, including a speech
+  library that can't load.
+- **Build checks:** the speech library and model must match
+  `scripts/deps.sha256`, the same list `fetch_deps.sh` uses. A wrong model
+  file would make sherpa-onnx end the app.
+- **Speech library:** only the ARM builds (64-bit and 32-bit) are packaged.
+- **Offline:** the manifest removes the internet permission if a library
+  adds it, and the build fails if any merged manifest contains it.
+- **No backups or phone-to-phone transfers** of app data. `allowBackup` is
+  false, and data-extraction rules exclude everything. Without those rules,
+  Android 12 and later would still copy app data to a new phone.
+- **Temporary names:**
+  - application ID and Kotlin namespace `englishbolo.app`;
+  - app label "English practice".
+
+  They change once the name is decided.
+- **Test clips from the macOS voices are not committed**, because the voices'
+  licence doesn't allow sharing recordings made with them.
+  `scripts/make_test_wavs.sh` makes them locally.
+
 ## Later milestones: carried over from the pilot review
 
 - **Tie a recording to its screen and step.** In the pilot, a transcript

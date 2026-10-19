@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Temporary: the app name is not decided yet. -->
+    <string name="app_name">English practice</string>
+</resources>

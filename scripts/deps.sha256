@@ -1,0 +1,5 @@
+b22c3fc1b6a45666d28892bb2f7694beeb77a8362d7ebd77c1a5431ec9435471  app/libs/sherpa-onnx-static-link-onnxruntime-1.13.8.aar
+0ce578b827c94a961aacb8fa14b02f096504b337e5c94be37c36238cbe3e8bc6  app/src/main/assets/asr/whisper-tiny.en/tiny.en-encoder.int8.onnx
+01f50ff8ddfcbd3659dcae4bd638c453ed95e7f479593d7ea9c65f839052db7d  app/src/main/assets/asr/whisper-tiny.en/tiny.en-decoder.int8-embedding.onnx
+306cd27f03c1a714eca7108e03d66b7dc042abe8c258b44c199a7ed9838dd930  app/src/main/assets/asr/whisper-tiny.en/tiny.en-tokens.txt
+6bc58a4efdf20daac252b6b1502632601a71efe0308f6757dc1eda34891a7e4f  app/src/androidTest/assets/asr-test/librispeech-0.wav

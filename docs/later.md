@@ -11,8 +11,24 @@ Out of scope for v0.1. Collected here so they are not lost.
   (streaming transducers expose `ysProbs`). The aligner would then mark a
   CORRECT word with low confidence as UNCLEAR.
 - **Multi-word alternate spellings.** An `accept` entry is compared with one
-  heard word, so a place name heard as two words ("betty ah") cannot be
-  accepted. Matching would need phrase-level alternatives in the aligner.
+  heard word, so a place name heard as two words cannot be accepted. Whisper
+  usually hears "Patna" as "but now" (`docs/asr-model-comparison.md`).
+  Matching would need phrase-level alternatives in the aligner.
+- **End-of-speech detection with a model.** If the loudness-based detector
+  stops too late or too early in noisy homes, sherpa-onnx's Silero VAD (a
+  small extra model) could tell speech from noise.
+- **Recording at 48 kHz as a fallback.** Android requires phones to record
+  at 16 kHz, but if a cheap phone can't, the app could record at 48 kHz and
+  let sherpa-onnx resample.
+
+## App size
+
+- **Smaller APK for sharing directly.** The single APK that works on every
+  phone is about 76 MB. It carries the speech library twice (64-bit and
+  32-bit ARM), uncompressed so that Android can load it without unpacking.
+  Separate APKs per processor type, or compressed libraries, would make it
+  much smaller to pass between phones. Play Store installs already get only
+  the library their phone needs.
 
 ## Text matching
 

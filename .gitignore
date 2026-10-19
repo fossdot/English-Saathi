@@ -19,3 +19,10 @@ local.properties
 tools/asr-compare/.venv/
 tools/asr-compare/work/
 __pycache__/
+
+# Downloaded by scripts/fetch_deps.sh (not kept in git)
+app/libs/*.aar
+app/src/main/assets/asr/
+app/src/androidTest/assets/asr-test/
+# Made by scripts/make_test_wavs.sh with the macOS voices, whose licence doesn't allow sharing them
+app/src/debug/assets/asr-test/

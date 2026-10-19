@@ -20,3 +20,6 @@ rootProject.name = "english-bolo"
 // Pure Kotlin domain logic (no Android imports): normalizer, aligner, scorer,
 // feedback selector, fixing loop, streak and Leitner rules.
 include(":domain")
+
+// The Android app: recording, speech recognition and the screens.
+include(":app")
