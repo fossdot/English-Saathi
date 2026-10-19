@@ -83,7 +83,7 @@ Use the debug build. Its "Speech check" screen shows, after every answer:
 - the memory used;
 - why the recording ended.
 
-The same numbers are logged with the tag `EnglishBolo` (`adb logcat -s EnglishBolo`).
+The same numbers are logged with the tag `EnglishSaathi` (`adb logcat -s EnglishSaathi`).
 
 1. **Phones:** a cheap 2–3 GB phone with a 64-bit ARM processor, and one
    with a 32-bit (armeabi-v7a) processor. No emulator exists for 32-bit

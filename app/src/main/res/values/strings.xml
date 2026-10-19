@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Temporary: the app name is not decided yet. -->
-    <string name="app_name">English practice</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">English Saathi</string>
+    <!-- The Hindi name, for bilingual labels inside the app from milestone e on; the launcher shows the English one. -->
+    <string name="app_name_hi" tools:ignore="UnusedResources">इंग्लिश साथी</string>
 </resources>

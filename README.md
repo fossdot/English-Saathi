@@ -1,4 +1,6 @@
-# English speaking practice (working title)
+# English Saathi (इंग्लिश साथी)
+
+Package ID `net.bodhya.speak`.
 
 Offline Android app that helps Hindi speakers in rural Bihar practise spoken
 English. A learner says a sentence; the app finds the words that went wrong
@@ -74,12 +76,12 @@ for every APK, bundle and install.
   with the agreed changes applied. To re-record them after the pilot changes,
   see `tools/pilot-golden/README.md`.
 - **On-device tests:** they recognize the LibriSpeech clip word for word and
-  log speed and memory with the tag `EnglishBoloTest`. For a clean memory
+  log speed and memory with the tag `EnglishSaathiTest`. For a clean memory
   figure, run the first test on its own:
 
   ```sh
   ./gradlew :app:connectedDebugAndroidTest \
-    -Pandroid.testInstrumentationRunnerArguments.class=englishbolo.speech.WhisperOnDeviceTest#recognizesTheLibriSpeechClipAndMeasuresTheEndToEndPipeline
+    -Pandroid.testInstrumentationRunnerArguments.class=net.bodhya.speak.speech.WhisperOnDeviceTest#recognizesTheLibriSpeechClipAndMeasuresTheEndToEndPipeline
   ```
 
 - **Microphone tests:** these are skipped on devices whose microphone can't be

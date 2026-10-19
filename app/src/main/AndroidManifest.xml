@@ -11,14 +11,14 @@
 
     <!-- Voice recordings must not leave the phone through backups or transfers. -->
     <application
-        android:name="englishbolo.EnglishBoloApp"
+        android:name="net.bodhya.speak.EnglishSaathiApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
-            android:name="englishbolo.ui.MainActivity"
+            android:name="net.bodhya.speak.ui.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>

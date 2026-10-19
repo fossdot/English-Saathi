@@ -12,9 +12,20 @@ their results may change the practice and feedback screens.
 
 - **Profiles:** each learner picks a colour and one of about 8 drawn symbols.
   The name is recorded as audio (no typing); tapping the card plays it.
-- **App name and package ID:** still pending after milestone b; the owner
-  will send them separately. Until then the Kotlin packages are
-  `englishbolo.domain` and `englishbolo.app`.
+- **App name and package ID** (decided 2026-10-19, after milestone b): the
+  app is **English Saathi** (Hindi: इंग्लिश साथी) and the package ID is
+  **`net.bodhya.speak`**. The display name can change later; the package ID
+  cannot, so check it everywhere before any Play upload:
+  - `app/build.gradle.kts`: `applicationId` and `namespace`;
+  - the built APK (`aapt dump badging`) and the bundle must show
+    `package: name='net.bodhya.speak'`;
+  - Kotlin packages `net.bodhya.speak.domain`, `.speech` and `.ui`, and the
+    Application class `net.bodhya.speak.EnglishSaathiApp`;
+  - Gradle root project `english-saathi`; log tags `EnglishSaathi` and
+    `EnglishSaathiTest`.
+  - Release builds are not signed yet: a Play upload also needs a signing key.
+  - There is no launcher icon yet (Play rejects an upload without one); it
+    comes with the artwork in milestone f.
 - **Place names:** lesson words get an optional `accept` list of alternate
   spellings. Fill it in after testing what Whisper actually hears.
   - Changed after milestone b: place names are not scored at all, and have
@@ -155,10 +166,6 @@ consequences are under "Domain rules" below, marked "not yet implemented".
     in a sentence when its entry says so or the sentence overrides it. A word
     with no entry behaves as in the pilot: generic tip, no sound hint.
 
-### Still open
-
-- **App name and package ID:** the owner will send them separately.
-
 ## Open questions: wrong phone dates
 
 The reviewers found two corners of the agreed wrong-date rules. Both need a
@@ -219,11 +226,8 @@ change.
 - **No backups or phone-to-phone transfers** of app data. `allowBackup` is
   false, and data-extraction rules exclude everything. Without those rules,
   Android 12 and later would still copy app data to a new phone.
-- **Temporary names:**
-  - application ID and Kotlin namespace `englishbolo.app`;
-  - app label "English practice".
-
-  They change once the name is decided.
+- **Names:** application ID `net.bodhya.speak`, Kotlin packages under
+  `net.bodhya.speak`, app label "English Saathi" (see "Owner answers").
 - **Test clips from the macOS voices are not committed**, because the voices'
   licence doesn't allow sharing recordings made with them.
   `scripts/make_test_wavs.sh` makes them locally.

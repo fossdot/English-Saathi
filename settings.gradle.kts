@@ -14,8 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-// Temporary name: the app name and package ID are still to be decided.
-rootProject.name = "english-bolo"
+rootProject.name = "english-saathi"
 
 // Pure Kotlin domain logic (no Android imports): normalizer, aligner, scorer,
 // feedback selector, fixing loop, streak and Leitner rules.

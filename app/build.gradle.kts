@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    // Temporary namespace and application ID: the app name and package ID are not decided yet.
-    namespace = "englishbolo.app"
+    // The package ID. It can never change once the app is on Google Play.
+    namespace = "net.bodhya.speak"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "englishbolo.app"
+        applicationId = "net.bodhya.speak"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
