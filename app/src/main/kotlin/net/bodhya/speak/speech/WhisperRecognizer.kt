@@ -7,23 +7,6 @@ import com.k2fsa.sherpa.onnx.OfflineRecognizer
 import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
 import com.k2fsa.sherpa.onnx.OfflineWhisperModelConfig
 
-/** Recognizer settings; the measurements behind them are in docs/asr-model-comparison.md. */
-data class AsrSettings(
-    val numThreads: Int = 2,
-    /**
-     * Silent 10 ms frames sherpa-onnx adds after the audio so Whisper finds
-     * the end of the sentence. 1000 was as accurate as the official model;
-     * 300 is faster with no significant loss.
-     */
-    val tailPaddings: Int = 1000,
-) {
-    init {
-        require(numThreads >= 1)
-        // sherpa-onnx silently turns 0 or less into 1000.
-        require(tailPaddings > 0)
-    }
-}
-
 /**
  * Whisper tiny.en through sherpa-onnx 1.13.8, with the decoder whose token
  * embedding is quantized too (docs/asr-model-comparison.md).

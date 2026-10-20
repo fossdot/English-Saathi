@@ -20,5 +20,10 @@ rootProject.name = "english-saathi"
 // feedback selector, fixing loop, streak and Leitner rules.
 include(":domain")
 
+// Speech code that doesn't depend on Android: recording, end-of-speech
+// detection, the speech engine and its settings. Shared by the Android and
+// desktop apps.
+include(":speech")
+
 // The Android app: recording, speech recognition and the screens.
 include(":app")

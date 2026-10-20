@@ -20,7 +20,8 @@ full one at the end of v0.1.
 | Path | What |
 |---|---|
 | `domain/` | Pure Kotlin rules, with no Android imports: normalizer, aligner, scoring, tip selection, fixing loop, streak, Leitner box, sentence choice |
-| `app/` | The Android app. `speech/` holds recording, end-of-speech detection and the Whisper recognizer; `ui/` holds the screens |
+| `speech/` | Speech code shared by the Android and desktop apps, with no Android imports: recording, end-of-speech detection, the speech engine |
+| `app/` | The Android app. `speech/` holds the microphone and the Whisper recognizer; `ui/` holds the screens |
 | `scripts/` | `fetch_deps.sh` downloads the speech library and model; `make_test_wavs.sh` makes test clips (macOS) |
 | `docs/decisions.md` | Everything agreed with the product owner, including where the Kotlin rules deliberately differ from the pilot |
 | `docs/asr-model-comparison.md` | Which speech model the app uses, and why |
@@ -66,7 +67,8 @@ for every APK, bundle and install.
 
 ```sh
 ./gradlew :domain:test                  # domain rules, including the pilot golden cases
-./gradlew :app:testDebugUnitTest        # recording, end of speech, speech engine, answer check (JVM)
+./gradlew :speech:test                  # recording, end of speech, speech engine
+./gradlew :app:testDebugUnitTest        # answer check, memory figures (JVM)
 ./gradlew :app:connectedDebugAndroidTest  # on a running emulator or phone
 ./gradlew check                         # unit tests, lint and the offline check
 ```

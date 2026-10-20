@@ -37,6 +37,7 @@ kotlin {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":speech"))
     // sherpa-onnx has no Maven package; scripts/fetch_deps.sh downloads the release file.
     implementation(files("libs/sherpa-onnx-static-link-onnxruntime-1.13.8.aar"))
     implementation(libs.androidx.core.ktx)
