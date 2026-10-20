@@ -82,19 +82,39 @@ function overlay() {
   /** Words of recognizer output: tags removed, then the one normalizer. [] means "Didn't hear you". */
   const agreedHeard = text => agreedNormalize(stripTags(text));
 
-  /** Accept entries are normalized too; only entries that normalize to one word count. */
+  // ---------- Content decisions for milestone c ----------
+  // Place names are not scored, and the guessed spellings the pilot shipped for them are removed.
+  for (const w of ["patna", "bettiah"]) { delete WORDS[w].accept; WORDS[w].score = false; }
+
+  /** Homophones: words in one group match each other (after number normalization, so "2" matches "to"). */
+  const HOMOPHONES = [["to", "two", "too"], ["for", "four"], ["one", "won"]];
+  const agreedHomophones = (a, b) => a !== b && HOMOPHONES.some(g => g.includes(a) && g.includes(b));
+
+  /** Equal, homophones, or in the target word's accept list (normalized; only one-word entries count). */
   globalThis.same = function (t, h) {
-    if (t === h) return true;
+    if (t === h || agreedHomophones(t, h)) return true;
     const acc = (WORDS[t] && WORDS[t].accept) || [];
     return acc.some(e => { const n = agreedNormalize(e); return n.length === 1 && n[0] === h; });
+  };
+
+  // ---------- Unscored words ----------
+  /** A word is unscored when its entry says score: false or the sentence lists it as unscored. */
+  const agreedUnscored = (s, w) => (WORDS[w] && WORDS[w].score === false) || (s.unscored || []).includes(w);
+  /** Marks each result of an alignment against sentence [s]: unscored words stay aligned but don't count. */
+  function markScored(s, res) { for (const r of res) r.scored = !agreedUnscored(s, r.word); return res; }
+  /** Stars over scored words only; nothing to score counts as all correct. */
+  globalThis.score = function (res) {
+    const scored = res.filter(r => r.scored !== false), c = scored.filter(r => r.status === "ok").length, n = scored.length;
+    return { c, n, stars: c === n ? 3 : c / n >= CONFIG.twoStarRatio ? 2 : 1 };
   };
 
   // ---------- Word to fix: first WRONG word, else first MISSING word ----------
   function agreedWordToFix() {
     const r = S.result;
     if (!r) return null;
-    let i = r.res.findIndex(x => x.status === "wrong");
-    if (i < 0) i = r.res.findIndex(x => x.status === "missing");
+    // Unscored words are never the word to fix.
+    let i = r.res.findIndex(x => x.scored !== false && x.status === "wrong");
+    if (i < 0) i = r.res.findIndex(x => x.scored !== false && x.status === "missing");
     return i < 0 ? null : { word: r.res[i].word, index: i };
   }
   globalThis.firstWrong = function () { const w = agreedWordToFix(); return w ? w.word : null; };
@@ -151,7 +171,8 @@ function overlay() {
     if (n) { stats.pullBacks += n; save(); }
     return n;
   }
-  globalThis.updateRevision = function (results) { agreedPullBack(); pilot.updateRevision(results); };
+  /** Unscored words never enter the box. */
+  globalThis.updateRevision = function (results) { agreedPullBack(); pilot.updateRevision(results.filter(r => r.scored !== false)); };
   /** A due date as read today: pulled back if further ahead than its box's interval (nothing stored). */
   const dueAsOfToday = e => { const max = latestDue(e); return e.due > max ? max : e.due; };
   /** Words due today or earlier, reading through the pull-back without storing it. */
@@ -200,7 +221,9 @@ function overlay() {
   globalThis.handleAttempt = function (heard) {
     const s = sent(), H = agreedHeard(heard);
     if (!H.length) return { nothingHeard: true };
-    const a = align(agreedNormalize(s.text), H), sc = score(a.res), xp = CONFIG.xpAttempt + CONFIG.xpStar * sc.stars;
+    const a = align(agreedNormalize(s.text), H);
+    markScored(s, a.res);
+    const sc = score(a.res), xp = CONFIG.xpAttempt + CONFIG.xpStar * sc.stars;
     addXP(xp); markDone(s.id, sc.stars); updateRevision(a.res); logAttempt("sentence", s.text, heard, sc);
     S.result = Object.assign({ res: a.res, extra: a.extra, heard, xp }, sc);
     go("feedback");
@@ -256,7 +279,7 @@ function overlay() {
     logAttempt("fix step " + f.step, target, heard, { c: sc.c, n: sc.n });
     if (ok) {
       addXP(CONFIG.xpFixStep);
-      if (f.step === 5) { updateRevision(a.res); afterSentence(); return { nothingHeard: false, passed: true }; }
+      if (f.step === 5) { updateRevision(markScored(sent(), a.res)); afterSentence(); return { nothingHeard: false, passed: true }; }
       f.step++; f.fails = 0;
     } else {
       f.fails++;
@@ -270,11 +293,11 @@ function overlay() {
   // assumes one target word per whitespace token, which the one normalizer changes.
   globalThis.render = function () {};
 
-  const added = { agreedNormalize, agreedHeard, agreedHasTag, agreedWordToFix, agreedPullBack, agreedDueWords,
+  const added = { agreedNormalize, agreedHeard, agreedHasTag, agreedHomophones, agreedUnscored, agreedWordToFix, agreedPullBack, agreedDueWords,
     agreedTomorrow, agreedTomorrowView, agreedStats: stats, openApp, streakView, startIndex };
   Object.assign(globalThis, added);
   const replaced = {};
-  for (const name of ["same", "firstWrong", "markDone", "updateRevision", "nextIndex", "afterSentence",
+  for (const name of ["same", "score", "firstWrong", "markDone", "updateRevision", "nextIndex", "afterSentence",
     "handleAttempt", "startFix", "handleFix", "render"]) replaced[name] = globalThis[name];
   return Object.assign(added, replaced);
 }

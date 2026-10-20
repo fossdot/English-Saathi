@@ -160,12 +160,7 @@
    ],
    "hi": "पट-ना",
    "tag": "generic",
-   "accept": [
-    "patna",
-    "patana",
-    "pattna",
-    "patnaa"
-   ]
+   "score": false
   },
   "bettiah": {
    "syl": [
@@ -175,14 +170,7 @@
    ],
    "hi": "बे-ति-या",
    "tag": "generic",
-   "accept": [
-    "bettiah",
-    "betia",
-    "bettia",
-    "betiya",
-    "bettiya",
-    "bethia"
-   ]
+   "score": false
   }
  },
  "hints": {

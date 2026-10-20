@@ -1,15 +1,16 @@
 package net.bodhya.speak.domain
 
-/** Stars for one attempt: [correct] of [total] target words were right. */
+/** Stars for one attempt: [correct] of [total] scored target words were right. */
 data class Score(val correct: Int, val total: Int, val stars: Int)
 
 /** Stars and XP, as in the pilot's `score()` and `handleAttempt()`. */
 object Scorer {
 
     /**
-     * 3 stars when every target word is correct, 2 when at least
-     * [GameConfig.twoStarRatio] of them are, otherwise 1. Extra words never
-     * cost stars. An empty target counts as all correct.
+     * 3 stars when every scored target word is correct, 2 when at least
+     * [GameConfig.twoStarRatio] of them are, otherwise 1. Unscored words and
+     * extra words never cost stars. A target with nothing to score counts as
+     * all correct.
      */
     fun score(alignment: Alignment, config: GameConfig): Score {
         val correct = alignment.correctCount

@@ -175,9 +175,10 @@ Answers to the desktop plan's questions (`docs/desktop-plan.md`).
 
 ## Content decisions for milestone c
 
-Answered by the owner on 2026-10-19, after milestone b. None of it is
-implemented yet: milestone c is on hold (see Status above). The domain
-consequences are under "Domain rules" below, marked "not yet implemented".
+Answered by the owner on 2026-10-19, after milestone b. Built in desktop
+milestone D4 (2026-10-20): the domain rules are under "Domain rules" below,
+the lesson file is `content/bus_stand.json` (with `content/hints.json`), and
+the desktop app's loader (`LessonLoader`) reads it with the load checks.
 
 - **Place names are not scored.** A word entry gets an optional
   `"score": false` flag in the lesson JSON, set for Patna and Bettiah. Such a
@@ -241,7 +242,7 @@ consequences are under "Domain rules" below, marked "not yet implemented".
     `"unscored": ["word"]` (proposed name). The override can only turn scoring
     off. Field names stay the spec's: `syllables`, `hint_hi`, `hint_tag`,
     `accept`, `score`.
-  - Domain (not yet implemented): the word table moves from `Sentence` to
+  - Domain (built in D4): the word table moved from `Sentence` to
     `Lesson`, and a sentence keeps only its `unscored` list. A word is unscored
     in a sentence when its entry says so or the sentence overrides it. A word
     with no entry behaves as in the pilot: generic tip, no sound hint.
@@ -319,7 +320,9 @@ change.
   whatever was on screen by then.
 - **Show the fix word as written.** The tip, the Fix button and the big word
   should show "Patna", not the normalized "patna".
-- **Check content when it is loaded.** The domain already rejects:
+- **Check content when it is loaded.** Built in D4 (`LessonLoader`, in the
+  desktop app): the domain's rejections and a sentence with no scored word
+  are errors; the rest are warnings. The domain already rejects:
   - a lesson without sentences, or with repeated sentence ids;
   - a sentence without English words;
   - word keys that aren't normalized words.
@@ -344,10 +347,11 @@ Decided by the owner on 2026-10-19. Everything not listed here behaves exactly
 like the pilot. That is checked by `PilotGoldenTest`, using cases recorded from
 the pilot's own code (see `tools/pilot-golden/`).
 
-Two rules were decided after milestone b and are **not yet implemented**:
-"Homophones" and "Unscored words". When they are built, the overlay in
-`tools/pilot-golden/agreed-changes.mjs` gets the same rules and the golden
-cases are re-recorded.
+Two rules were decided after milestone b and built in desktop milestone D4
+(2026-10-20): "Homophones" and "Unscored words". The overlay in
+`tools/pilot-golden/agreed-changes.mjs` has the same rules, with the content
+change (Patna and Bettiah unscored, their accept lists removed), and the
+golden cases were re-recorded.
 
 ### Text matching
 
@@ -383,7 +387,7 @@ cases are re-recorded.
   count ("0000000001" → "one").
 - **Hint tag without a template:** gets the generic tip. The pilot showed
   "undefined".
-- **Homophones** (not yet implemented). Two normalized words match when they
+- **Homophones** (built in D4: `Homophones`). Two normalized words match when they
   are equal, when they are in the same homophone group, or when the heard
   word is in the target word's `accept` list. The groups: to/two/too,
   for/four, one/won. One table in the domain module holds them.
@@ -399,7 +403,7 @@ cases are re-recorded.
 
 ### Unscored words
 
-Decided after milestone b; not yet implemented. A word is unscored when its
+Decided after milestone b; built in D4. A word is unscored when its
 lesson entry says `"score": false` (Patna, Bettiah) or when the sentence lists
 it as `unscored`: a word the recognizer can't be expected to hear.
 
@@ -413,7 +417,10 @@ it as `unscored`: a word the recognizer can't be expected to hear.
   - it never enters the Leitner box, and a step-5 pass skips it;
   - a sentence must keep at least one scored word (a loader check).
 - The milestone-a test that passes "1 ticket to patana please" through
-  Patna's `accept` list becomes a test of the unscored flag.
+  Patna's `accept` list became a test of the unscored flag.
+- A consequence seen in the re-recorded cases: a place name said right no
+  longer counts either, so stars can drop. "one tickets to patna" was 3 of 5
+  words (2 stars) and is now 2 of 4 (1 star, below the 0.6 needed for 2).
 
 ### Fixing loop
 

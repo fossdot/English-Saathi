@@ -1,6 +1,11 @@
 package net.bodhya.speak.domain
 
-/** The pilot's Bus stand sentences and word data, as test fixtures. */
+/**
+ * The pilot's Bus stand sentences and word data, as test fixtures, with the
+ * content decisions for milestone c: the place names are not scored and have
+ * no accept lists. (The real lesson file, with drafted entries for more
+ * words, is content/bus_stand.json.)
+ */
 object BusStand {
 
     private val words = mapOf(
@@ -16,17 +21,12 @@ object BusStand {
         "does" to WordInfo(listOf("does"), "डज़", "generic"),
         "this" to WordInfo(listOf("this"), "दिस", "th"),
         "the" to WordInfo(listOf("the"), "द", "th"),
-        "patna" to WordInfo(listOf("Pat", "na"), "पट-ना", "generic", listOf("patna", "patana", "pattna", "patnaa")),
-        "bettiah" to WordInfo(
-            listOf("Bet", "ti", "ah"), "बे-ति-या", "generic",
-            listOf("bettiah", "betia", "bettia", "betiya", "bettiya", "bethia"),
-        ),
+        "patna" to WordInfo(listOf("Pat", "na"), "पट-ना", "generic", score = false),
+        "bettiah" to WordInfo(listOf("Bet", "ti", "ah"), "बे-ति-या", "generic", score = false),
     )
 
-    private fun sentence(id: String, text: String, hi: String, vararg chunks: String) = Sentence(
-        id = id, text = text, hi = hi, chunks = chunks.toList(),
-        words = words.filterKeys { it in Normalizer.normalizeHeard(text) },
-    )
+    private fun sentence(id: String, text: String, hi: String, vararg chunks: String) =
+        Sentence(id = id, text = text, hi = hi, chunks = chunks.toList())
 
     val whereIsTheBusStop = sentence("bus_01", "Where is the bus stop?", "बस स्टॉप कहाँ है?", "Where is", "the bus stop")
     val whenWillTheBusCome = sentence("bus_02", "When will the bus come?", "बस कब आएगी?", "When will", "the bus come")
@@ -37,6 +37,7 @@ object BusStand {
     val lesson = Lesson(
         id = "bus_stand", titleEn = "Bus stand", titleHi = "बस स्टैंड",
         sentences = listOf(whereIsTheBusStop, whenWillTheBusCome, oneTicketToPatna, howMuchIsTheTicket, doesThisBusGoToBettiah),
+        words = words,
     )
 
     val hints = Hints(

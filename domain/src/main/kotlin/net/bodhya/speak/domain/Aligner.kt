@@ -3,18 +3,27 @@ package net.bodhya.speak.domain
 /** How one word of the target sentence was said. */
 enum class WordStatus { CORRECT, WRONG, MISSING }
 
-/** One target word (normalized) and how it was said. */
-data class WordResult(val word: String, val status: WordStatus)
+/**
+ * One target word (normalized) and how it was said. An unscored word
+ * ([scored] false, see [WordInfo.score]) keeps its place and status, so the
+ * words around it line up as usual, but nothing counts it.
+ */
+data class WordResult(val word: String, val status: WordStatus, val scored: Boolean = true)
 
 /**
  * Result of comparing what was heard with the target.
  *
  * [words] has exactly one entry per target word, in target order. [extra] holds
  * heard words that were not matched to any target word, in heard order.
+ * [correctCount] and [total] count scored words only.
  */
 data class Alignment(val words: List<WordResult>, val extra: List<String>) {
-    val correctCount: Int get() = words.count { it.status == WordStatus.CORRECT }
-    val total: Int get() = words.size
+    val correctCount: Int get() = words.count { it.scored && it.status == WordStatus.CORRECT }
+    val total: Int get() = words.count { it.scored }
+
+    /** The same alignment with [unscored] words marked as not scored. */
+    fun withUnscored(unscored: Set<String>): Alignment =
+        if (unscored.isEmpty()) this else copy(words = words.map { if (it.word in unscored) it.copy(scored = false) else it })
 }
 
 /**
@@ -25,9 +34,10 @@ object Aligner {
     /**
      * Aligns normalized [heard] words against normalized [target] words.
      *
-     * A heard word matches a target word when they are equal, or when the
-     * heard word is in [accept] for that target word (alternate spellings, e.g.
-     * "patana" for "patna"). Substitutions, missing and extra words all cost 1.
+     * A heard word matches a target word when they are equal, when they are
+     * [Homophones] ("two" for "to"), or when the heard word is in [accept] for
+     * that target word (alternate spellings). Substitutions, missing and extra
+     * words all cost 1.
      *
      * When several alignments have the same cost, the backtrace (from the end)
      * prefers a match/substitution, then a missing target word, then an extra
@@ -41,7 +51,7 @@ object Aligner {
     ): Alignment {
         val n = target.size
         val m = heard.size
-        fun same(t: String, h: String) = t == h || accept[t]?.contains(h) == true
+        fun same(t: String, h: String) = t == h || Homophones.same(t, h) || accept[t]?.contains(h) == true
         fun cost(i: Int, j: Int) = if (same(target[i - 1], heard[j - 1])) 0 else 1
 
         val d = Array(n + 1) { IntArray(m + 1) }

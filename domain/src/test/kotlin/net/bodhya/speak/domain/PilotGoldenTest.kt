@@ -37,7 +37,7 @@ class PilotGoldenTest {
         )
     }
 
-    /** The pilot looks words up in one global table, so every sentence gets all of it. */
+    /** The pilot's one word table (with the agreed content changes), which becomes the lesson's. */
     private val allWords: Map<String, WordInfo> = content.obj("words").mapValues { (_, v) ->
         val w = v.jsonObject
         WordInfo(
@@ -45,13 +45,22 @@ class PilotGoldenTest {
             hintHi = w.str("hi"),
             hintTag = w.str("tag"),
             accept = if ("accept" in w) w.strings("accept") else emptyList(),
+            score = w["score"]?.jsonPrimitive?.boolean ?: true,
         )
     }
 
-    private val sentences: List<Sentence> = content.obj("lesson").getValue("sentences").jsonArray.map {
-        val s = it.jsonObject
-        Sentence(id = s.str("id")!!, text = s.str("text")!!, hi = s.str("hi")!!, chunks = s.strings("chunks"), words = allWords)
+    private val lesson: Lesson = content.obj("lesson").let { l ->
+        Lesson(
+            id = "bus_stand", titleEn = l.str("title_en")!!, titleHi = l.str("title_hi")!!,
+            sentences = l.getValue("sentences").jsonArray.map {
+                val s = it.jsonObject
+                Sentence(id = s.str("id")!!, text = s.str("text")!!, hi = s.str("hi")!!, chunks = s.strings("chunks"))
+            },
+            words = allWords,
+        )
     }
+
+    private val sentences: List<Sentence> = lesson.sentences
 
     @Test
     fun normalization() {
@@ -82,13 +91,14 @@ class PilotGoldenTest {
             val heard = c.str("heard")!!
             val label = "#$i ${sentence.id} <$heard>"
             assertEquals(label, c.strings("targetWords"), sentence.targetWords)
-            val r = Practice.attemptSentence(LearnerProgress(), sentence, heard, today, config)
+            val r = Practice.attemptSentence(LearnerProgress(), lesson, sentence, heard, today, config)
             if (c.bool("nothingHeard")) {
                 assertEquals(label, SentenceAttempt.NothingHeard, r)
                 continue
             }
             r as SentenceAttempt.Scored
             assertEquals(label, c.strings("statuses"), r.alignment.words.map { it.status.name })
+            assertEquals(label, c.bools("scored"), r.alignment.words.map { it.scored })
             assertEquals(label, c.strings("extra"), r.alignment.extra)
             assertEquals(label, Score(c.int("correct"), c.int("total"), c.int("stars")), r.score)
             assertEquals(label, c.int("xp"), r.xp)
@@ -109,15 +119,17 @@ class PilotGoldenTest {
             // A probe's own accept lists replace those words' entries, as the generator does.
             val accept = (c["accept"] as? JsonObject).orEmpty()
                 .mapValues { (w, v) -> WordInfo(listOf(w), accept = v.jsonArray.map { it.jsonPrimitive.content }) }
-            val sentence = Sentence(id = "probe", text = text, hi = "", chunks = chunks, words = allWords + accept)
+            val sentence = Sentence(id = "probe", text = text, hi = "", chunks = chunks, unscored = c.strings("unscored").toSet())
+            val probeLesson = Lesson("probe", "", "", listOf(sentence), words = allWords + accept)
             assertEquals(label, c.strings("targetWords"), sentence.targetWords)
-            val r = Practice.attemptSentence(LearnerProgress(), sentence, heard, today, config)
+            val r = Practice.attemptSentence(LearnerProgress(), probeLesson, sentence, heard, today, config)
             if (c.bool("nothingHeard")) {
                 assertEquals(label, SentenceAttempt.NothingHeard, r)
                 continue
             }
             r as SentenceAttempt.Scored
             assertEquals(label, c.strings("statuses"), r.alignment.words.map { it.status.name })
+            assertEquals(label, c.bools("scored"), r.alignment.words.map { it.scored })
             assertEquals(label, c.strings("extra"), r.alignment.extra)
             assertEquals(label, c.int("stars"), r.score.stars)
             val fix = FeedbackSelector.wordToFix(r.alignment)
@@ -183,7 +195,7 @@ class PilotGoldenTest {
                     }
                     "attempt" -> {
                         current = ev.int("sentenceIndex")
-                        val r = Practice.attemptSentence(progress, sentences[current], ev.str("heard")!!, day!!, config)
+                        val r = Practice.attemptSentence(progress, lesson, sentences[current], ev.str("heard")!!, day!!, config)
                         fix = null
                         if (ev.bool("nothingHeard")) {
                             assertEquals(label, SentenceAttempt.NothingHeard, r)
@@ -206,7 +218,7 @@ class PilotGoldenTest {
                     "fixNext" -> fix = FixingLoop.next(fix!!)
                     "fixSay" -> {
                         assertEquals(label, ev.str("target"), FixingLoop.target(fix!!))
-                        val r = Practice.attemptFixStep(progress, fix, sentences[current], ev.str("heard")!!, day!!, config)
+                        val r = Practice.attemptFixStep(progress, fix, lesson, sentences[current], ev.str("heard")!!, day!!, config)
                         progress = r.progress
                         fix = r.result.state
                         val outcome = r.result.outcome
@@ -275,4 +287,5 @@ class PilotGoldenTest {
     private fun JsonObject.str(key: String): String? = this[key]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content
     private fun JsonObject.strings(key: String): List<String> =
         (this[key] as? JsonArray ?: JsonArray(emptyList())).map { it.jsonPrimitive.content }
+    private fun JsonObject.bools(key: String): List<Boolean> = getValue(key).jsonArray.map { it.jsonPrimitive.boolean }
 }

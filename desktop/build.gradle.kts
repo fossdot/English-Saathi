@@ -13,6 +13,8 @@ dependencies {
     implementation(project(":speech"))
     // sherpa-onnx's Java library has no Maven Central package; scripts/fetch_deps.sh downloads the release file.
     implementation(files("libs/sherpa-onnx-jvm-1.13.8.jar"))
+    // Lesson and hint files (content/).
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
 }
@@ -84,7 +86,7 @@ val checkDesktopDeps = tasks.register<CheckDesktopDeps>("checkDesktopDeps") {
 tasks.named("compileKotlin") { dependsOn(checkDesktopDeps) }
 
 tasks.test {
-    // The recognizer tests load the real models from the project folder.
+    // The recognizer and content tests read the real models and lesson files from the project folder.
     systemProperty("projectDir", rootProject.projectDir.absolutePath)
     testLogging {
         events("failed")

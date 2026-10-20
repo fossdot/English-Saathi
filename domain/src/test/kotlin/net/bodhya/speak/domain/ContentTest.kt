@@ -5,8 +5,10 @@ import org.junit.Test
 
 class ContentTest {
 
-    private fun bettiah(vararg accept: String) = Sentence(
-        id = "x", text = "Does this bus go to Bettiah?", hi = "", chunks = emptyList(),
+    private val doesThisBusGo = Sentence("x", "Does this bus go to Bettiah?", "", emptyList())
+
+    private fun bettiah(vararg accept: String) = Lesson(
+        "l", "L", "एल", listOf(doesThisBusGo),
         words = mapOf("bettiah" to WordInfo(listOf("Bet", "ti", "ah"), accept = accept.toList())),
     )
 
@@ -23,10 +25,25 @@ class ContentTest {
 
     @Test
     fun `a word without an entry is its own single syllable`() {
-        val s = BusStand.oneTicketToPatna
-        assertEquals(listOf("tic", "ket"), s.syllablesOf("ticket"))
-        assertEquals(listOf("to"), s.syllablesOf("to"))
-        assertEquals(listOf("one"), s.copy(words = mapOf("one" to WordInfo(emptyList()))).syllablesOf("one"))
+        val lesson = BusStand.lesson
+        assertEquals(listOf("tic", "ket"), lesson.syllablesOf("ticket"))
+        assertEquals(listOf("to"), lesson.syllablesOf("to"))
+        assertEquals(listOf("one"), lesson.copy(words = mapOf("one" to WordInfo(emptyList()))).syllablesOf("one"))
+    }
+
+    @Test
+    fun `words are unscored by their entry or by the sentence`() {
+        assertEquals(setOf("patna"), BusStand.lesson.unscoredIn(BusStand.oneTicketToPatna))
+        assertEquals(emptySet<String>(), BusStand.lesson.unscoredIn(BusStand.whereIsTheBusStop))
+        val noBus = BusStand.whereIsTheBusStop.copy(unscored = setOf("bus"))
+        assertEquals(setOf("bus"), BusStand.lesson.unscoredIn(noBus))
+        // An override naming a word that isn't in the sentence changes nothing.
+        assertEquals(emptySet<String>(), BusStand.lesson.unscoredIn(BusStand.whereIsTheBusStop.copy(unscored = setOf("patna"))))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `unscored overrides must be normalized words`() {
+        Sentence("x", "One ticket to Patna", "", emptyList(), unscored = setOf("Patna"))
     }
 
     @Test
@@ -36,7 +53,7 @@ class ContentTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `word keys must be normalized words`() {
-        Sentence("x", "One ticket to Patna", "", emptyList(), words = mapOf("Patna" to WordInfo(listOf("Pat", "na"))))
+        Lesson("l", "L", "एल", listOf(doesThisBusGo), words = mapOf("Patna" to WordInfo(listOf("Pat", "na"))))
     }
 
     @Test(expected = IllegalArgumentException::class)

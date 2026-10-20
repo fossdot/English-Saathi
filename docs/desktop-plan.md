@@ -80,6 +80,11 @@ Status: done on the Apple M4, natively and under Rosetta
   hear you" and the blocked-microphone message appear when they should.
 
 **D4. Domain rules and the lesson file**
+
+Status: done. `:domain` has the two rules and the lesson-level word table;
+`content/bus_stand.json` and `content/hints.json` are the lesson files;
+`LessonLoader` (desktop) reads them with the checks.
+
 - Build homophones and unscored words as decided, with the word table moved
   to the lesson. Update the golden overlay and re-record the cases, as
   `docs/decisions.md` describes. `:app` doesn't use these types.

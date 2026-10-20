@@ -47,7 +47,8 @@ data class AfterSentenceResult(val progress: LearnerProgress, val next: AfterSen
 /**
  * Applies a learner's actions to their progress: the pilot's `handleAttempt()`,
  * `handleFix()` and `afterSentence()` with the agreed changes
- * (docs/decisions.md).
+ * (docs/decisions.md). A sentence's word data (accepted spellings, unscored
+ * words) comes from its [Lesson].
  *
  * `current` parameters are the index of the sentence last shown, or 0 when
  * none has been shown yet (as in the pilot).
@@ -59,12 +60,14 @@ object Practice {
         progress.copy(streak = Streaks.onAppOpened(progress.streak, today, config))
 
     /**
-     * A recording of a whole sentence. If words were heard: score it, add XP,
-     * mark the sentence done today (updating the streak) and update the
-     * Leitner box.
+     * A recording of [sentence], one of [lesson]'s. If words were heard: score
+     * it, add XP, mark the sentence done today (updating the streak) and update
+     * the Leitner box. Unscored words are aligned but neither counted nor put
+     * in the box.
      */
     fun attemptSentence(
         progress: LearnerProgress,
+        lesson: Lesson,
         sentence: Sentence,
         heard: String,
         today: LocalDate,
@@ -72,37 +75,40 @@ object Practice {
     ): SentenceAttempt {
         val heardWords = Normalizer.normalizeHeard(heard)
         if (heardWords.isEmpty()) return SentenceAttempt.NothingHeard
-        val alignment = Aligner.align(sentence.targetWords, heardWords, sentence.accept)
+        val alignment = Aligner.align(sentence.targetWords, heardWords, lesson.accept).withUnscored(lesson.unscoredIn(sentence))
         val score = Scorer.score(alignment, config)
         val xp = Scorer.sentenceAttemptXp(score.stars, config)
         val updated = progress
             .addXp(xp, today)
             .markDone(sentence.id, score.stars, today, config)
-            .let { it.copy(leitner = Leitner.update(it.leitner, alignment.words, today, config)) }
+            .let { it.copy(leitner = Leitner.update(it.leitner, alignment.scoredWords(), today, config)) }
         return SentenceAttempt.Scored(updated, alignment, score, xp)
     }
 
     /**
-     * One recording at fixing step 3, 4 or 5 of [sentence]. A pass earns
-     * [GameConfig.fixStepXp]; passing step 5 also updates the Leitner box with
-     * the step-5 result for every word of the sentence.
+     * One recording at fixing step 3, 4 or 5 of [sentence], one of [lesson]'s.
+     * A pass earns [GameConfig.fixStepXp]; passing step 5 also updates the
+     * Leitner box with the step-5 result for every scored word of the
+     * sentence.
      */
     fun attemptFixStep(
         progress: LearnerProgress,
         state: FixState,
+        lesson: Lesson,
         sentence: Sentence,
         heard: String,
         today: LocalDate,
         config: GameConfig,
     ): FixStepAttempt {
         require(state.sentenceId == sentence.id) { "fixing ${state.sentenceId}, but got sentence ${sentence.id}" }
-        val result = FixingLoop.submit(state, heard, sentence.accept, config)
+        val result = FixingLoop.submit(state, heard, lesson.accept, config)
         var updated = progress
         if (result.outcome == FixOutcome.PASSED || result.outcome == FixOutcome.SENTENCE_FIXED) {
             updated = updated.addXp(result.xp, today)
         }
         if (result.outcome == FixOutcome.SENTENCE_FIXED) {
-            updated = updated.copy(leitner = Leitner.update(updated.leitner, result.alignment!!.words, today, config))
+            val sentenceResult = result.alignment!!.withUnscored(lesson.unscoredIn(sentence))
+            updated = updated.copy(leitner = Leitner.update(updated.leitner, sentenceResult.scoredWords(), today, config))
         }
         return FixStepAttempt(updated, result)
     }
@@ -140,6 +146,9 @@ object Practice {
     /** Words for the lesson-done screen's "Practise again tomorrow" list. */
     fun wordsForTomorrow(progress: LearnerProgress, today: LocalDate, config: GameConfig): List<String> =
         Leitner.forTomorrow(progress.leitner, today, config)
+
+    /** Unscored words never enter the Leitner box. */
+    private fun Alignment.scoredWords(): List<WordResult> = words.filter { it.scored }
 
     private fun LearnerProgress.addXp(xp: Int, today: LocalDate): LearnerProgress =
         copy(xpTotal = xpTotal + xp, xpByDay = xpByDay + (today to xpOn(today) + xp))

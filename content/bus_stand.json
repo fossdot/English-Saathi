@@ -1,0 +1,33 @@
+{
+  "id": "bus_stand",
+  "title_en": "Bus stand",
+  "title_hi": "बस स्टैंड",
+  "words": {
+    "where": { "syllables": ["where"], "hint_hi": "वेयर", "hint_tag": "v_w", "reviewed": false },
+    "is": { "syllables": ["is"], "hint_hi": "इज़", "hint_tag": "short_vowel", "reviewed": false },
+    "the": { "syllables": ["the"], "hint_hi": "द", "hint_tag": "th", "reviewed": false },
+    "bus": { "syllables": ["bus"], "hint_hi": "बस", "hint_tag": "short_vowel", "reviewed": false },
+    "stop": { "syllables": ["stop"], "hint_hi": "स्टॉप", "hint_tag": "s_cluster", "reviewed": false },
+    "when": { "syllables": ["when"], "hint_hi": "वेन", "hint_tag": "v_w", "reviewed": false },
+    "will": { "syllables": ["will"], "hint_hi": "विल", "hint_tag": "v_w", "reviewed": false },
+    "come": { "syllables": ["come"], "hint_hi": "कम", "hint_tag": "short_vowel", "reviewed": false },
+    "one": { "syllables": ["one"], "hint_hi": "वन", "hint_tag": "v_w", "reviewed": false },
+    "ticket": { "syllables": ["tic", "ket"], "hint_hi": "टि-केट", "hint_tag": "generic", "reviewed": false },
+    "to": { "syllables": ["to"], "hint_hi": "टू", "hint_tag": "generic", "reviewed": false },
+    "patna": { "syllables": ["Pat", "na"], "hint_hi": "पट-ना", "hint_tag": "generic", "score": false, "reviewed": false },
+    "please": { "syllables": ["please"], "hint_hi": "प्लीज़", "hint_tag": "generic", "reviewed": false },
+    "how": { "syllables": ["how"], "hint_hi": "हाउ", "hint_tag": "generic", "reviewed": false },
+    "much": { "syllables": ["much"], "hint_hi": "मच", "hint_tag": "short_vowel", "reviewed": false },
+    "does": { "syllables": ["does"], "hint_hi": "डज़", "hint_tag": "generic", "reviewed": false },
+    "this": { "syllables": ["this"], "hint_hi": "दिस", "hint_tag": "th", "reviewed": false },
+    "go": { "syllables": ["go"], "hint_hi": "गो", "hint_tag": "generic", "reviewed": false },
+    "bettiah": { "syllables": ["Bet", "ti", "ah"], "hint_hi": "बे-ति-या", "hint_tag": "generic", "score": false, "reviewed": false }
+  },
+  "sentences": [
+    { "id": "bus_01", "text": "Where is the bus stop?", "hi": "बस स्टॉप कहाँ है?", "chunks": ["Where is", "the bus stop"], "picture": null },
+    { "id": "bus_02", "text": "When will the bus come?", "hi": "बस कब आएगी?", "chunks": ["When will", "the bus come"], "picture": null },
+    { "id": "bus_03", "text": "One ticket to Patna, please.", "hi": "पटना का एक टिकट दीजिए।", "chunks": ["One ticket", "to Patna", "please"], "picture": null },
+    { "id": "bus_04", "text": "How much is the ticket?", "hi": "टिकट कितने का है?", "chunks": ["How much", "is the ticket"], "picture": null },
+    { "id": "bus_05", "text": "Does this bus go to Bettiah?", "hi": "क्या यह बस बेतिया जाती है?", "chunks": ["Does this bus", "go to Bettiah"], "picture": null }
+  ]
+}

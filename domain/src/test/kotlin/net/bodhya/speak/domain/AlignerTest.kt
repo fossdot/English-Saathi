@@ -111,4 +111,32 @@ class AlignerTest {
         assertEquals(listOf(CORRECT, WRONG, CORRECT), a.statuses())
         assertEquals(listOf("x", "z"), a.extra)
     }
+
+    @Test
+    fun `homophones match in both directions - owner's example`() {
+        // Whisper writes "to" as 2, which is spelled out as "two".
+        assertEquals(listOf(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT), align("one ticket to patna please", "1 ticket 2 patna please").statuses())
+        assertEquals(listOf(CORRECT, CORRECT), align("two tickets", "to tickets").statuses())
+        assertEquals(listOf(CORRECT, CORRECT), align("for me", "4 me").statuses())
+        assertEquals(listOf(CORRECT), align("won", "one").statuses())
+        assertEquals(listOf(CORRECT), align("too", "two").statuses())
+    }
+
+    @Test
+    fun `homophones are only the listed groups, and words keep their written form`() {
+        assertEquals(listOf(WRONG), align("to", "ta").statuses())
+        assertEquals(listOf(WRONG), align("for", "fore").statuses())
+        assertEquals(listOf(WRONG), align("one", "two").statuses())
+        assertEquals(listOf("to"), align("to", "2").words.map { it.word })
+        assertEquals(listOf("two"), Normalizer.normalize("2"))
+    }
+
+    @Test
+    fun `unscored words stay aligned but don't count`() {
+        val a = align("one ticket to patna please", "one ticket to but now please").withUnscored(setOf("patna"))
+        assertEquals(listOf(CORRECT, CORRECT, CORRECT, WRONG, CORRECT), a.statuses())
+        assertEquals(listOf(true, true, true, false, true), a.words.map { it.scored })
+        assertEquals(4, a.correctCount)
+        assertEquals(4, a.total)
+    }
 }

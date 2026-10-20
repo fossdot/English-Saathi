@@ -16,13 +16,14 @@ data class Tip(val word: String, val soundHi: String?, val template: HintTemplat
 object FeedbackSelector {
 
     /**
-     * The word to fix and tip: the first word said WRONG, or if none, the first
-     * MISSING word. Null when every word is correct.
+     * The word to fix and tip: the first scored word said WRONG, or if none,
+     * the first scored MISSING word. Null when every scored word is correct:
+     * an unscored word is never the word to fix.
      */
     fun wordToFix(alignment: Alignment): WordToFix? {
         val words = alignment.words
-        val index = words.indexOfFirst { it.status == WordStatus.WRONG }.takeIf { it >= 0 }
-            ?: words.indexOfFirst { it.status == WordStatus.MISSING }.takeIf { it >= 0 }
+        val index = words.indexOfFirst { it.scored && it.status == WordStatus.WRONG }.takeIf { it >= 0 }
+            ?: words.indexOfFirst { it.scored && it.status == WordStatus.MISSING }.takeIf { it >= 0 }
             ?: return null
         return WordToFix(index, words[index].word)
     }
@@ -34,12 +35,12 @@ object FeedbackSelector {
     }
 
     /**
-     * Tip for [word]. A word without teaching data, or whose tag has no
-     * template, gets the generic tip. (The pilot showed "undefined" for a tag
-     * without a template.)
+     * Tip for [word] of [lesson]. A word without teaching data, or whose tag
+     * has no template, gets the generic tip. (The pilot showed "undefined" for
+     * a tag without a template.)
      */
-    fun tip(word: String, sentence: Sentence, hints: Hints): Tip {
-        val info = sentence.words[word]
+    fun tip(word: String, lesson: Lesson, hints: Hints): Tip {
+        val info = lesson.words[word]
         return Tip(word, info?.hintHi?.takeIf { it.isNotEmpty() }, hints.forTag(info?.hintTag?.takeIf { it.isNotEmpty() }))
     }
 }

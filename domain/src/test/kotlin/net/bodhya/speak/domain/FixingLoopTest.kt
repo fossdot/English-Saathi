@@ -15,13 +15,17 @@ class FixingLoopTest {
 
     private val config = GameConfig()
     private val today = LocalDate.of(2026, 10, 19)
+    private val lesson = BusStand.lesson
     private val busStop = BusStand.whereIsTheBusStop // where(0) is(1) the(2) bus(3) stop(4)
+
+    /** The lesson with an accepted spelling for "ticket" (the accept mechanism stays for words other than place names). */
+    private val tiketAccepted = lesson.copy(words = lesson.words + ("ticket" to WordInfo(listOf("tic", "ket"), accept = listOf("tiket"))))
 
     /** Fixing "bus" in "Where is the bus stop?", at [step]. */
     private fun at(step: Int, fails: Int = 0) = FixingLoop.start(busStop, 3).copy(step = step, fails = fails)
 
-    private fun say(state: FixState, heard: String, sentence: Sentence = busStop) =
-        FixingLoop.submit(state, heard, sentence.accept, config)
+    private fun say(state: FixState, heard: String, inLesson: Lesson = lesson) =
+        FixingLoop.submit(state, heard, inLesson.accept, config)
 
     private fun chunkFor(sentence: Sentence, index: Int) = FixingLoop.start(sentence, index).let { it.chunk to it.chunkWordIndex }
 
@@ -146,8 +150,17 @@ class FixingLoopTest {
 
     @Test
     fun `accepted spellings pass a step`() {
-        val bettiah = FixingLoop.start(BusStand.doesThisBusGoToBettiah, 5).copy(step = 3)
-        assertEquals(PASSED, say(bettiah, "betiya", BusStand.doesThisBusGoToBettiah).outcome)
+        val ticket = FixingLoop.start(BusStand.howMuchIsTheTicket, 4).copy(step = 3)
+        assertEquals(PASSED, say(ticket, "tiket", tiketAccepted).outcome)
+        assertEquals(TRY_AGAIN, say(ticket, "tiket").outcome)
+    }
+
+    @Test
+    fun `homophones pass a step`() {
+        // Fixing "to" in "One ticket to Patna, please." at step 3: Whisper writes "2".
+        val to = FixingLoop.start(BusStand.oneTicketToPatna, 2).copy(step = 3)
+        assertEquals(PASSED, say(to, "2").outcome)
+        assertEquals(PASSED, say(to, "too").outcome)
     }
 
     @Test
@@ -192,16 +205,16 @@ class FixingLoopTest {
     @Test
     fun `fix XP and the drop-back count come from the config`() {
         val custom = GameConfig(fixStepXp = 0, fixFailsBeforeDropBack = 3)
-        assertEquals(0, FixingLoop.submit(at(3), "bus", busStop.accept, custom).xp)
-        val once = FixingLoop.submit(at(3), "bas", busStop.accept, custom)
-        val twice = FixingLoop.submit(once.state, "bas", busStop.accept, custom)
+        assertEquals(0, FixingLoop.submit(at(3), "bus", lesson.accept, custom).xp)
+        val once = FixingLoop.submit(at(3), "bas", lesson.accept, custom)
+        val twice = FixingLoop.submit(once.state, "bas", lesson.accept, custom)
         assertEquals(TRY_AGAIN to 2, twice.outcome to twice.state.fails)
-        assertEquals(DROPPED_BACK, FixingLoop.submit(twice.state, "bas", busStop.accept, custom).outcome)
+        assertEquals(DROPPED_BACK, FixingLoop.submit(twice.state, "bas", lesson.accept, custom).outcome)
     }
 
     @Test
     fun `owner's example - the loop drills bus and can finish`() {
-        val attempt = Practice.attemptSentence(LearnerProgress(), busStop, "where is bas stop", today, config) as SentenceAttempt.Scored
+        val attempt = Practice.attemptSentence(LearnerProgress(), lesson, busStop, "where is bas stop", today, config) as SentenceAttempt.Scored
         val fix = FeedbackSelector.wordToFix(attempt.alignment)!!
         var state = FixingLoop.next(FixingLoop.next(FixingLoop.start(busStop, fix.index)))
         assertEquals("bus", state.word)
@@ -215,23 +228,32 @@ class FixingLoopTest {
     @Test
     fun `practice adds fix XP on a pass and nothing otherwise`() {
         val start = LearnerProgress(xpTotal = 20, xpByDay = mapOf(today to 20))
-        val passed = Practice.attemptFixStep(start, at(3), busStop, "bus", today, config)
+        val passed = Practice.attemptFixStep(start, at(3), lesson, busStop, "bus", today, config)
         assertEquals(25, passed.progress.xpTotal)
         assertEquals(25, passed.progress.xpOn(today))
-        assertEquals(start, Practice.attemptFixStep(start, at(3), busStop, "bas", today, config).progress)
-        assertEquals(start, Practice.attemptFixStep(start, at(3), busStop, "...", today, config).progress)
+        assertEquals(start, Practice.attemptFixStep(start, at(3), lesson, busStop, "bas", today, config).progress)
+        assertEquals(start, Practice.attemptFixStep(start, at(3), lesson, busStop, "...", today, config).progress)
     }
 
     @Test
-    fun `practice uses the sentence's own accept list in the fixing loop`() {
-        val s = BusStand.doesThisBusGoToBettiah
-        val r = Practice.attemptFixStep(LearnerProgress(), FixingLoop.start(s, 5).copy(step = 3), s, "betiya", today, config)
+    fun `practice uses the lesson's accept lists in the fixing loop`() {
+        val s = BusStand.howMuchIsTheTicket
+        val r = Practice.attemptFixStep(LearnerProgress(), FixingLoop.start(s, 4).copy(step = 3), tiketAccepted, s, "tiket", today, config)
         assertEquals(PASSED, r.result.outcome)
     }
 
     @Test
+    fun `a passed step 5 leaves unscored words out of the Leitner box`() {
+        val s = BusStand.oneTicketToPatna
+        val step5 = FixingLoop.start(s, 4).copy(step = 5)
+        val r = Practice.attemptFixStep(LearnerProgress(), step5, lesson, s, "one ticket to patana please", today, config)
+        assertEquals(SENTENCE_FIXED, r.result.outcome)
+        assertEquals(emptyMap<String, LeitnerEntry>(), r.progress.leitner)
+    }
+
+    @Test
     fun `finishing the loop earns XP but does not mark the sentence done or touch the streak`() {
-        val r = Practice.attemptFixStep(LearnerProgress(), at(5), busStop, "where is the bus stop", today, config)
+        val r = Practice.attemptFixStep(LearnerProgress(), at(5), lesson, busStop, "where is the bus stop", today, config)
         assertEquals(LearnerProgress(xpTotal = 5, xpByDay = mapOf(today to 5)), r.progress)
     }
 
@@ -241,10 +263,10 @@ class FixingLoopTest {
         val box = mapOf("bus" to LeitnerEntry(1, today.plusDays(1)), "stop" to LeitnerEntry(2, today))
         val start = LearnerProgress(leitner = box)
 
-        assertEquals(box, Practice.attemptFixStep(start, at(4), busStop, "the bus stop", today, config).progress.leitner)
-        assertEquals(box, Practice.attemptFixStep(start, at(5), busStop, "where is the bas stop", today, config).progress.leitner)
+        assertEquals(box, Practice.attemptFixStep(start, at(4), lesson, busStop, "the bus stop", today, config).progress.leitner)
+        assertEquals(box, Practice.attemptFixStep(start, at(5), lesson, busStop, "where is the bas stop", today, config).progress.leitner)
 
-        val fixed = Practice.attemptFixStep(start, at(5), busStop, "where is bus stop", today, config).progress.leitner
+        val fixed = Practice.attemptFixStep(start, at(5), lesson, busStop, "where is bus stop", today, config).progress.leitner
         assertEquals(LeitnerEntry(1, today.plusDays(1)), fixed["bus"]) // not due yet: unchanged
         assertEquals(LeitnerEntry(3, today.plusDays(7)), fixed["stop"]) // due and right: moves up
         assertEquals(LeitnerEntry(1, today.plusDays(1)), fixed["the"]) // missed at step 5: box 1
@@ -252,7 +274,7 @@ class FixingLoopTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `a fix step must be checked against its own sentence`() {
-        Practice.attemptFixStep(LearnerProgress(), at(3), BusStand.howMuchIsTheTicket, "bus", today, config)
+        Practice.attemptFixStep(LearnerProgress(), at(3), lesson, BusStand.howMuchIsTheTicket, "bus", today, config)
     }
 
     @Test

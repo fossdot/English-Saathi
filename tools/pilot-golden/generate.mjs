@@ -53,8 +53,8 @@ function check(ok, what) { if (!ok) throw new Error("Sanity check failed: " + wh
 
 // ---------- Feature tags (inputs that touch an agreed change) ----------
 const UNICODE_SPACE = /[\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/g;
-/** Tags for a lesson text [target] and recognizer outputs [texts]. */
-function features({ target = null, texts = [] }) {
+/** Tags for a lesson text [target] (with its sentence-level [unscored] words) and recognizer outputs [texts]. */
+function features({ target = null, texts = [], unscored = [] }) {
   const f = new Set();
   const all = target === null ? texts : [target, ...texts];
   for (const t of all) {
@@ -70,13 +70,16 @@ function features({ target = null, texts = [] }) {
     if (AG.agreedHeard(t).length === 0) f.add("nothingHeard");
   }
   if (target !== null) {
+    const T = AG.agreedNormalize(target);
+    if (T.some(w => AG.agreedUnscored({ unscored }, w))) f.add("unscored");
+    if (texts.some(t => AG.agreedHeard(t).some(h => T.some(w => AG.agreedHomophones(w, h))))) f.add("homophone");
     if (target.includes("-")) f.add("hyphenInTarget");
     if (target.split(/\s+/).some(tok => tok.toLowerCase().replace(/[^a-z0-9']/g, "") === "")) f.add("emptyTargetToken");
   }
   return [...f].sort();
 }
 /** Tags where the agreed result may differ from the pilot's. */
-const DEVIATIONS = ["apostrophe", "bigNumber", "bracketTag", "emptyTargetToken", "hyphenInTarget", "nothingHeard"];
+const DEVIATIONS = ["apostrophe", "bigNumber", "bracketTag", "emptyTargetToken", "homophone", "hyphenInTarget", "nothingHeard", "unscored"];
 
 // ---------- Heard-text variants ----------
 const CONFUSABLE = {
@@ -125,6 +128,8 @@ function fixHeard(target, pCorrect) {
 // ---------- Helpers ----------
 const STATUS = { ok: "CORRECT", wrong: "WRONG", missing: "MISSING" };
 const statuses = res => res.map(r => STATUS[r.status]);
+/** Which results count: false for unscored words. */
+const scoredFlags = res => res.map(r => r.scored !== false);
 /** Learner state after an event: today's XP and done list, plus everything that is not per day. */
 function studentSnapshot(P) {
   const a = P.api, s = P.snapshot(a.St()), t = a.today();
@@ -159,9 +164,9 @@ const header = P => ({
   config: P.snapshot(P.api.CONFIG),
 });
 
-// ---------- 0. The pilot's own content (for the Kotlin side to rebuild the same lesson) ----------
+// ---------- 0. The pilot's content with the agreed content changes (for the Kotlin side to rebuild the same lesson) ----------
 {
-  const P = fresh("content");
+  const P = agreed("content");
   write("content.json", { ...header(P), lesson: P.snapshot(P.api.LESSON), words: P.snapshot(P.api.WORDS), hints: P.snapshot(P.api.HINTS) });
 }
 
@@ -286,12 +291,12 @@ const header = P => ({
       const out = a.handleAttempt(heard);
       const feats = features({ target: s.text, texts: [heard] });
       if (out.nothingHeard) {
-        cases.push({ sentenceId: s.id, heard, nothingHeard: true, targetWords, statuses: [], extra: [], correct: null, total: null,
+        cases.push({ sentenceId: s.id, heard, nothingHeard: true, targetWords, statuses: [], scored: [], extra: [], correct: null, total: null,
           stars: null, xp: 0, wordToFix: null, wordToFixIndex: null, features: feats });
         continue;
       }
       const r = a.S.result, wf = a.agreedWordToFix();
-      const c = { sentenceId: s.id, heard, nothingHeard: false, targetWords, statuses: statuses(r.res), extra: P.snapshot(r.extra),
+      const c = { sentenceId: s.id, heard, nothingHeard: false, targetWords, statuses: statuses(r.res), scored: scoredFlags(r.res), extra: P.snapshot(r.extra),
         correct: r.c, total: r.n, stars: r.stars, xp: r.xp, wordToFix: wf ? wf.word : null, wordToFixIndex: wf ? wf.index : null, features: feats };
       cases.push(c);
       if (!feats.some(f => DEVIATIONS.includes(f))) {
@@ -307,7 +312,12 @@ const header = P => ({
   const find = (id, heard) => cases.find(c => c.sentenceId === id && c.heard === heard);
   const bas = find("bus_01", "where is bas stop");
   check(eq(bas.statuses, ["CORRECT", "CORRECT", "MISSING", "WRONG", "CORRECT"]) && bas.wordToFix === "bus" && bas.wordToFixIndex === 3, "where is bas stop");
-  check(find("bus_03", "1 ticket to patana please").statuses.every(s => s === "CORRECT"), "1 ticket to patana please");
+  // Patna is not scored now: "patana" is still WRONG, but it doesn't count.
+  const patana = find("bus_03", "1 ticket to patana please");
+  check(patana.correct === 4 && patana.total === 4 && patana.stars === 3 && eq(patana.scored, [true, true, true, false, true]), "1 ticket to patana please");
+  // Whisper's "2" for "to" matches.
+  const two = find("bus_03", "1 ticket 2 patna plz");
+  check(two.statuses[2] === "CORRECT" && two.wordToFix === "please", "1 ticket 2 patna plz");
   check(find("bus_01", "[BLANK_AUDIO]").nothingHeard && find("bus_01", "...").nothingHeard && find("bus_01", "(music)").nothingHeard, "nothing heard");
   write("attempts.json", { ...header(P), cases });
 }
@@ -316,7 +326,8 @@ const header = P => ({
 {
   const A = agreed("probes");
   const P = fresh("probes-pilot");
-  // [text, heards, chunks (default: the whole text), accept lists for this probe (default: none)]
+  // [text, heards, chunks (default: the whole text), accept lists for this probe (default: none),
+  //  words unscored in this sentence (default: none)]
   const probes = [
     ["Where is the bus-stop?", ["where is the bus stop", "where is the bus-stop", "where is the busstop"]],
     ["Twenty rupees, please.", ["20 rupees please", "twenty rupees please"]],
@@ -345,13 +356,23 @@ const header = P => ({
     ["Where is the bus stop?", ["[BLANK_AUDIO]", "...", "(music)", "(music) where is the bus stop"]],
     // Accept entries are normalized; an entry that is not one word is ignored.
     ["Twenty rupees, please.", ["twenty rupiya please", "twenty ru pees please", "twenty rupees please"], null, { rupees: ["Rupiya!", "ru-pees"] }],
+    // Homophones: to/two/too, for/four, one/won match both ways, after numbers are spelled out.
+    ["One ticket to Patna, please.", ["1 ticket 2 patna please", "won ticket too patna please", "one ticket two patna please",
+      "one ticket ta patna please", "for ticket to patna please"]],
+    ["Two tickets for Bettiah.", ["to tickets four bettiah", "2 tickets 4 betia", "too tickets for bettiah", "three tickets for bettiah"],
+      ["Two tickets", "for Bettiah"]],
+    // A sentence can turn scoring off for a word that is scored elsewhere.
+    ["Where is the bus stop?", ["where is the bas stop", "where is bas stop", "where is the bus stap", "where bus stop"],
+      ["Where is", "the bus stop"], null, ["bus"]],
+    // Only unscored words wrong: 3 stars and nothing to fix.
+    ["Does this bus go to Bettiah?", ["does this bus go to betty", "does this bus go to"]],
   ];
   const cases = [];
-  for (const [text, heards, chunksIn, acceptIn] of probes) {
-    const chunks = chunksIn || [text], accept = acceptIn || {};
+  for (const [text, heards, chunksIn, acceptIn, unscoredIn] of probes) {
+    const chunks = chunksIn || [text], accept = acceptIn || {}, unscored = unscoredIn || [];
     const saved = {};
     for (const X of [A, P]) {
-      X.api.LESSON.sentences.push({ id: "probe", text, hi: "", chunks });
+      X.api.LESSON.sentences.push({ id: "probe", text, hi: "", chunks, unscored });
       for (const [w, list] of Object.entries(accept)) { saved[w] = X.api.WORDS[w]; X.api.WORDS[w] = { accept: list }; }
     }
     const i = A.api.LESSON.sentences.length - 1;
@@ -361,12 +382,12 @@ const header = P => ({
       P.api.S.idx = i;
       P.api.handleAttempt(heard);
       const p = P.api.S.result;
-      const c = { text, chunks, accept, heard, nothingHeard: out.nothingHeard, targetWords: P.snapshot(A.api.agreedNormalize(text)) };
+      const c = { text, chunks, accept, unscored, heard, nothingHeard: out.nothingHeard, targetWords: P.snapshot(A.api.agreedNormalize(text)) };
       if (out.nothingHeard) {
-        Object.assign(c, { statuses: [], extra: [], stars: null, wordToFix: null });
+        Object.assign(c, { statuses: [], scored: [], extra: [], stars: null, wordToFix: null });
       } else {
         const r = A.api.S.result, wf = A.api.agreedWordToFix();
-        Object.assign(c, { statuses: statuses(r.res), extra: P.snapshot(r.extra), stars: r.stars, wordToFix: wf ? wf.word : null });
+        Object.assign(c, { statuses: statuses(r.res), scored: scoredFlags(r.res), extra: P.snapshot(r.extra), stars: r.stars, wordToFix: wf ? wf.word : null });
         // fixChunk / fixWordIndex only when there is a word to fix: PilotGoldenTest starts a
         // fixing loop whenever the "fixChunk" key is present, even if its value is null.
         if (wf) {
@@ -375,7 +396,7 @@ const header = P => ({
         }
       }
       Object.assign(c, { pilotTargetWords: P.api.tokens(P.api.LESSON.sentences[i]).map(P.api.normTok), pilotStatuses: statuses(p.res),
-        pilotStars: p.stars, features: features({ target: text, texts: [heard] }) });
+        pilotStars: p.stars, features: features({ target: text, texts: [heard], unscored }) });
       cases.push(c);
     }
     for (const X of [A, P]) {
@@ -386,6 +407,8 @@ const header = P => ({
   const twice = cases.find(c => c.text === "The bus to the bus stand" && c.chunks.length === 2 && c.chunks[1] === "to the bus stand"
     && c.heard === "the bus to the bas stand");
   check(twice.wordToFix === "bus" && twice.fixWordIndex === 4 && twice.fixChunk === "to the bus stand", "repeated word: fix the second bus");
+  const override = cases.find(c => c.unscored.includes("bus") && c.heard === "where is bas stop");
+  check(override.wordToFix === "the" && eq(override.scored, [true, true, true, false, true]), "a sentence's unscored word is never the word to fix");
   write("probes.json", { ...header(P), cases });
 }
 

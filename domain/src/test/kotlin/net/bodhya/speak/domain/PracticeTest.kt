@@ -11,10 +11,11 @@ class PracticeTest {
     private val config = GameConfig()
     private val day0 = LocalDate.of(2026, 10, 19)
     private val day1 = day0.plusDays(1)
-    private val sentences = BusStand.lesson.sentences
+    private val lesson = BusStand.lesson
+    private val sentences = lesson.sentences
 
     private fun scored(progress: LearnerProgress, index: Int, heard: String, day: LocalDate = day0) =
-        Practice.attemptSentence(progress, sentences[index], heard, day, config) as SentenceAttempt.Scored
+        Practice.attemptSentence(progress, lesson, sentences[index], heard, day, config) as SentenceAttempt.Scored
 
     @Test
     fun `a scored attempt adds XP, marks the sentence done, starts the streak and fills the box`() {
@@ -30,10 +31,33 @@ class PracticeTest {
     }
 
     @Test
-    fun `owner's example - an accepted spelling from the sentence's own list is correct`() {
+    fun `owner's example - Patna is not scored, so "patana" costs nothing`() {
         val r = scored(LearnerProgress(), 2, "1 ticket to patana please")
-        assertEquals(Score(5, 5, 3), r.score)
+        assertEquals(WordResult("patna", WordStatus.WRONG, scored = false), r.alignment.words[3])
+        assertEquals(Score(4, 4, 3), r.score)
         assertEquals(25, r.xp)
+        assertEquals(emptyMap<String, LeitnerEntry>(), r.progress.leitner)
+    }
+
+    @Test
+    fun `owner's example - Whisper's 2 for "to" is right`() {
+        val r = scored(LearnerProgress(), 2, "1 ticket 2 Patna please")
+        assertEquals(Score(4, 4, 3), r.score)
+    }
+
+    @Test
+    fun `unscored words never enter the Leitner box`() {
+        val r = scored(LearnerProgress(), 4, "does this bus go to")
+        assertEquals(WordStatus.MISSING, r.alignment.words[5].status)
+        assertEquals(Score(5, 5, 3), r.score)
+        assertEquals(emptyMap<String, LeitnerEntry>(), r.progress.leitner)
+    }
+
+    @Test
+    fun `a sentence can turn scoring off for one of its words`() {
+        val noBus = sentences[0].copy(unscored = setOf("bus"))
+        val r = Practice.attemptSentence(LearnerProgress(), lesson, noBus, "where is the bas stop", day0, config) as SentenceAttempt.Scored
+        assertEquals(Score(4, 4, 3), r.score)
         assertEquals(emptyMap<String, LeitnerEntry>(), r.progress.leitner)
     }
 
@@ -41,7 +65,7 @@ class PracticeTest {
     fun `nothing heard changes nothing`() {
         val start = scored(LearnerProgress(), 0, "where is bas stop").progress
         for (heard in listOf("", "   ", "...", "[BLANK_AUDIO]", "(music)")) {
-            assertSame(heard, SentenceAttempt.NothingHeard, Practice.attemptSentence(start, sentences[1], heard, day0, config))
+            assertSame(heard, SentenceAttempt.NothingHeard, Practice.attemptSentence(start, lesson, sentences[1], heard, day0, config))
         }
     }
 
@@ -90,8 +114,8 @@ class PracticeTest {
 
     @Test
     fun `due words decide the next sentence and the start`() {
-        // Day 0: Bettiah is missed in bus_05, so it is due on day 1.
-        val p = scored(LearnerProgress(), 4, "does this bus go to").progress
+        // Day 0: "go" is missed in bus_05, so it is due on day 1. (Bettiah is unscored, so it never enters the box.)
+        val p = scored(LearnerProgress(), 4, "does this bus to bettiah").progress
         assertEquals(4, Practice.startPractice(p, sentences, 0, day1, config))
         assertEquals(AfterSentence.Next(4), Practice.afterSentence(p, sentences, 0, day1, config).next)
     }

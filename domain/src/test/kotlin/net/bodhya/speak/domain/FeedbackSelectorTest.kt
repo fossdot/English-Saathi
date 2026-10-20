@@ -14,7 +14,7 @@ class FeedbackSelectorTest {
     private val today = LocalDate.of(2026, 10, 19)
 
     private fun alignment(sentence: Sentence, heard: String) =
-        (Practice.attemptSentence(LearnerProgress(), sentence, heard, today, config) as SentenceAttempt.Scored).alignment
+        (Practice.attemptSentence(LearnerProgress(), BusStand.lesson, sentence, heard, today, config) as SentenceAttempt.Scored).alignment
 
     private fun statuses(vararg s: WordStatus) = Alignment(s.mapIndexed { i, st -> WordResult("w$i", st) }, emptyList())
 
@@ -36,6 +36,15 @@ class FeedbackSelectorTest {
     }
 
     @Test
+    fun `an unscored word is never the word to fix`() {
+        // Patna is not scored: "patana" is the first WRONG word but doesn't count, so "please" is fixed.
+        val a = alignment(BusStand.oneTicketToPatna, "one ticket to patana plis")
+        assertEquals(listOf(WRONG, WRONG), a.words.drop(3).map { it.status })
+        assertEquals(WordToFix(4, "please"), FeedbackSelector.wordToFix(a))
+        assertNull(FeedbackSelector.wordToFix(alignment(BusStand.doesThisBusGoToBettiah, "does this bus go to betty")))
+    }
+
+    @Test
     fun `nothing to fix when every word is right`() {
         assertNull(FeedbackSelector.wordToFix(alignment(BusStand.whereIsTheBusStop, "where is the bus stop please")))
         assertNull(FeedbackSelector.wordToFix(statuses()))
@@ -50,26 +59,26 @@ class FeedbackSelectorTest {
 
     @Test
     fun `the tip uses the word's sound hint and its tag's template`() {
-        val tip = FeedbackSelector.tip("bus", BusStand.whereIsTheBusStop, BusStand.hints)
+        val tip = FeedbackSelector.tip("bus", BusStand.lesson, BusStand.hints)
         assertEquals(Tip("bus", "बस", BusStand.hints.forTag("short_vowel")), tip)
     }
 
     @Test
     fun `a word without teaching data gets the generic tip`() {
-        val tip = FeedbackSelector.tip("is", BusStand.whereIsTheBusStop, BusStand.hints)
+        val tip = FeedbackSelector.tip("is", BusStand.lesson, BusStand.hints)
         assertEquals(Tip("is", null, BusStand.hints.forTag("generic")), tip)
     }
 
     @Test
     fun `a tag without a template falls back to the generic tip`() {
-        val sentence = BusStand.whereIsTheBusStop.copy(words = mapOf("zero" to WordInfo(listOf("ze", "ro"), "ज़ीरो", "z_j")))
-        assertEquals("generic", FeedbackSelector.tip("zero", sentence, BusStand.hints).template.tag)
+        val lesson = BusStand.lesson.copy(words = mapOf("zero" to WordInfo(listOf("ze", "ro"), "ज़ीरो", "z_j")))
+        assertEquals("generic", FeedbackSelector.tip("zero", lesson, BusStand.hints).template.tag)
     }
 
     @Test
     fun `an empty sound hint or tag counts as none`() {
-        val sentence = BusStand.whereIsTheBusStop.copy(words = mapOf("bus" to WordInfo(listOf("bus"), "", "")))
-        assertEquals(Tip("bus", null, BusStand.hints.forTag("generic")), FeedbackSelector.tip("bus", sentence, BusStand.hints))
+        val lesson = BusStand.lesson.copy(words = mapOf("bus" to WordInfo(listOf("bus"), "", "")))
+        assertEquals(Tip("bus", null, BusStand.hints.forTag("generic")), FeedbackSelector.tip("bus", lesson, BusStand.hints))
     }
 
     @Test(expected = IllegalArgumentException::class)

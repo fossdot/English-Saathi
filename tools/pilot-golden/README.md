@@ -16,9 +16,13 @@ TZ=Asia/Kolkata node tools/pilot-golden/generate.mjs
   stubbed DOM and storage, and a fake clock for multi-day histories.
 - `agreed-changes.mjs` is the overlay. It runs inside the pilot's `vm` and
   replaces only the pilot functions that the agreed changes touch:
+  - the content decisions: Patna and Bettiah get `score: false` and lose
+    their accept lists
   - the one normalizer (`agreedNormalize`), and recognizer output with
     bracketed tags removed (`agreedHeard`)
-  - normalized accept entries
+  - normalized accept entries, and homophones (`agreedHomophones`)
+  - unscored words (`agreedUnscored`): aligned, but left out of the count,
+    the stars, the word to fix and the Leitner box
   - "nothing heard"
   - the word to fix and the step-4 chunk, chosen by position
   - passing steps 3–5 on the fixed word only
@@ -30,14 +34,16 @@ TZ=Asia/Kolkata node tools/pilot-golden/generate.mjs
   It is written from `docs/decisions.md` alone, independently of the Kotlin
   code. Everything else is the pilot's own code.
 - `generate.mjs` writes `domain/src/test/resources/pilot-golden/*.json`:
-  - `content.json`: the pilot's lesson, words and hints
+  - `content.json`: the pilot's lesson, words and hints, with the agreed
+    content changes
   - `normalize.json`: `pilot` (the pilot's `normText`), `agreed` (the one
     normalizer) and `heard` (recognizer output: tags removed, then
     normalized; empty means "Didn't hear you")
   - `align.json`: the pilot's alignment on word lists
-  - `attempts.json`: attempts on the bus-stand sentences
-  - `probes.json`: edge-case sentences with their `chunks` and `accept`
-    lists. The `pilot*` fields come from the unpatched pilot. `fixChunk`
+  - `attempts.json`: attempts on the bus-stand sentences. `scored` says, per
+    target word, whether it counts (false for unscored words).
+  - `probes.json`: edge-case sentences with their `chunks`, `accept` lists
+    and `unscored` words. The `pilot*` fields come from the unpatched pilot. `fixChunk`
     and `fixWordIndex` are present only when there is a word to fix.
   - `picker.json`: Next (`next`) and Start practice (`start`). `dueWords` are
     due today and `notDueWords` are due tomorrow, all in box 1.
@@ -55,6 +61,8 @@ Indian time zone).
 - `bigNumber`
 - `hyphenInTarget`
 - `emptyTargetToken`
+- `homophone`
+- `unscored`
 - `bracketTag`
 - `nothingHeard`
 - `nonAscii` (for information only)
