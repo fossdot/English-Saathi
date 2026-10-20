@@ -22,6 +22,16 @@ Out of scope for v0.1. Collected here so they are not lost.
   at 16 kHz, but if a cheap phone can't, the app could record at 48 kHz and
   let sherpa-onnx resample.
 
+## macOS desktop app
+
+- **Package as a .app after D9** (`docs/desktop-plan.md`): jpackage with a
+  bundled Corretto runtime, so the MacBooks don't need Gradle, Terminal or
+  internet. The app then needs its own microphone text
+  (`NSMicrophoneUsageDescription` in Info.plist) and the
+  `com.apple.security.device.audio-input` entitlement: the Compose Gradle
+  plugin's defaults include neither. macOS will ask for the microphone
+  again, this time for English Saathi instead of Terminal.
+
 ## App size
 
 - **Smaller APK for sharing directly.** The single APK that works on every

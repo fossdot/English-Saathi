@@ -6,9 +6,10 @@ gaps between the spec, the design mockup (`design/`) and the web pilot
 (`docs/pilot/english-practice-pilot.html`).
 
 **Status (2026-10-20):** the macOS desktop app comes first and Android is
-paused (see "Direction change" below). Milestone c is now the desktop UI. It
-waits for the owner's go: this week's student pilots may change the practice
-and feedback screens.
+paused (see "Direction change" below). The desktop plan is
+`docs/desktop-plan.md` (milestones D1–D9). D1–D4 are approved; D5–D9 (the
+screens) wait until this week's student pilots are done, because they may
+change the practice and feedback screens.
 
 ## Direction change: macOS desktop app first (2026-10-19)
 
@@ -30,6 +31,62 @@ and feedback screens.
   used only offline, to draft lesson content (Task A in the benchmark), and
   a teacher reviews every draft before it reaches students. qwen2.5:3b is
   out because its licence forbids commercial use.
+
+## Desktop app: owner answers (2026-10-20)
+
+Answers to the desktop plan's questions (`docs/desktop-plan.md`).
+
+- **Domain changes (Q1):** yes. D4 builds the decided "Homophones" and
+  "Unscored words" rules and moves the word table to the lesson, as
+  described below. The test suite keeps passing; only the cases this file
+  says will change, change.
+- **Shared speech code (Q2):** a new plain Kotlin module `:speech` holds
+  the speech code that doesn't depend on Android, with its tests. `:app`
+  depends on it and behaves the same.
+- **Speech model default (Q3):** both tiny.en and small.en (int8) stay,
+  behind a hidden settings switch, and every attempt logs its model. The
+  switch starts on small.en if a 3-second clip takes 1.5 s or less on the
+  MacBook (measured in D1), otherwise tiny.en. The final default also
+  depends on the student recordings.
+- **Backups (Q4):** the desktop data folder is excluded from Time Machine,
+  as Android app data is excluded from backups.
+- **Slow speech (Q5):** `say -r` barely slows the voices (rate 105 instead
+  of 175 makes speech only about 1.2× longer). So `say` writes to a
+  temporary file and the app time-stretches it to 0.6× with the pitch
+  kept: slow single words matter most, in fixing step 1. The time-stretch
+  code must be our own or a permissively licensed library, named to the
+  owner before it is added.
+- **Run JDK:** Amazon Corretto 17 on the MacBooks, not Temurin: Temurin's
+  `java` lacks the microphone entitlement its hardened runtime needs, so
+  it records silence (`docs/desktop-plan.md`, "Version set").
+- **Profiles (P1):** on the desktop, a colour-and-symbol card the learner
+  recognises, plus a name the facilitator types, used in Results and the
+  CSV. The recorded audio name (see "Owner answers") comes later.
+- **Locked places (P2):** Market, Bank and Hospital, as decided below (the
+  pilot shows only Bank and Hospital).
+- **Labels (P3):** English above Hindi everywhere, at least 16 sp, as
+  decided below. The pilot's one-line labels ("Skip for now · अभी आगे
+  बढ़ें") and its 14–15 px text are not copied.
+- **Streak wording (P4):** a paused streak shows "paused" / "रुका हुआ"
+  under the count, marked for teacher review.
+- **Teacher-review note (P5):** "To be checked by an English teacher"
+  appears on the Results and Settings screens only, never on student
+  screens (the desktop app run from Gradle has no separate test build).
+- **CSV (P6):** the pilot's nine columns in the same order (time, student,
+  sentence, mode, target, heard, correct, total, stars), then `model`,
+  `result` (scored / passed / failed / not heard) and `wait_ms`. "Didn't
+  hear you" attempts are logged with empty counts.
+- **Start screen (P7):** the app always starts at the student picker (the
+  pilot reopens the last student's home screen).
+- **Deleting a student:** a facilitator action with a confirmation step
+  removes the student's progress, attempt-log rows and recordings (D5 or
+  D8).
+- **Recordings on the desktop:** the latest recording per sentence per
+  learner, for sentence attempts only (not fixing steps).
+- **Show words as written** in "Practise again tomorrow" too, not only in
+  the tip, the Fix button and the big word.
+- **Packaging:** a .app with a bundled Corretto runtime comes after D9
+  (`docs/later.md`).
 
 ## Owner answers
 
