@@ -16,6 +16,10 @@ Pro, with the log sent back.
 ## Milestones
 
 **D1. sherpa-onnx on the JVM (MacBook run)**
+
+Status: done on the Apple M4, natively and under Rosetta
+(`docs/desktop-speech.md`); waiting for the MacBook run.
+
 - Move the speech code that doesn't depend on Android (`Transcriber`,
   `SpeechEngine`, `Recorder`, `Endpointer`, `WavReader`, `AsrSettings`) and
   its tests from `:app` into a new plain Kotlin module, `:speech`. Android

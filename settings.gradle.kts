@@ -27,3 +27,7 @@ include(":speech")
 
 // The Android app: recording, speech recognition and the screens.
 include(":app")
+
+// The macOS desktop app (docs/desktop-plan.md). For now: the JVM speech
+// recognizer and the D1 speech check.
+include(":desktop")

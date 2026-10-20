@@ -22,6 +22,7 @@ full one at the end of v0.1.
 | `domain/` | Pure Kotlin rules, with no Android imports: normalizer, aligner, scoring, tip selection, fixing loop, streak, Leitner box, sentence choice |
 | `speech/` | Speech code shared by the Android and desktop apps, with no Android imports: recording, end-of-speech detection, the speech engine |
 | `app/` | The Android app. `speech/` holds the microphone and the Whisper recognizer; `ui/` holds the screens |
+| `desktop/` | The macOS desktop app (`docs/desktop-plan.md`). So far: Whisper through sherpa-onnx's Java library, and the speech check (`docs/desktop-speech.md`) |
 | `scripts/` | `fetch_deps.sh` downloads the speech library and model; `make_test_wavs.sh` makes test clips (macOS) |
 | `docs/decisions.md` | Everything agreed with the product owner, including where the Kotlin rules deliberately differ from the pilot |
 | `docs/asr-model-comparison.md` | Which speech model the app uses, and why |
@@ -50,8 +51,9 @@ scripts/make_test_wavs.sh    # optional, macOS only: lesson sentences for the de
 ```
 
 `fetch_deps.sh` gets these files, which are not kept in git:
-- the sherpa-onnx 1.13.8 library;
-- the Whisper tiny.en files;
+- the sherpa-onnx 1.13.8 library (the Android archive, and for the desktop
+  app the Java library and its macOS native libraries);
+- the Whisper tiny.en files, and small.en (int8) for the desktop app;
 - a LibriSpeech test clip.
 
 It then builds the quantized decoder with
@@ -69,6 +71,8 @@ for every APK, bundle and install.
 ./gradlew :domain:test                  # domain rules, including the pilot golden cases
 ./gradlew :speech:test                  # recording, end of speech, speech engine
 ./gradlew :app:testDebugUnitTest        # answer check, memory figures (JVM)
+./gradlew :desktop:test                 # desktop speech recognizer, with the real models
+./gradlew :desktop:speechCheck          # times both models on the test clips (docs/desktop-speech.md)
 ./gradlew :app:connectedDebugAndroidTest  # on a running emulator or phone
 ./gradlew check                         # unit tests, lint and the offline check
 ```
