@@ -1,0 +1,402 @@
+{
+ "model": "hf.co/arunmcops/Param-1-2.9B-Instruct-GGUF:Q4_K_M",
+ "parameter_size": "2.86B",
+ "quantization": "Q4_K_M",
+ "family": "llama",
+ "task_a": [
+  {
+   "id": "bus_02",
+   "text": "When will the bus come?",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 10.735,
+    "load_s": 0.003,
+    "prompt_tokens": 576,
+    "prompt_tokens_per_s": 54.3,
+    "output_tokens": 2,
+    "tokens_per_s": 16.85
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bus_03",
+   "text": "One ticket to Patna, please.",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.691,
+    "load_s": 0.005,
+    "prompt_tokens": 577,
+    "prompt_tokens_per_s": 371.2,
+    "output_tokens": 2,
+    "tokens_per_s": 15.77
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bus_04",
+   "text": "How much is the ticket?",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.583,
+    "load_s": 0.006,
+    "prompt_tokens": 576,
+    "prompt_tokens_per_s": 399.4,
+    "output_tokens": 2,
+    "tokens_per_s": 15.23
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bus_05",
+   "text": "Does this bus go to Bettiah?",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.76,
+    "load_s": 0.003,
+    "prompt_tokens": 578,
+    "prompt_tokens_per_s": 355.6,
+    "output_tokens": 2,
+    "tokens_per_s": 15.69
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "market_01",
+   "text": "How much is one kilo of rice?",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.823,
+    "load_s": 0.003,
+    "prompt_tokens": 578,
+    "prompt_tokens_per_s": 343.9,
+    "output_tokens": 2,
+    "tokens_per_s": 14.8
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "market_02",
+   "text": "Please give me two kilos of onions.",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.828,
+    "load_s": 0.003,
+    "prompt_tokens": 578,
+    "prompt_tokens_per_s": 341.8,
+    "output_tokens": 2,
+    "tokens_per_s": 15.43
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bank_01",
+   "text": "I want to open a bank account.",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.838,
+    "load_s": 0.004,
+    "prompt_tokens": 578,
+    "prompt_tokens_per_s": 341.1,
+    "output_tokens": 2,
+    "tokens_per_s": 14.86
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bank_02",
+   "text": "Where do I sign?",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.503,
+    "load_s": 0.003,
+    "prompt_tokens": 575,
+    "prompt_tokens_per_s": 421.6,
+    "output_tokens": 2,
+    "tokens_per_s": 15.38
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "hospital_01",
+   "text": "My child has had a fever since yesterday.",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 2.088,
+    "load_s": 0.003,
+    "prompt_tokens": 581,
+    "prompt_tokens_per_s": 299.4,
+    "output_tokens": 2,
+    "tokens_per_s": 14.25
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "hospital_02",
+   "text": "Which doctor should I see?",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.597,
+    "load_s": 0.005,
+    "prompt_tokens": 576,
+    "prompt_tokens_per_s": 396.0,
+    "output_tokens": 2,
+    "tokens_per_s": 14.98
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  }
+ ],
+ "task_b": [
+  {
+   "id": "bus_01-1",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 6.329,
+    "load_s": 0.003,
+    "prompt_tokens": 207,
+    "prompt_tokens_per_s": 52.3,
+    "output_tokens": 21,
+    "tokens_per_s": 8.97
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_01-2",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 4.466,
+    "load_s": 0.004,
+    "prompt_tokens": 211,
+    "prompt_tokens_per_s": 148.4,
+    "output_tokens": 26,
+    "tokens_per_s": 8.56
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_01-3",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 3.917,
+    "load_s": 0.004,
+    "prompt_tokens": 211,
+    "prompt_tokens_per_s": 144.6,
+    "output_tokens": 22,
+    "tokens_per_s": 8.97
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_02-4",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 2.708,
+    "load_s": 0.007,
+    "prompt_tokens": 207,
+    "prompt_tokens_per_s": 109.5,
+    "output_tokens": 8,
+    "tokens_per_s": 9.92
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_03-5",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 1.955,
+    "load_s": 0.004,
+    "prompt_tokens": 216,
+    "prompt_tokens_per_s": 117.9,
+    "output_tokens": 2,
+    "tokens_per_s": 17.5
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_04-6",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 2.034,
+    "load_s": 0.003,
+    "prompt_tokens": 207,
+    "prompt_tokens_per_s": 108.5,
+    "output_tokens": 2,
+    "tokens_per_s": 16.86
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_05-7",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 2.905,
+    "load_s": 0.005,
+    "prompt_tokens": 217,
+    "prompt_tokens_per_s": 117.1,
+    "output_tokens": 10,
+    "tokens_per_s": 9.59
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_05-8",
+   "output": "",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": null,
+    "wall_s": 2.53,
+    "load_s": 0.003,
+    "prompt_tokens": 217,
+    "prompt_tokens_per_s": 149.0,
+    "output_tokens": 10,
+    "tokens_per_s": 9.36
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 0,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  }
+ ],
+ "load_s": 2.407,
+ "first_response_wall_s": 4.873,
+ "speech_after_llm": [
+  "After early nightfall, the yellow lamps would light.",
+  0.165
+ ],
+ "peak_ram_mb": {
+  "ollama_total_mb": 2561,
+  "children_mb": 2514,
+  "self_mb": 127
+ },
+ "medians": {
+  "task_a": {
+   "ttft_s": null,
+   "tokens_per_s": 15.3,
+   "prompt_tokens_per_s": 349.75,
+   "wall_s": 1.79,
+   "output_tokens": 2.0
+  },
+  "task_b": {
+   "ttft_s": null,
+   "tokens_per_s": 9.47,
+   "prompt_tokens_per_s": 117.5,
+   "wall_s": 2.81,
+   "output_tokens": 10.0
+  }
+ },
+ "format": {
+  "task_a_valid_json": 0,
+  "task_a_valid_after_brace_repair": 0,
+  "task_a_all_checks": 0,
+  "task_b_devanagari": 0,
+  "task_b_at_most_2_sentences": 0
+ }
+}

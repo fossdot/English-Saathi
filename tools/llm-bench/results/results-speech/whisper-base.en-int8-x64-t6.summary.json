@@ -1,0 +1,14 @@
+{
+ "config": "whisper-base.en-int8-x64",
+ "threads": 6,
+ "files": {
+  "sherpa-onnx-whisper-base.en/base.en-encoder.int8.onnx": 29120534,
+  "sherpa-onnx-whisper-base.en/base.en-decoder.int8.onnx": 130669978,
+  "sherpa-onnx-whisper-base.en/base.en-tokens.txt": 835554
+ },
+ "load_s": 0.619,
+ "first_decode_s": 0.325,
+ "rss_before_mb": 123.8,
+ "rss_after_load_mb": 591.2,
+ "rss_peak_mb": 692.3
+}

@@ -1,0 +1,11 @@
+{
+  "hf.co/itlwas/Nemotron-4-Mini-Hindi-4B-Instruct-Q4_K_M-GGUF": {
+    "stop": ["<extra_id_1>"],
+    "why": "The GGUF's template is right but has no stop marker, so the model goes on to write the next <extra_id_1> User turn itself."
+  },
+  "hf.co/arunmcops/Param-1-2.9B-Instruct-GGUF:Q4_K_M": {
+    "stop": ["<|im_end|>"],
+    "prompt": "<|im_start|>system\n{system}<|im_end|>\n<|im_start|>user\n{user}<|im_end|>\n<|im_start|>assistant\n",
+    "why": "Ollama gives this GGUF a Qwen3-style template that ends the prompt with an open <think> tag, after which the model stops at once with an empty answer. This is the model's own ChatML format from chat_template.jinja in bharatgenai/Param-1-2.9B-Instruct."
+  }
+}

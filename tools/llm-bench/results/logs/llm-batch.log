@@ -1,0 +1,224 @@
+not available: gemma3n:e4b
+models: llama3.2:1b-instruct-q4_K_M llama3.2:3b gemma3:1b gemma3:4b qwen3:1.7b qwen3:4b qwen2.5:3b phi4-mini nemotron-mini hf.co/itlwas/Nemotron-4-Mini-Hindi-4B-Instruct-Q4_K_M-GGUF hf.co/arunmcops/Param-1-2.9B-Instruct-GGUF:Q4_K_M
+== llama3.2:1b-instruct-q4_K_M
+  A bus_02: 13.36 tok/s, ttft 4.426 s
+  A bus_03: 13.27 tok/s, ttft 0.738 s
+  A bus_04: 13.36 tok/s, ttft 0.624 s
+  A bus_05: 13.08 tok/s, ttft 0.733 s
+  A market_01: 13.26 tok/s, ttft 0.787 s
+  A market_02: 13.22 tok/s, ttft 0.777 s
+  A bank_01: 13.28 tok/s, ttft 0.735 s
+  A bank_02: 13.46 tok/s, ttft 0.568 s
+  A hospital_01: 12.69 tok/s, ttft 0.785 s
+  A hospital_02: 13.42 tok/s, ttft 0.634 s
+  B bus_01-1: 15.43 tok/s, ttft 2.087 s
+  B bus_01-2: 15.3 tok/s, ttft 1.575 s
+  B bus_01-3: 15.61 tok/s, ttft 1.519 s
+  B bus_02-4: 15.29 tok/s, ttft 0.929 s
+  B bus_03-5: 14.59 tok/s, ttft 0.994 s
+  B bus_04-6: 16.1 tok/s, ttft 0.981 s
+  B bus_05-7: 14.36 tok/s, ttft 1.018 s
+  B bus_05-8: 14.99 tok/s, ttft 0.786 s
+== llama3.2:3b
+  A bus_02: 5.22 tok/s, ttft 13.49 s
+  A bus_03: 5.22 tok/s, ttft 2.067 s
+  A bus_04: 5.22 tok/s, ttft 1.75 s
+  A bus_05: 5.18 tok/s, ttft 2.061 s
+  A market_01: 5.14 tok/s, ttft 2.216 s
+  A market_02: 5.19 tok/s, ttft 2.239 s
+  A bank_01: 5.13 tok/s, ttft 2.086 s
+  A bank_02: 5.2 tok/s, ttft 1.599 s
+  A hospital_01: 5.13 tok/s, ttft 2.228 s
+  A hospital_02: 5.19 tok/s, ttft 1.758 s
+  B bus_01-1: 5.89 tok/s, ttft 5.832 s
+  B bus_01-2: 5.97 tok/s, ttft 4.596 s
+  B bus_01-3: 5.81 tok/s, ttft 4.418 s
+  B bus_02-4: 6.02 tok/s, ttft 2.508 s
+  B bus_03-5: 5.82 tok/s, ttft 2.643 s
+  B bus_04-6: 5.8 tok/s, ttft 2.602 s
+  B bus_05-7: 5.83 tok/s, ttft 2.725 s
+  B bus_05-8: 5.28 tok/s, ttft 2.073 s
+== gemma3:1b
+  A bus_02: 11.82 tok/s, ttft 4.035 s
+  A bus_03: 11.87 tok/s, ttft 0.869 s
+  A bus_04: 11.84 tok/s, ttft 0.8 s
+  A bus_05: 11.77 tok/s, ttft 0.934 s
+  A market_01: 11.88 tok/s, ttft 0.936 s
+  A market_02: 11.73 tok/s, ttft 0.939 s
+  A bank_01: 11.73 tok/s, ttft 0.938 s
+  A bank_02: 11.8 tok/s, ttft 0.738 s
+  A hospital_01: 11.74 tok/s, ttft 1.001 s
+  A hospital_02: 11.81 tok/s, ttft 0.801 s
+  B bus_01-1: 12.93 tok/s, ttft 2.022 s
+  B bus_01-2: 12.77 tok/s, ttft 1.984 s
+  B bus_01-3: 12.84 tok/s, ttft 1.978 s
+  B bus_02-4: 12.98 tok/s, ttft 1.943 s
+  B bus_03-5: 12.94 tok/s, ttft 1.985 s
+  B bus_04-6: 12.95 tok/s, ttft 1.923 s
+  B bus_05-7: 13.5 tok/s, ttft 2.015 s
+  B bus_05-8: 13.22 tok/s, ttft 2.04 s
+== gemma3:4b
+  A bus_02: 4.37 tok/s, ttft 18.755 s
+  A bus_03: 4.41 tok/s, ttft 17.557 s
+  A bus_04: 4.38 tok/s, ttft 16.117 s
+  A bus_05: 4.4 tok/s, ttft 16.598 s
+  A market_01: 4.39 tok/s, ttft 16.214 s
+  A market_02: 2.78 tok/s, ttft 16.381 s
+  A bank_01: 2.74 tok/s, ttft 25.281 s
+  A bank_02: 2.76 tok/s, ttft 24.924 s
+  A hospital_01: 2.72 tok/s, ttft 26.098 s
+  A hospital_02: 2.74 tok/s, ttft 25.456 s
+  B bus_01-1: 3.02 tok/s, ttft 11.783 s
+  B bus_01-2: 2.51 tok/s, ttft 14.177 s
+  B bus_01-3: 2.59 tok/s, ttft 18.071 s
+  B bus_02-4: 2.77 tok/s, ttft 15.231 s
+  B bus_03-5: 2.27 tok/s, ttft 18.705 s
+  B bus_04-6: 2.76 tok/s, ttft 15.968 s
+  B bus_05-7: 2.34 tok/s, ttft 15.868 s
+  B bus_05-8: 2.79 tok/s, ttft 16.236 s
+== qwen3:1.7b
+  A bus_02: 4.93 tok/s, ttft 14.477 s
+  A bus_03: 9.32 tok/s, ttft 2.971 s
+  A bus_04: 9.54 tok/s, ttft 1.497 s
+  A bus_05: 9.22 tok/s, ttft 1.74 s
+  A market_01: 9.63 tok/s, ttft 1.789 s
+  A market_02: 9.46 tok/s, ttft 1.756 s
+  A bank_01: 9.38 tok/s, ttft 1.795 s
+  A bank_02: 9.41 tok/s, ttft 1.452 s
+  A hospital_01: 8.85 tok/s, ttft 1.804 s
+  A hospital_02: 9.67 tok/s, ttft 1.56 s
+  B bus_01-1: 11.17 tok/s, ttft 3.263 s
+  B bus_01-2: 10.75 tok/s, ttft 1.207 s
+  B bus_01-3: 11.18 tok/s, ttft 1.187 s
+  B bus_02-4: 10.54 tok/s, ttft 1.524 s
+  B bus_03-5: 10.38 tok/s, ttft 1.707 s
+  B bus_04-6: 11.06 tok/s, ttft 1.542 s
+  B bus_05-7: 10.44 tok/s, ttft 1.763 s
+  B bus_05-8: 10.51 tok/s, ttft 1.302 s
+== qwen3:4b
+  A bus_02: 3.76 tok/s, ttft 18.074 s
+  A bus_03: 3.86 tok/s, ttft 3.018 s
+  A bus_04: 3.6 tok/s, ttft 2.948 s
+  A bus_05: 3.66 tok/s, ttft 3.864 s
+  A market_01: 0.74 tok/s, ttft 3.226 s
+  A market_02: 0.56 tok/s, ttft 3.179 s
+  A bank_01: 3.82 tok/s, ttft 3.526 s
+  A bank_02: 3.58 tok/s, ttft 2.531 s
+  A hospital_01: 3.72 tok/s, ttft 3.192 s
+  A hospital_02: 3.73 tok/s, ttft 2.991 s
+  B bus_01-1: 4.6 tok/s, ttft 7.681 s
+  B bus_01-2: 4.59 tok/s, ttft 2.541 s
+  B bus_01-3: 4.34 tok/s, ttft 2.491 s
+  B bus_02-4: 4.51 tok/s, ttft 4.078 s
+  B bus_03-5: 4.48 tok/s, ttft 3.573 s
+  B bus_04-6: 4.39 tok/s, ttft 3.516 s
+  B bus_05-7: 4.72 tok/s, ttft 3.686 s
+  B bus_05-8: 4.73 tok/s, ttft 2.558 s
+== qwen2.5:3b
+  A bus_02: 6.17 tok/s, ttft 13.049 s
+  A bus_03: 5.94 tok/s, ttft 1.797 s
+  A bus_04: 6.0 tok/s, ttft 1.563 s
+  A bus_05: 6.03 tok/s, ttft 1.878 s
+  A market_01: 5.94 tok/s, ttft 2.031 s
+  A market_02: 5.8 tok/s, ttft 1.982 s
+  A bank_01: 5.69 tok/s, ttft 1.93 s
+  A bank_02: 5.83 tok/s, ttft 1.396 s
+  A hospital_01: 6.03 tok/s, ttft 1.971 s
+  A hospital_02: 5.88 tok/s, ttft 1.566 s
+  B bus_01-1: 6.67 tok/s, ttft 5.468 s
+  B bus_01-2: 6.49 tok/s, ttft 4.321 s
+  B bus_01-3: 6.37 tok/s, ttft 3.909 s
+  B bus_02-4: 5.81 tok/s, ttft 2.766 s
+  B bus_03-5: 6.26 tok/s, ttft 2.725 s
+  B bus_04-6: 6.55 tok/s, ttft 2.585 s
+  B bus_05-7: 6.16 tok/s, ttft 2.83 s
+  B bus_05-8: 6.32 tok/s, ttft 2.048 s
+== phi4-mini
+  A bus_02: 4.76 tok/s, ttft 15.361 s
+  A bus_03: 4.4 tok/s, ttft 1.757 s
+  A bus_04: 4.8 tok/s, ttft 1.367 s
+  A bus_05: 4.8 tok/s, ttft 1.683 s
+  A market_01: 4.52 tok/s, ttft 1.871 s
+  A market_02: 4.62 tok/s, ttft 1.913 s
+  A bank_01: 4.43 tok/s, ttft 1.679 s
+  A bank_02: 4.14 tok/s, ttft 1.639 s
+  A hospital_01: 4.61 tok/s, ttft 2.226 s
+  A hospital_02: 4.45 tok/s, ttft 1.375 s
+  B bus_01-1: 5.41 tok/s, ttft 5.911 s
+  B bus_01-2: 5.05 tok/s, ttft 4.703 s
+  B bus_01-3: 3.61 tok/s, ttft 4.607 s
+  B bus_02-4: 5.41 tok/s, ttft 2.636 s
+  B bus_03-5: 3.14 tok/s, ttft 3.12 s
+  B bus_04-6: 4.67 tok/s, ttft 2.732 s
+  B bus_05-7: 4.86 tok/s, ttft 3.907 s
+  B bus_05-8: 4.92 tok/s, ttft 2.307 s
+== nemotron-mini
+  A bus_02: 5.14 tok/s, ttft 15.782 s
+  A bus_03: 5.2 tok/s, ttft 1.71 s
+  A bus_04: 4.98 tok/s, ttft 1.431 s
+  A bus_05: 5.26 tok/s, ttft 1.742 s
+  A market_01: 5.4 tok/s, ttft 1.688 s
+  A market_02: 5.22 tok/s, ttft 1.73 s
+  A bank_01: 5.03 tok/s, ttft 1.722 s
+  A bank_02: 5.44 tok/s, ttft 1.29 s
+  A hospital_01: 4.36 tok/s, ttft 1.857 s
+  A hospital_02: 5.16 tok/s, ttft 1.49 s
+  B bus_01-1: 6.88 tok/s, ttft 5.564 s
+  B bus_01-2: 7.09 tok/s, ttft 4.025 s
+  B bus_01-3: 6.99 tok/s, ttft 3.767 s
+  B bus_02-4: 6.63 tok/s, ttft 2.317 s
+  B bus_03-5: 6.59 tok/s, ttft 2.315 s
+  B bus_04-6: 6.77 tok/s, ttft 2.481 s
+  B bus_05-7: 6.5 tok/s, ttft 2.551 s
+  B bus_05-8: 6.51 tok/s, ttft 1.906 s
+== hf.co/itlwas/Nemotron-4-Mini-Hindi-4B-Instruct-Q4_K_M-GGUF
+  A bus_02: 4.38 tok/s, ttft 16.002 s
+  A bus_03: 4.03 tok/s, ttft 1.831 s
+  A bus_04: 3.95 tok/s, ttft 1.749 s
+  A bus_05: 4.05 tok/s, ttft 2.05 s
+  A market_01: 3.91 tok/s, ttft 1.513 s
+  A market_02: 4.67 tok/s, ttft 2.017 s
+  A bank_01: 4.64 tok/s, ttft 2.003 s
+  A bank_02: 4.4 tok/s, ttft 1.471 s
+  A hospital_01: 4.49 tok/s, ttft 2.111 s
+  A hospital_02: 4.73 tok/s, ttft 1.649 s
+  B bus_01-1: 5.31 tok/s, ttft 5.959 s
+  B bus_01-2: 5.54 tok/s, ttft 4.805 s
+  B bus_01-3: 5.71 tok/s, ttft 3.89 s
+  B bus_02-4: 5.51 tok/s, ttft 2.458 s
+  B bus_03-5: 5.73 tok/s, ttft 2.357 s
+  B bus_04-6: 5.76 tok/s, ttft 2.392 s
+  B bus_05-7: 5.64 tok/s, ttft 2.436 s
+  B bus_05-8: 5.53 tok/s, ttft 2.012 s
+== hf.co/arunmcops/Param-1-2.9B-Instruct-GGUF:Q4_K_M
+  A bus_02: 16.85 tok/s, ttft None s
+  A bus_03: 15.77 tok/s, ttft None s
+  A bus_04: 15.23 tok/s, ttft None s
+  A bus_05: 15.69 tok/s, ttft None s
+  A market_01: 14.8 tok/s, ttft None s
+  A market_02: 15.43 tok/s, ttft None s
+  A bank_01: 14.86 tok/s, ttft None s
+  A bank_02: 15.38 tok/s, ttft None s
+  A hospital_01: 14.25 tok/s, ttft None s
+  A hospital_02: 14.98 tok/s, ttft None s
+  B bus_01-1: 8.97 tok/s, ttft None s
+  B bus_01-2: 8.56 tok/s, ttft None s
+  B bus_01-3: 8.97 tok/s, ttft None s
+  B bus_02-4: 9.92 tok/s, ttft None s
+  B bus_03-5: 17.5 tok/s, ttft None s
+  B bus_04-6: 16.86 tok/s, ttft None s
+  B bus_05-7: 9.59 tok/s, ttft None s
+  B bus_05-8: 9.36 tok/s, ttft None s
+### llama-bench (llama.cpp x86_64 AVX2 build) on the same 4-bit files, 6 threads
+== llama3.2:1b-instruct-q4_K_M -> /Users/fossdot/.ollama/models/blobs/sha256-84fffd9ce0ecc7e0a36ec7a3c3aa21bb888213f8bf3db9408d5520a26412f06e
+== llama3.2:3b -> /Users/fossdot/.ollama/models/blobs/sha256-dde5aa3fc5ffc17176b5e8bdc82f587b24b2678c6c66101bf7da77af9f7ccdff
+== gemma3:1b -> /Users/fossdot/.ollama/models/blobs/sha256-2f8c3d137f2496dcb4019e17a50f2974b89c1be1a742db3c80cc86f91cafeeef
+== gemma3:4b -> /Users/fossdot/.ollama/models/blobs/sha256-f06e91e18fc74295d0c781bf91622508c75655e2c18ed869d52447ffe1e667e1
+== qwen3:1.7b -> /Users/fossdot/.ollama/models/blobs/sha256-3d0b790534fe4b79525fc3692950408dca41171676ed7e21db57af5c65ef6ab6
+== qwen3:4b -> /Users/fossdot/.ollama/models/blobs/sha256-3e4cb14174460404e7a233e531675303b2fbf7749c02f91864fe311ab6344e4f
+== qwen2.5:3b -> /Users/fossdot/.ollama/models/blobs/sha256-5ee4f07cdb9beadbbb293e85803c569b01bd37ed059d2715faa7bb405f31caa6
+== phi4-mini -> /Users/fossdot/.ollama/models/blobs/sha256-3c168af1dea0a414299c7d9077e100ac763370e5a98b3c53801a958a47f0a5db
+== nemotron-mini -> /Users/fossdot/.ollama/models/blobs/sha256-1dcbd925825b41744ddc2fc3047db6d3ad0aecf8d336f4fadc044eaaf79779d5
+== hf.co/itlwas/Nemotron-4-Mini-Hindi-4B-Instruct-Q4_K_M-GGUF -> /Users/fossdot/.ollama/models/blobs/sha256-642dc5ba1e15b4c25c7947e5fa68cb3fc3842a6e8e02173b645cbccc09806cb4
+== hf.co/arunmcops/Param-1-2.9B-Instruct-GGUF:Q4_K_M -> /Users/fossdot/.ollama/models/blobs/sha256-11bbaa8d5c6d6d7c6ec64947f5a4b5bb29ecebe6642a10ecd42404039ece23c0
+LLM-BATCH-DONE

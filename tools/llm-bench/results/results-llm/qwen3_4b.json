@@ -1,0 +1,402 @@
+{
+ "model": "qwen3:4b",
+ "parameter_size": "4.0B",
+ "quantization": "Q4_K_M",
+ "family": "qwen3",
+ "task_a": [
+  {
+   "id": "bus_02",
+   "text": "When will the bus come?",
+   "output": "We are given the sentence: \"When will the bus come?\"\n\nStep 1: Translate to Hindi (Devanagari, polite form, natural for a villager)\nThe sentence in English: \"When will the bus come?\"\nIn Hindi (using polite \"आप\" form and natural for a villager): \n  - \"When\" -> \"कहाँ\" (but note: in this context, we are asking about time, so we use \"कब\" for \"when\" in the sense of \"at what time\")\n  - However, the common phrase for \"When will the bus come?\" in Hindi (for a villager) might be: \"बस कब आएगी?\" but note: the verb \"come\" in future tense for bus (which is feminine) would be \"आएगी\" (for feminine) but in informal Hindi, sometimes they use the present tense for future? \n  - But the example in the problem uses \"बस स्टॉप कहाँ है?\" for \"Where is the bus stop?\" so we follow natural.\n\nLet me think: \n  In Hindi, for \"When will the bus come?\" we can say: \"बस कब आएगी?\" (if the bus is feminine) but in many villages, they might use the present tense for future? Actually, the verb for \"come\" in Hindi is \"आना\". The future tense for feminine noun (bus) would be \"आएगी\" (for third person feminine). However, in the context of a villager, they might use the present tense for future? \n\nBut note: the problem says \"polite (आप form) and natural, as a villager would say it\". \n\nAlternative: In many rural areas, they might use the present tense for future (like \"bus kya aayega?\" but that's not exactly). \n\nActually, the standard translation for \"When will the bus come?\" in Hindi (for a villager) is: \"बस कब आएगी?\" (using the future tense for feminine). However, in the example they used \"कहाँ है\" (present tense) for \"is\", so we have to be consistent.\n\nBut note: the problem says \"villagers in Bihar\". In Bihar, they use Hindi. \n\nLet me check: \n  The verb \"to come\" in Hindi: आना (aana). \n  For \"bus\" (बस) is feminine? Actually, in Hindi, \"bus\" is a masculine noun? Wait, no: in Hindi, \"bus\" is a masculine noun? \n\nWait, in Hindi, the gender of \"bus\" is masculine? Actually, in Hindi, the word \"bus\" is borrowed and is masculine. So the verb conjugation would be for masculine: \"आएगा\" (for third person masculine). \n\nBut in the example, they used \"bus\" as a masculine? \n\nHowever, in the problem, the example sentence was \"Where is the bus stop?\" -> \"बस स्टॉप कहाँ है?\" (so they used the present tense for the bus stop, which is a masculine noun? Actually, \"bus stop\" is a compound noun and in Hindi it's treated as masculine?).\n\nBut for the verb: \n  \"When will the bus come?\" -> \"बस कब आएगा?\" (if masculine) or \"बस कब आएगी?\" (if feminine). \n\nIn Hindi, the word \"bus\" (बस) is masculine. So we use \"आएगा\". \n\nBut in the context of a villager in Bihar, they might use the present tense for future? Actually, in informal Hindi,",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 18.074,
+    "wall_s": 230.732,
+    "load_s": 0.009,
+    "prompt_tokens": 521,
+    "prompt_tokens_per_s": 28.9,
+    "output_tokens": 800,
+    "tokens_per_s": 3.76
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bus_03",
+   "text": "One ticket to Patna, please.",
+   "output": "We are given the sentence: \"One ticket to Patna, please.\"\n\nStep 1: Translate to Hindi (Devanagari) in polite (आप form) and natural as a villager would say it.\nThe sentence in English: \"One ticket to Patna, please.\"\nIn Hindi (for a villager in Bihar, polite form): \n  - \"One ticket\" -> \"एक टिकट\"\n  - \"to Patna\" -> \"पटना तक\" (but note: in Hindi, we often say \"पटना जाने वाला\" for \"to Patna\", but in this context, it's a location so we can say \"पटना\" as the destination. However, the phrase \"to Patna\" in the context of a ticket might be expressed as \"पटना के लिए\" or simply \"पटना तक\". But note: the example in the problem uses \"bus stop\" as \"बस स्टॉप\", so we have to be natural.\n\nLet me think: In Hindi, when you say \"ticket to Patna\", it's common to say \"पटना तक का एक टिकट\" but the sentence structure in English is \"One ticket to Patna, please.\" meaning they want one ticket for Patna.\n\nA natural translation for a villager in Bihar (polite) would be: \"पटना के लिए एक टिकट, कृपया।\" \nBut note: the example in the problem uses a question mark in the Hindi translation for the example sentence. However, in this sentence, it's a request so it's a statement with a polite request.\n\nAlternatively, in the context of a ticket counter, they might say: \"पटना तक एक टिकट, कृपया।\"\n\nBut let's check the common usage in Bihar. Since the app is for Hindi speakers from villages in Bihar, we want a natural translation.\n\nI think the most natural translation for a villager would be: \"पटना के लिए एक टिकट, कृपया।\" \nHowever, note that in Hindi, when you say \"to Patna\", it's often \"पटना जाने वाला\" but for a ticket, it's simpler.\n\nBut the problem says: \"polite (आप form) and natural, as a villager would say it.\"\n\nAnother common way: In many Indian contexts, for such a request, they say: \"पटना के लिए एक टिकट चाहिए, कृपया।\" but the example sentence is in the imperative for the ticket (it's a request for one ticket to Patna).\n\nHowever, the problem says: \"One ticket to Patna, please.\" -> so it's a direct request.\n\nLet me look for a standard translation. I recall that in Hindi, the phrase for \"ticket to Patna\" is often \"पटना तक का टिकट\".\n\nBut to be precise and natural for a villager in Bihar, I'll go with: \"पटना के लिए एक टिकट, कृपया।\"\n\nBut note: the example in the problem for the sentence \"Where is the bus stop?\" was translated as \"बस स्टॉप कहाँ है?\" which is a question. Here, the sentence is a statement with a polite request.\n\n",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.018,
+    "wall_s": 210.308,
+    "load_s": 0.01,
+    "prompt_tokens": 523,
+    "prompt_tokens_per_s": 179.2,
+    "output_tokens": 800,
+    "tokens_per_s": 3.86
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bus_04",
+   "text": "How much is the ticket?",
+   "output": "We are given the sentence: \"How much is the ticket?\"\n\nStep 1: Translate to Hindi (Devanagari, polite form, natural for a villager)\nThe sentence in English: \"How much is the ticket?\"\nIn Hindi (polite form, using \"आप\"): \n  \"How much\" -> \"कितना\" (but note: in context of price, we might say \"कितना\" for \"how much\" in terms of money)\n  \"is the ticket\" -> \"बिल्कुल\" is not the right word. Actually, the ticket is \"टिकट\" (ticket) and in Hindi we say \"टिकट का कितना\" but the structure for \"how much is the ticket?\" is: \"टिकट कितना है?\"\n\nHowever, note: In Hindi, when we say \"how much is the ticket?\" we might say: \"टिकट कितना है?\" but the common phrase for price is \"कितना\" (how much) and the object is \"टिकट\".\n\nBut let's think: In the context of a ticket (like a bus ticket), the natural Hindi phrase for a villager would be: \"टिकट कितना है?\" (but note: the word order in Hindi is different? Actually, in Hindi we often say \"कितना है टिकट?\" but the polite form for the question is usually with the verb at the end? However, the example in the problem uses \"बस स्टॉप कहाँ है?\" so the structure is: [object] [how much] [is] ...)\n\nBut the problem says: \"polite (आप form) and natural, as a villager would say it.\"\n\nIn Hindi, for a question like \"How much is the ticket?\" we can say: \"टिकट कितना है?\" (meaning: \"Ticket how much is?\") but note that in Hindi, the verb \"है\" (is) is used for the present. However, the common way to ask for price in Hindi is: \"कितना चढ़ा है?\" but that's for a specific context.\n\nActually, for a ticket (like a bus ticket) in a market, a villager might say: \"टिकट कितना है?\" (literally: \"Ticket how much is?\")\n\nBut let's check with the example: In the example, the Hindi for \"Where is the bus stop?\" is \"बस स्टॉप कहाँ है?\".\n\nSo for \"How much is the ticket?\", we can structure it as: [object] [how much] [is] -> \"टिकट कितना है?\"\n\nHowever, note: In Hindi, the word for \"how much\" in terms of money is \"कितना\" (for quantity) but when we say \"how much\" for a price, we use \"कितना\" as well.\n\nBut the problem says: \"natural, as a villager would say it\". So we'll go with: \"टिकट कितना है?\"\n\nBut wait: In Hindi, the verb \"है\" is used for the present, and the question structure is: [object] [how much] [is] -> but actually, the verb \"है\" is the third person singular of \"to be\". So the phrase is: \"टिकट कितना है?\" (meaning:",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 2.948,
+    "wall_s": 225.387,
+    "load_s": 0.017,
+    "prompt_tokens": 521,
+    "prompt_tokens_per_s": 185.4,
+    "output_tokens": 800,
+    "tokens_per_s": 3.6
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bus_05",
+   "text": "Does this bus go to Bettiah?",
+   "output": "We are given the sentence: \"Does this bus go to Bettiah?\"\n\nStep 1: Translate to Hindi (in Devanagari, polite form, natural for a villager)\nThe sentence in English: \"Does this bus go to Bettiah?\"\nIn Hindi (using polite \"आप\" form and natural village speech): \n  - \"Bettiah\" is a place name, so we keep it as is (in Hindi it's often written in Devanagari as \"बेटिया\" but note: the app uses the English spelling for place names? However, the example used \"बस स्टॉप\" for \"bus stop\", so we'll write the place name in Devanagari as per common Hindi transliteration).\n  - But note: the example for \"bus stop\" was translated as \"बस स्टॉप\" (without changing the English word). Similarly, we'll transliterate \"Bettiah\" as \"बेटिया\" (since in Hindi, it's often written that way for the place).\n\nHowever, the problem says: \"its Hindi translation in Devanagari, polite (आप form) and natural, as a villager would say it.\"\n\nLet's break down the English sentence:\n  - \"Does this bus go to Bettiah?\" \n  - In Hindi: \"यह बस बेटिया जाती है?\" \n    But note: the question form. In Hindi, we use \"कहाँ\" for \"where\", but here it's \"to Bettiah\". Also, the verb \"go\" in this context is \"जाती है\" (for feminine bus? but bus is masculine in Hindi? Actually, in Hindi, the bus is \"बस\" which is feminine? Wait, no: in Hindi, \"bus\" is a masculine noun? Actually, in Hindi, the word for bus is \"बस\" and it's feminine? Let me check: \n    However, the app is for villagers in Bihar. They might use a simpler structure.\n\nBut the example used: \"Where is the bus stop?\" -> \"बस स्टॉप कहाँ है?\" (so the structure is: [object] [verb] कहाँ है? for \"where is ...\")\n\nFor the question \"Does this bus go to Bettiah?\", we can structure it as:\n  \"यह बस बेटिया जाती है?\" \n  But note: the verb \"go\" in the present continuous? Actually, the sentence is in present tense: \"Does this bus go to Bettiah?\" meaning \"Does this bus go to Bettiah?\" (as in, does it go there?).\n\nHowever, in Hindi, we might say: \"यह बस बेटिया जाती है?\" (using the present continuous for the verb? Actually, in Hindi, the verb for \"go\" is \"जाना\", but in the present continuous we use the present tense with \"रहता\" or \"जाता\"?)\n\nBut the example used a simple structure. Let's think of a natural way for a villager.\n\nAlternatively, we can use the structure: \"यह बस बेटिया जाती है?\" (meaning: \"This bus goes to Bettiah?\")\n\nBut note: the verb \"go\" in the present simple for the bus (which is feminine) would be \"जाती है\". \n\nHowever, the problem says: \"polite (आप form) and natural\". In Hindi, when we ask a question to someone, we",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.864,
+    "wall_s": 222.442,
+    "load_s": 0.016,
+    "prompt_tokens": 523,
+    "prompt_tokens_per_s": 140.0,
+    "output_tokens": 800,
+    "tokens_per_s": 3.66
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "market_01",
+   "text": "How much is one kilo of rice?",
+   "output": "We are given the sentence: \"How much is one kilo of rice?\"\n\nStep 1: Translate to Hindi (Devanagari, polite form, natural for a villager)\nThe sentence in English: \"How much is one kilo of rice?\"\nIn Hindi (using polite form \"आप\" and natural village speech): \n  The phrase \"How much\" -> \"कितना\"\n  \"is\" -> \"कितना है\" (but note: in Hindi, we don't say \"is\" in the same way; the structure is: [What] + [is] + [quantity] + [of] + [item]\")\n  However, the natural translation for a villager in Bihar would be: \"एक किलो राइस कितना है?\" but note that in Hindi, we don't use \"rice\" as \"राइस\" (it's \"चावल\" for rice). \n  But wait: the problem says \"Hindi speakers from villages in Bihar\". In Bihar, they might use English loanwords for \"rice\" (like \"राइस\")? Actually, in Hindi, rice is \"चावल\". However, the context is that the app is for Hindi speakers who are learning English, so they might use English words for things they know? But the problem says: \"Hindi translation in Devanagari\".\n\nLet me clarify: The app is for Hindi speakers from villages in Bihar to practice speaking English. So they are learning English, but they have to translate the English sentence into Hindi (which they know) to help them.\n\nThe sentence: \"How much is one kilo of rice?\"\n\nIn Hindi (using the common Hindi for this context, and polite form for the speaker):\n  We say: \"एक किलो राइस कितना है?\" \n  But note: in Hindi, the word for rice is \"चावल\" (chāval), not \"राइस\". However, in many Indian contexts, especially in informal speech, they use \"rice\" as \"राइस\" (from English). But the problem says \"natural\" as a villager would say.\n\nBut the problem states: \"Hindi translation in Devanagari, polite (आप form) and natural, as a villager would say it.\"\n\nIn Bihar, the villagers might use the English word \"rice\" as \"राइस\" (pronounced as in English) because they are in a context of English learning? However, the problem says \"Hindi translation\", so we have to use the Hindi word for rice? \n\nBut note: the example sentence was \"Where is the bus stop?\" and the translation was \"बस स्टॉप कहाँ है?\" which uses \"स्टॉप\" (English loanword) for \"stop\". Similarly, for rice, we might use the English word \"rice\" as \"राइस\" (in Hindi, it's written as \"राइस\" but pronounced with English sounds).\n\nHowever, the problem says: \"Hindi translation\". In standard Hindi, rice is \"चावल\". But in the context of the app, since they are learning English, they might use the English word for rice? \n\nBut the problem says: \"as a villager would say it\". In Bihar, the villagers might use the Hindi word \"चावल\" for rice. However, the app is for English practice, so the translation should be in Hindi (the language they know) but using the words they use.\n\nLet me check: In the example, they used \"स्टॉप\" (which is English) for \"stop\". So",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.226,
+    "wall_s": 283.191,
+    "load_s": 0.013,
+    "prompt_tokens": 524,
+    "prompt_tokens_per_s": 176.2,
+    "output_tokens": 800,
+    "tokens_per_s": 0.74
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "market_02",
+   "text": "Please give me two kilos of onions.",
+   "output": "We are given the sentence: \"Please give me two kilos of onions.\"\n\nStep 1: Translate to Hindi (Devanagari, polite form, natural for a villager)\nThe sentence in English: \"Please give me two kilos of onions.\"\nIn Hindi (polite form, using \"आप\" and natural for a villager from Bihar):\n- \"Please\" -> \"कृपया\" (but in informal village Hindi, they might use \"बताओ\" or \"दिए जाए\" but the context is polite and the app is for Hindi speakers from villages in Bihar, so we use standard polite Hindi that they would use in daily life)\n- However, note: The example used \"बस स्टॉप कहाँ है?\" for \"Where is the bus stop?\" so we follow that style.\n\nLet's break down:\n- \"Please\" -> \"कृपया\" (but in Bihar village Hindi, they might use \"कृपया\" or sometimes \"बताओ\" for \"tell\", but the sentence is \"give me\", so we need to be polite and direct)\n- \"give me\" -> \"मुझे दें\" (but in polite form for \"you\" (आप) we say \"मुझे दें\" for \"give me\" in the sense of \"please give me\")\n- \"two kilos\" -> \"दो किलो\"\n- \"of onions\" -> \"मिर्च के\" -> wait, no: onions are \"लहसुन\" in Hindi? Actually, onions are \"प्याज\" in Hindi.\n\nWait, let me correct:\n- Onions: In Hindi, onions are \"प्याज\" (pyaz). But in Bihar, they might use the same.\n\nSo the translation: \n\"कृपया मुझे दो किलो प्याज दें।\"\n\nBut note: The example used a question mark in the example, but here it's a statement. Also, the example used \"कहाँ है?\" for \"where is\", so we use the same structure.\n\nHowever, the sentence is a request: \"Please give me two kilos of onions.\"\n\nIn Hindi (polite form, using \"आप\" for the listener):\n- We say: \"कृपया मुझे दो किलो प्याज दें।\"\n\nBut in the context of a villager from Bihar, they might use a slightly different structure? However, the app is for Hindi speakers, so we use standard Hindi.\n\nBut note: The example used \"बस स्टॉप कहाँ है?\" which is a question. Our sentence is a statement (request).\n\nLet me check: \n- In Hindi, for a request: \"कृपया [verb] ...\" \n- The verb here: \"give me\" -> \"मुझे दें\" (in the imperative for \"you\" in polite form)\n\nSo: \"कृपया मुझे दो किलो प्याज दें।\"\n\nBut wait: In Hindi, when we say \"give me\", we use the verb in the imperative for the listener (the person we are addressing). So the structure is: [Request] + [object] + [verb]\n\nHowever, the phrase \"two kilos of onions\" is \"दो किलो प्याज\". \n\nBut note: In Hindi, we don't say \"of\" in the same way. We say \"प",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.179,
+    "wall_s": 255.869,
+    "load_s": 0.009,
+    "prompt_tokens": 524,
+    "prompt_tokens_per_s": 173.4,
+    "output_tokens": 800,
+    "tokens_per_s": 0.56
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bank_01",
+   "text": "I want to open a bank account.",
+   "output": "We are given the sentence: \"I want to open a bank account.\"\n\nStep 1: Write the text exactly as given.\n  text: \"I want to open a bank account.\"\n\nStep 2: Translate to Hindi (Devanagari) in polite (आप form) and natural, as a villager would say it.\n  The sentence in Hindi: \n    \"I want to open a bank account.\" \n  In Hindi (using polite form for the speaker addressing someone): \n    \"मैं एक बैंक अकाउंट खोलना चाहता हूँ।\" \n  But note: In the example, the Hindi translation for \"Where is the bus stop?\" was \"बस स्टॉप कहाँ है?\" which is in the present tense and uses the polite form (the verb \"है\" is in the present for the location).\n\n  However, for the sentence \"I want to open a bank account\", a natural translation for a villager in Bihar (using polite form) might be:\n    \"मैं एक बैंक अकाउंट खोलना चाहता हूँ।\" \n  But note: In Hindi, the verb for \"want\" is \"चाहता हूँ\" (for masculine). However, in the context of a villager, they might use the more common structure.\n\n  Let's think: \n    In Hindi, the phrase for \"I want to\" is \"मैं ... चाहता हूँ\" (for masculine). \n    But in the example, the translation for \"Where is the bus stop?\" was in the form of a question and used the present tense.\n\n  However, the sentence is a statement. We need to translate it naturally.\n\n  Alternative: In many Indian contexts, especially in Bihar, they might use the verb \"खाली\" for \"want\" but that's not standard. \n\n  Standard translation: \n    \"I want to open a bank account\" -> \"मैं एक बैंक अकाउंट खोलना चाहता हूँ।\"\n\n  But note: The example used \"कहाँ है?\" for \"where is\", so we are using the same structure.\n\n  However, the problem says: \"polite (आप form) and natural, as a villager would say it\".\n\n  In Bihar, the common Hindi for this might be: \n    \"मैं बैंक अकाउंट खोलना चाहता हूँ।\" (without \"एक\", because in informal Hindi they might omit the article)\n\n  But the sentence says \"a bank account\", so we need the article.\n\n  Let's check: In Hindi, the article \"एक\" is used for \"a\". \n\n  However, in the context of a villager, they might use the more direct translation without the article? But the sentence says \"a bank account\", so we have to include it.\n\n  I think the most natural translation for a villager in Bihar (using standard Hindi) would be:\n    \"मैं एक बैंक अकाउंट खोलना चाहता हूँ।\"\n\n  But note: The example used \"बस स्टॉप\" (bus stop) as a loanword. Similarly, \"bank account\" is a loan",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.526,
+    "wall_s": 212.994,
+    "load_s": 0.021,
+    "prompt_tokens": 523,
+    "prompt_tokens_per_s": 153.8,
+    "output_tokens": 800,
+    "tokens_per_s": 3.82
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "bank_02",
+   "text": "Where do I sign?",
+   "output": "We are given the sentence: \"Where do I sign?\"\n\nStep 1: Translate to Hindi (Devanagari, polite form, natural for a villager)\nThe sentence in English: \"Where do I sign?\"\nIn Hindi (polite form, using \"आप\" and natural for a villager): \n  \"कहाँ मैं साइन करूँ?\"\n\nBut note: In the example, the Hindi translation for \"Where is the bus stop?\" was \"बस स्टॉप कहाँ है?\" (which is in the order: [object] [verb] [question word] [subject] ... but actually the structure is different).\n\nHowever, for the sentence \"Where do I sign?\", the natural Hindi translation for a villager (using polite form) would be:\n  \"मैं कहाँ साइन करूँ?\" \nBut wait, the example used the structure: \"कहाँ है?\" for \"where is\". \n\nActually, in Hindi, the question \"Where do I sign?\" would be: \n  \"मैं कहाँ साइन करूँ?\" \nBut the example translation for the sentence \"Where is the bus stop?\" was in the order: \"बस स्टॉप कहाँ है?\" (which is the object first, then the question word at the end). \n\nHowever, in English, the sentence \"Where do I sign?\" is a question that is asking for the location where the speaker can sign (like a signature). \n\nIn Hindi, the natural way for a villager to say this might be: \n  \"मैं कहाँ साइन कर सकता हूँ?\" \nBut the example uses the present continuous form? Actually, the verb \"to sign\" in Hindi for a signature is \"साइन करना\". \n\nBut note: The example translation for the sentence \"Where is the bus stop?\" was: \"बस स्टॉप कहाँ है?\" (which is the standard Hindi for \"Where is the bus stop?\"). \n\nFor \"Where do I sign?\", we have to form a question. \n\nLet me think: \n  In Hindi, the structure for \"Where do I [verb]?\" is often: \"मैं [verb] कहाँ कर सकता हूँ?\" but for a villager, they might use a simpler form.\n\nHowever, the problem says: \"polite (आप form) and natural, as a villager would say it\".\n\nBut note: The example used the structure: \"कहाँ है?\" for the location. \n\nActually, the sentence \"Where do I sign?\" is a bit ambiguous. It could mean:\n  - Where do I (as a person) sign (like a signature)? \n  - Or, where do I (the action) of signing happen?\n\nIn the context of the app, it's likely about signing a document. \n\nI think the natural Hindi translation for a villager would be: \n  \"मैं कहाँ साइन करूँ?\" \n\nBut wait, the example used the present continuous form? Actually, in Hindi, the verb for \"to sign\" is \"साइन करना\", and the question form for \"where\" is often with \"कहाँ\".\n\nHowever, the problem says: \"polite (आप form)\" - but in Hindi, the \"आप\" form is for the listener. Since the speaker is asking the listener (the person in the village), they would use",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 2.531,
+    "wall_s": 226.116,
+    "load_s": 0.01,
+    "prompt_tokens": 520,
+    "prompt_tokens_per_s": 221.2,
+    "output_tokens": 800,
+    "tokens_per_s": 3.58
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "hospital_01",
+   "text": "My child has had a fever since yesterday.",
+   "output": "We are given the sentence: \"My child has had a fever since yesterday.\"\n\nStep 1: Translate to Hindi (Devanagari, polite form, natural for a villager)\nThe sentence in English: \"My child has had a fever since yesterday.\"\nWe need to translate this into Hindi in the polite (आप) form and natural as a villager from Bihar would say.\n\nLet's break down:\n- \"My child\" -> \"मेरा बच्चा\" (but in polite form for a villager, they might use \"आपका\" for the person they are addressing? However, note: the sentence is about the speaker's child. In Hindi, when speaking to someone else, we use \"मेरा\" for \"my\" in the context of the speaker. But the problem says \"polite (आप form)\" meaning the speaker is addressing the listener in polite form. However, the sentence is about the speaker's own child. So the translation for \"My child\" in Hindi would be \"मेरा बच्चा\" (using \"मेरा\" for possessive). But note: in the context of a villager in Bihar, they might use a more colloquial form? However, the problem says \"polite (आप form)\" and natural.\n\nBut note: the example used \"बस स्टॉप कहाँ है?\" for \"Where is the bus stop?\" which is in the form of a question and uses the standard Hindi for a villager.\n\nLet me think of the translation:\n\nThe sentence: \"My child has had a fever since yesterday.\"\n\nIn Hindi (Devanagari, polite form for the speaker addressing the listener):\n- \"My child\" -> \"मेरा बच्चा\" (but in polite form for the listener, we don't change the possessive for the speaker's own child? Actually, the speaker is the one who has the child, so it's \"मेरा बच्चा\")\n- \"has had a fever\" -> \"फीवर लग चुका है\" (but note: the verb tense) -> in Hindi, we might say \"कल से फीवर लग चुका है\" (since yesterday) but the phrase \"has had a fever since yesterday\" is a continuous state.\n\nHowever, the problem says: \"natural, as a villager would say\". In Bihar, they might use a more simple structure.\n\nLet me try to translate:\n\n\"मेरा बच्चा कल से फीवर लग चुका है।\"\n\nBut note: the sentence says \"has had a fever since yesterday\" meaning the fever started yesterday and continues. So in Hindi, we can say: \"मेरा बच्चा कल से फीवर लग चुका है\" (but \"कल\" means yesterday? Actually, in Hindi, \"कल\" means tomorrow, so we have to be careful).\n\nWait: \n- \"yesterday\" in Hindi: \"कल\" is tomorrow, \"पहले कल\" is yesterday? Actually, in Hindi, \"पहले कल\" is not standard. \nStandard Hindi for yesterday: \"कल\" is tomorrow, so yesterday is \"कल से पहले\" or \"कल से पहले\" is not common. Actually, in spoken Hindi, especially in rural areas, they might use:\n  - \"कल\" = tomorrow\n  - \"कल से पहले\" = yesterday? \n\nBut let",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.192,
+    "wall_s": 218.155,
+    "load_s": 0.023,
+    "prompt_tokens": 524,
+    "prompt_tokens_per_s": 171.9,
+    "output_tokens": 800,
+    "tokens_per_s": 3.72
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "hospital_02",
+   "text": "Which doctor should I see?",
+   "output": "We are given the sentence: \"Which doctor should I see?\"\n\nStep 1: Translate to Hindi (Devanagari, polite form, natural for a villager)\nThe sentence in English: \"Which doctor should I see?\"\nIn Hindi (using polite \"आप\" form and natural for a villager): \n  The phrase \"Which doctor\" -> \"किस डॉक्टर\"\n  \"should I see\" -> \"मैं किस डॉक्टर से देखूँ?\" but note: the question is in the context of a villager speaking. However, the example uses a question structure.\n\nBut note: The example for \"Where is the bus stop?\" was translated as \"बस स्टॉप कहाँ है?\" (which is a common way in Hindi for such questions).\n\nFor \"Which doctor should I see?\", a natural translation for a villager might be: \"मैं किस डॉक्टर से देखूँ?\" but in the context of the app, we want the translation to be in the form that the villager would say in Hindi. However, the example uses the structure: [object] कहाँ है? for location.\n\nBut note: The example translation for the sentence \"Where is the bus stop?\" was \"बस स्टॉप कहाँ है?\" (which is in the order: [object] कहाँ है?).\n\nFor this sentence, we can translate as: \"किस डॉक्टर से मैं देखूँ?\" but the natural order in Hindi for such questions is often: \"मैं किस डॉक्टर से देखूँ?\" (I which doctor see?).\n\nHowever, the problem says: \"polite (आप form) and natural, as a villager would say it\". Since the villager is speaking to someone (the listener) in the context of the app, we use the standard Hindi for such questions.\n\nBut note: In Hindi, when asking \"which doctor should I see\", the common phrase is: \"मैं किस डॉक्टर से देखूँ?\" (I which doctor from see?).\n\nHowever, the example translation for the sentence \"Where is the bus stop?\" was in the order: [object] कहाँ है? (so the object comes first). But in this case, the sentence structure is different.\n\nLet me think of a natural translation for a villager in Bihar. They might say: \"किस डॉक्टर से मैं देखूँ?\" but the standard Hindi for such a question is often in the order: \"मैं किस डॉक्टर से देखूँ?\".\n\nBut note: The problem says \"polite (आप form)\" - in Hindi, the polite form for the speaker (when addressing someone) uses \"आप\" but in the question, the speaker is the one asking, so the verb conjugation is in the past tense? Actually, the verb here is in the future (should see) but in Hindi we use the future tense with \"देखूँ\" (which is the future of \"देखना\").\n\nHowever, the example translation for the sentence \"Where is the bus stop?\" was in the form of a question: \"बस स्टॉप कहाँ ह",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 2.991,
+    "wall_s": 217.608,
+    "load_s": 0.011,
+    "prompt_tokens": 521,
+    "prompt_tokens_per_s": 184.1,
+    "output_tokens": 800,
+    "tokens_per_s": 3.73
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  }
+ ],
+ "task_b": [
+  {
+   "id": "bus_01-1",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in simple Hindi. The learner is from a village in Bihar, might be a child, and reads Hindi slowly. The app showed them the English sentence \"Where is the bus stop?\" but the recognizer heard \"Where is bus stop?\" so the mistake was missing the word \"the\".\n\nFirst, I need to write 1 or 2 short sentences in simple Hindi (Devanagari) that tell the learner what went wrong with that one word and how to say it right. Use polite आप form. No English except the English words themselves. No greetings, no lists, nothing about other words. Output only the Hindi text.\n\nThe first mistake is",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 7.681,
+    "wall_s": 42.473,
+    "load_s": 0.01,
+    "prompt_tokens": 208,
+    "prompt_tokens_per_s": 27.7,
+    "output_tokens": 160,
+    "tokens_per_s": 4.6
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 12,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 127
+   }
+  },
+  {
+   "id": "bus_01-2",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in simple Hindi. The learner is from a village in Bihar, might be a child, and reads Hindi slowly. The app showed them the English sentence \"Where is the bus stop?\" but the recognizer heard \"Where is the boss stop?\" The first mistake is that \"bus\" was said as \"boss\".\n\nI need to write 1 or 2 short sentences in simple Hindi (Devanagari) that tell the learner what went wrong with the word \"bus\" and how to say it right. Use polite आप form. No English except the English words themselves. No greetings, no lists, nothing about other words. Output only the Hindi text",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 2.541,
+    "wall_s": 37.423,
+    "load_s": 0.016,
+    "prompt_tokens": 212,
+    "prompt_tokens_per_s": 85.2,
+    "output_tokens": 160,
+    "tokens_per_s": 4.59
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 11,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 125
+   }
+  },
+  {
+   "id": "bus_01-3",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in simple Hindi. The learner is from a village in Bihar, might be a child, and reads Hindi slowly. The app showed them the English sentence \"Where is the bus stop?\" but the recognizer wrote down \"Where is the bus shop?\" because they said \"shop\" instead of \"stop\".\n\nFirst, I need to identify the mistake. The word \"stop\" was said as \"shop\". So the error is in the word \"stop\" being mispronounced as \"shop\". The teacher needs to tell the learner in simple Hindi (Devanagari) what went wrong with that one word and how to say it right. Use polite \"आप",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 2.491,
+    "wall_s": 39.393,
+    "load_s": 0.021,
+    "prompt_tokens": 212,
+    "prompt_tokens_per_s": 87.7,
+    "output_tokens": 160,
+    "tokens_per_s": 4.34
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 11,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 124
+   }
+  },
+  {
+   "id": "bus_02-4",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in a village in Bihar. The learner reads Hindi slowly, so the teacher needs to use simple Hindi in Devanagari. The app showed an English sentence: \"When will the bus come?\" The learner said it aloud, and the recognizer wrote down what it heard as \"When the bus will come?\" The first mistake is that the word \"will\" was missing.\n\nWait, the problem says the recognizer heard \"When the bus will come?\" but the original sentence is \"When will the bus come?\" So the mistake here is that the learner said \"When the bus will come?\" instead of \"When will the bus come?\" So the error is that the",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 4.078,
+    "wall_s": 39.514,
+    "load_s": 0.018,
+    "prompt_tokens": 203,
+    "prompt_tokens_per_s": 50.4,
+    "output_tokens": 160,
+    "tokens_per_s": 4.51
+   },
+   "checks": {
+    "devanagari": false,
+    "sentences": 11,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 133
+   }
+  },
+  {
+   "id": "bus_03-5",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in simple Hindi. The learner is from a village in Bihar, might be a child, and reads Hindi slowly. The app showed them the English sentence \"One ticket to Patna, please.\" They said it aloud, and the speech recognizer wrote down \"Van ticket to Patna, please.\" The first mistake is that the word \"one\" was said as \"van\".\n\nThe task is to write 1 or 2 short sentences in simple Hindi (Devanagari) that tell the learner what went wrong with that one word and how to say it right. Use the polite आप form. No English except the English words themselves. No greetings,",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.573,
+    "wall_s": 39.312,
+    "load_s": 0.022,
+    "prompt_tokens": 221,
+    "prompt_tokens_per_s": 63.1,
+    "output_tokens": 160,
+    "tokens_per_s": 4.48
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 10,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 124
+   }
+  },
+  {
+   "id": "bus_04-6",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in simple Hindi. The learner is from a village in Bihar, might be a child, and reads Hindi slowly. The app showed them the English sentence \"How much is the ticket?\" but the recognizer heard \"How much the ticket?\" so the mistake was missing the word \"is\".\n\nFirst, I need to write 1 or 2 short sentences in simple Hindi (Devanagari) that tell the learner what went wrong with the word \"is\" and how to say it right. The response should be in polite आप form, no English except the English words themselves. No greetings, no lists, nothing about other words. Output only the Hindi",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.516,
+    "wall_s": 39.974,
+    "load_s": 0.012,
+    "prompt_tokens": 207,
+    "prompt_tokens_per_s": 59.5,
+    "output_tokens": 160,
+    "tokens_per_s": 4.39
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 10,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 126
+   }
+  },
+  {
+   "id": "bus_05-7",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in simple Hindi. The learner is from a village in Bihar, might be a child, and reads Hindi slowly. The app showed them the English sentence \"Does this bus go to Bettiah?\" but the recognizer heard \"Does this bus goes to Bettiah?\".\n\nThe first mistake is that the word \"go\" was said as \"goes\". So, the teacher needs to write 1 or 2 short sentences in simple Hindi (Devanagari) that tell the learner what went wrong with that one word and how to say it right. Use polite आप form. No English except the English words themselves. No greetings, no lists, nothing",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 3.686,
+    "wall_s": 37.586,
+    "load_s": 0.015,
+    "prompt_tokens": 226,
+    "prompt_tokens_per_s": 62.0,
+    "output_tokens": 160,
+    "tokens_per_s": 4.72
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 11,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 123
+   }
+  },
+  {
+   "id": "bus_05-8",
+   "output": "Okay, let me try to figure out how to approach this. So, the user is a kind English teacher who speaks to a learner in simple Hindi. The learner is from a village in Bihar, might be a child, and reads Hindi slowly. The app showed them the English sentence \"Does this bus go to Bettiah?\" which translates to \"क्या यह बस बेतिया जाती है?\" But the speech recognizer heard \"Do this bus go to Bett?\". The first mistake is that the word \"does\" was said as \"do\".\n\nThe task is to write 1 or 2 short sentences in simple Hindi (Devanagari) that tell the learner what went wrong with that one word and how",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 2.558,
+    "wall_s": 36.408,
+    "load_s": 0.012,
+    "prompt_tokens": 225,
+    "prompt_tokens_per_s": 89.3,
+    "output_tokens": 160,
+    "tokens_per_s": 4.73
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 9,
+    "at_most_2_sentences": false,
+    "mentions_word": true,
+    "latin_words": 107
+   }
+  }
+ ],
+ "load_s": 3.262,
+ "first_response_wall_s": 7.997,
+ "speech_after_llm": [
+  "After early nightfall, the yellow lamps would light.",
+  0.458
+ ],
+ "peak_ram_mb": {
+  "ollama_total_mb": 3246,
+  "children_mb": 3216,
+  "self_mb": 130
+ },
+ "medians": {
+  "task_a": {
+   "ttft_s": 3.19,
+   "tokens_per_s": 3.69,
+   "prompt_tokens_per_s": 174.8,
+   "wall_s": 223.91,
+   "output_tokens": 800.0
+  },
+  "task_b": {
+   "ttft_s": 3.54,
+   "tokens_per_s": 4.55,
+   "prompt_tokens_per_s": 62.55,
+   "wall_s": 39.35,
+   "output_tokens": 160.0
+  }
+ },
+ "format": {
+  "task_a_valid_json": 0,
+  "task_a_valid_after_brace_repair": 0,
+  "task_a_all_checks": 0,
+  "task_b_devanagari": 7,
+  "task_b_at_most_2_sentences": 0
+ }
+}

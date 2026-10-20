@@ -1,0 +1,17 @@
+== llama3.2:1b
+success [K[?25h[?2026l
+== llama3.2:3b
+success [K[?25h[?2026l
+== gemma3:1b
+success [K[?25h[?2026l
+== gemma3:4b
+success [K[?25h[?2026l
+== qwen3:1.7b
+success [K[?25h[?2026l
+== qwen3:4b
+success [K[?25h[?2026l
+== qwen2.5:3b
+success [K[?25h[?2026l
+== phi4-mini
+success [K[?25h[?2026l
+PULLS-DONE

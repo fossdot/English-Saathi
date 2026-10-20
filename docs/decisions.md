@@ -5,8 +5,31 @@ after milestone b ("Content decisions for milestone c"). These settle the
 gaps between the spec, the design mockup (`design/`) and the web pilot
 (`docs/pilot/english-practice-pilot.html`).
 
-**Status:** milestone c is on hold until this week's student pilots finish;
-their results may change the practice and feedback screens.
+**Status (2026-10-20):** the macOS desktop app comes first and Android is
+paused (see "Direction change" below). Milestone c is now the desktop UI. It
+waits for the owner's go: this week's student pilots may change the practice
+and feedback screens.
+
+## Direction change: macOS desktop app first (2026-10-19)
+
+- **Build a macOS desktop app first**, with Compose Multiplatform (desktop,
+  JVM). Students practise in sessions on one shared MacBook with a
+  facilitator present; the web pilot (`docs/pilot`) shows the target flow.
+- **Target machine:** a 2019 Intel 16-inch MacBook Pro (x86_64) with 16 GB
+  RAM, not Apple silicon.
+- **Android is paused.** It stays in the repo unchanged. If the Mac version
+  works well with students, Android resumes.
+- **Milestone c is the desktop UI**, and it does not start until the owner
+  says go.
+- The pure Kotlin domain module is reused unchanged and all its tests must
+  still pass.
+- Before any app code, the owner asked for a dependency check and speech and
+  LLM benchmarks on Intel macOS (`docs/intel-macbook-benchmarks.md`), and
+  will give an OK before anything is added to the app.
+- **No LLM in the app** (owner, 2026-10-20, after the benchmark). LLMs are
+  used only offline, to draft lesson content (Task A in the benchmark), and
+  a teacher reviews every draft before it reaches students. qwen2.5:3b is
+  out because its licence forbids commercial use.
 
 ## Owner answers
 

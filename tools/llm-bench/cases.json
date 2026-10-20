@@ -1,0 +1,214 @@
+{
+ "example": {
+  "id": "bus_01",
+  "text": "Where is the bus stop?",
+  "hi": "बस स्टॉप कहाँ है?",
+  "chunks": [
+   "Where is",
+   "the bus stop"
+  ],
+  "words": {
+   "where": {
+    "syllables": [
+     "where"
+    ],
+    "hint_hi": "वेयर",
+    "hint_tag": "v_w"
+   },
+   "the": {
+    "syllables": [
+     "the"
+    ],
+    "hint_hi": "द",
+    "hint_tag": "th"
+   },
+   "bus": {
+    "syllables": [
+     "bus"
+    ],
+    "hint_hi": "बस",
+    "hint_tag": "short_vowel"
+   },
+   "stop": {
+    "syllables": [
+     "stop"
+    ],
+    "hint_hi": "स्टॉप",
+    "hint_tag": "s_cluster"
+   }
+  }
+ },
+ "task_a": [
+  {
+   "id": "bus_02",
+   "text": "When will the bus come?",
+   "pilot_hi": "बस कब आएगी?",
+   "pilot_chunks": [
+    "When will",
+    "the bus come"
+   ]
+  },
+  {
+   "id": "bus_03",
+   "text": "One ticket to Patna, please.",
+   "pilot_hi": "पटना का एक टिकट दीजिए।",
+   "pilot_chunks": [
+    "One ticket",
+    "to Patna",
+    "please"
+   ]
+  },
+  {
+   "id": "bus_04",
+   "text": "How much is the ticket?",
+   "pilot_hi": "टिकट कितने का है?",
+   "pilot_chunks": [
+    "How much",
+    "is the ticket"
+   ]
+  },
+  {
+   "id": "bus_05",
+   "text": "Does this bus go to Bettiah?",
+   "pilot_hi": "क्या यह बस बेतिया जाती है?",
+   "pilot_chunks": [
+    "Does this bus",
+    "go to Bettiah"
+   ]
+  },
+  {
+   "id": "market_01",
+   "text": "How much is one kilo of rice?",
+   "pilot_hi": null,
+   "pilot_chunks": null
+  },
+  {
+   "id": "market_02",
+   "text": "Please give me two kilos of onions.",
+   "pilot_hi": null,
+   "pilot_chunks": null
+  },
+  {
+   "id": "bank_01",
+   "text": "I want to open a bank account.",
+   "pilot_hi": null,
+   "pilot_chunks": null
+  },
+  {
+   "id": "bank_02",
+   "text": "Where do I sign?",
+   "pilot_hi": null,
+   "pilot_chunks": null
+  },
+  {
+   "id": "hospital_01",
+   "text": "My child has had a fever since yesterday.",
+   "pilot_hi": null,
+   "pilot_chunks": null
+  },
+  {
+   "id": "hospital_02",
+   "text": "Which doctor should I see?",
+   "pilot_hi": null,
+   "pilot_chunks": null
+  }
+ ],
+ "task_b": [
+  {
+   "id": "bus_01-1",
+   "text": "Where is the bus stop?",
+   "hi": "बस स्टॉप कहाँ है?",
+   "heard": "Where is bus stop?",
+   "mistake": {
+    "index": 2,
+    "word": "the",
+    "status": "MISSING",
+    "heard_as": null
+   }
+  },
+  {
+   "id": "bus_01-2",
+   "text": "Where is the bus stop?",
+   "hi": "बस स्टॉप कहाँ है?",
+   "heard": "Where is the boss stop?",
+   "mistake": {
+    "index": 3,
+    "word": "bus",
+    "status": "WRONG",
+    "heard_as": "boss"
+   }
+  },
+  {
+   "id": "bus_01-3",
+   "text": "Where is the bus stop?",
+   "hi": "बस स्टॉप कहाँ है?",
+   "heard": "Where is the bus shop?",
+   "mistake": {
+    "index": 4,
+    "word": "stop",
+    "status": "WRONG",
+    "heard_as": "shop"
+   }
+  },
+  {
+   "id": "bus_02-4",
+   "text": "When will the bus come?",
+   "hi": "बस कब आएगी?",
+   "heard": "When the bus will come?",
+   "mistake": {
+    "index": 1,
+    "word": "will",
+    "status": "MISSING",
+    "heard_as": null
+   }
+  },
+  {
+   "id": "bus_03-5",
+   "text": "One ticket to Patna, please.",
+   "hi": "पटना का एक टिकट दीजिए।",
+   "heard": "Van ticket to Patna, please.",
+   "mistake": {
+    "index": 0,
+    "word": "one",
+    "status": "WRONG",
+    "heard_as": "van"
+   }
+  },
+  {
+   "id": "bus_04-6",
+   "text": "How much is the ticket?",
+   "hi": "टिकट कितने का है?",
+   "heard": "How much the ticket?",
+   "mistake": {
+    "index": 2,
+    "word": "is",
+    "status": "MISSING",
+    "heard_as": null
+   }
+  },
+  {
+   "id": "bus_05-7",
+   "text": "Does this bus go to Bettiah?",
+   "hi": "क्या यह बस बेतिया जाती है?",
+   "heard": "Does this bus goes to Bettiah?",
+   "mistake": {
+    "index": 3,
+    "word": "go",
+    "status": "WRONG",
+    "heard_as": "goes"
+   }
+  },
+  {
+   "id": "bus_05-8",
+   "text": "Does this bus go to Bettiah?",
+   "hi": "क्या यह बस बेतिया जाती है?",
+   "heard": "Do this bus go to Bettiah?",
+   "mistake": {
+    "index": 0,
+    "word": "does",
+    "status": "WRONG",
+    "heard_as": "do"
+   }
+  }
+ ]
+}

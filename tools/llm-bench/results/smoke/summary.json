@@ -1,0 +1,94 @@
+{
+ "arch": "x86_64",
+ "speech": {
+  "load_s": 0.41,
+  "process_mb_before": 45,
+  "process_mb_after_load": 154,
+  "warmup": [
+   "After early nightfall, the yellow lamps would light.",
+   0.416
+  ]
+ },
+ "models": [
+  {
+   "model": "llama3.2:1b",
+   "parameter_size": "1.2B",
+   "quantization": "Q8_0",
+   "family": "llama",
+   "task_a": [
+    {
+     "id": "bus_02",
+     "text": "When will the bus come?",
+     "output": "{\n \"text\": \"When will the bus come?\",\n \"hi\": \"कल क्या होगा?\",\n \"chunks\": [\n  \"When\",\n  \"will\",\n  \"the\",\n  \"bus\",\n  \"come\"\n ],\n \"words\": {\n  \"when\": {\n   \"syllables\": [\n    \"when\"\n   ],\n   \"hint_hi\": \"कल\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"will\": {\n   \"syllables\": [\n    \"will\"\n   ],\n   \"hint_hi\": \"क्या\",\n   \"hint_tag\": \"th\"\n  },\n  \"the\": {\n   \"syllables\": [\n    \"the\"\n   ],\n   \"hint_hi\": \"द\",\n   \"hint_tag\": \"th\"\n  },\n  \"bus\": {\n   \"syllables\": [\n    \"bus\"\n   ],\n   \"hint_hi\": \"बस\",\n   \"hint_tag\": \"short_vowel\"\n  },\n  \"come\": {\n   \"syllables\": [\n    \"come\"\n   ],\n   \"hint_hi\": \"कम\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }",
+     "metrics": {
+      "ttft_s": 7.798,
+      "wall_s": 35.438,
+      "load_s": 0.006,
+      "prompt_tokens": 519,
+      "prompt_tokens_per_s": 66.7,
+      "output_tokens": 244,
+      "tokens_per_s": 8.83
+     },
+     "checks": {
+      "valid_json": false
+     }
+    }
+   ],
+   "task_b": [
+    {
+     "id": "bus_01-1",
+     "output": "आपके शब्दों में एक शब्द की कमी है। आप इस शब्द को \"the\" कहकर पूरा कर सकते हैं।",
+     "metrics": {
+      "ttft_s": 3.087,
+      "wall_s": 5.196,
+      "load_s": 0.006,
+      "prompt_tokens": 207,
+      "prompt_tokens_per_s": 67.6,
+      "output_tokens": 37,
+      "tokens_per_s": 17.55
+     },
+     "checks": {
+      "devanagari": true,
+      "sentences": 2,
+      "at_most_2_sentences": true,
+      "mentions_word": true,
+      "latin_words": 1
+     }
+    }
+   ],
+   "load_s": 3.028,
+   "first_response_wall_s": 4.327,
+   "speech_after_llm": [
+    "After early nightfall, the yellow lamps would light.",
+    0.304
+   ],
+   "peak_ram_mb": {
+    "ollama_total_mb": 1669,
+    "runner_mb": 0,
+    "self_mb": 223
+   },
+   "medians": {
+    "task_a": {
+     "ttft_s": 7.8,
+     "tokens_per_s": 8.83,
+     "prompt_tokens_per_s": 66.7,
+     "wall_s": 35.44,
+     "output_tokens": 244
+    },
+    "task_b": {
+     "ttft_s": 3.09,
+     "tokens_per_s": 17.55,
+     "prompt_tokens_per_s": 67.6,
+     "wall_s": 5.2,
+     "output_tokens": 37
+    }
+   },
+   "format": {
+    "task_a_valid_json": 0,
+    "task_a_all_checks": 0,
+    "task_b_devanagari": 1,
+    "task_b_at_most_2_sentences": 1
+   }
+  }
+ ]
+}

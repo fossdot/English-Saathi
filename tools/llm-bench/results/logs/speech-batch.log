@@ -1,0 +1,47 @@
+### sherpa-onnx accuracy+timing runs, 6 threads
+== whisper-fq-compute x64
+{"config": "whisper-fq-compute-x64", "threads": 6, "files": {"whisper-fq-compute/tiny.en-encoder.int8.onnx": 12937772, "whisper-fq-compute/tiny.en-decoder.int8.onnx": 30521939, "whisper-fq-compute/tiny.en-tokens.txt": 835554}, "load_s": 0.361, "first_decode_s": 0.155, "rss_before_mb": 126.8, "rss_after_load_mb": 241.3, "rss_peak_mb": 381.3}
+== whisper-fq-compute arm64
+{"config": "whisper-fq-compute-arm64", "threads": 6, "files": {"whisper-fq-compute/tiny.en-encoder.int8.onnx": 12937772, "whisper-fq-compute/tiny.en-decoder.int8.onnx": 30521939, "whisper-fq-compute/tiny.en-tokens.txt": 835554}, "load_s": 0.181, "first_decode_s": 0.062, "rss_before_mb": 127.2, "rss_after_load_mb": 294.5, "rss_peak_mb": 493.3}
+== whisper-base.en-int8 x64
+{"config": "whisper-base.en-int8-x64", "threads": 6, "files": {"sherpa-onnx-whisper-base.en/base.en-encoder.int8.onnx": 29120534, "sherpa-onnx-whisper-base.en/base.en-decoder.int8.onnx": 130669978, "sherpa-onnx-whisper-base.en/base.en-tokens.txt": 835554}, "load_s": 0.619, "first_decode_s": 0.325, "rss_before_mb": 123.8, "rss_after_load_mb": 591.2, "rss_peak_mb": 692.3}
+== whisper-base.en-int8 arm64
+{"config": "whisper-base.en-int8-arm64", "threads": 6, "files": {"sherpa-onnx-whisper-base.en/base.en-encoder.int8.onnx": 29120534, "sherpa-onnx-whisper-base.en/base.en-decoder.int8.onnx": 130669978, "sherpa-onnx-whisper-base.en/base.en-tokens.txt": 835554}, "load_s": 0.393, "first_decode_s": 0.084, "rss_before_mb": 127.2, "rss_after_load_mb": 648.8, "rss_peak_mb": 834.3}
+== whisper-base.en-fp32 x64
+{"config": "whisper-base.en-fp32-x64", "threads": 6, "files": {"sherpa-onnx-whisper-base.en/base.en-encoder.onnx": 95087154, "sherpa-onnx-whisper-base.en/base.en-decoder.onnx": 196546950, "sherpa-onnx-whisper-base.en/base.en-tokens.txt": 835554}, "load_s": 0.67, "first_decode_s": 0.311, "rss_before_mb": 123.6, "rss_after_load_mb": 748.2, "rss_peak_mb": 816.5}
+== whisper-base.en-fp32 arm64
+{"config": "whisper-base.en-fp32-arm64", "threads": 6, "files": {"sherpa-onnx-whisper-base.en/base.en-encoder.onnx": 95087154, "sherpa-onnx-whisper-base.en/base.en-decoder.onnx": 196546950, "sherpa-onnx-whisper-base.en/base.en-tokens.txt": 835554}, "load_s": 0.345, "first_decode_s": 0.082, "rss_before_mb": 127.1, "rss_after_load_mb": 766.6, "rss_peak_mb": 936.7}
+== whisper-small.en-int8 x64
+{"config": "whisper-small.en-int8-x64", "threads": 6, "files": {"sherpa-onnx-whisper-small.en/small.en-encoder.int8.onnx": 112442483, "sherpa-onnx-whisper-small.en/small.en-decoder.int8.onnx": 262223042, "sherpa-onnx-whisper-small.en/small.en-tokens.txt": 835554}, "load_s": 1.28, "first_decode_s": 1.485, "rss_before_mb": 124.3, "rss_after_load_mb": 857.7, "rss_peak_mb": 1078.7}
+== whisper-small.en-int8 arm64
+{"config": "whisper-small.en-int8-arm64", "threads": 6, "files": {"sherpa-onnx-whisper-small.en/small.en-encoder.int8.onnx": 112442483, "sherpa-onnx-whisper-small.en/small.en-decoder.int8.onnx": 262223042, "sherpa-onnx-whisper-small.en/small.en-tokens.txt": 835554}, "load_s": 0.697, "first_decode_s": 0.357, "rss_before_mb": 127.1, "rss_after_load_mb": 1024.6, "rss_peak_mb": 1598.7}
+== whisper-small.en-fp32 x64
+{"config": "whisper-small.en-fp32-x64", "threads": 6, "files": {"sherpa-onnx-whisper-small.en/small.en-encoder.onnx": 409528992, "sherpa-onnx-whisper-small.en/small.en-decoder.onnx": 559124757, "sherpa-onnx-whisper-small.en/small.en-tokens.txt": 835554}, "load_s": 1.863, "first_decode_s": 1.38, "rss_before_mb": 123.9, "rss_after_load_mb": 1028.9, "rss_peak_mb": 1787.6}
+== whisper-small.en-fp32 arm64
+{"config": "whisper-small.en-fp32-arm64", "threads": 6, "files": {"sherpa-onnx-whisper-small.en/small.en-encoder.onnx": 409528992, "sherpa-onnx-whisper-small.en/small.en-decoder.onnx": 559124757, "sherpa-onnx-whisper-small.en/small.en-tokens.txt": 835554}, "load_s": 0.852, "first_decode_s": 0.387, "rss_before_mb": 127.1, "rss_after_load_mb": 1480.9, "rss_peak_mb": 1902.7}
+### whisper.cpp runs, 6 threads
+== whispercpp-tiny.en x64
+arch: Can't find any plists for arch
+FAILED whispercpp tiny.en x64
+== whispercpp-tiny.en-q5_1 x64
+arch: Can't find any plists for arch
+FAILED whispercpp tiny.en-q5_1 x64
+== whispercpp-base.en x64
+arch: Can't find any plists for arch
+FAILED whispercpp base.en x64
+== whispercpp-base.en-q5_1 x64
+arch: Can't find any plists for arch
+FAILED whispercpp base.en-q5_1 x64
+== whispercpp-small.en x64
+arch: Can't find any plists for arch
+FAILED whispercpp small.en x64
+== whispercpp-small.en-q5_1 x64
+arch: Can't find any plists for arch
+FAILED whispercpp small.en-q5_1 x64
+== whispercpp-tiny.en arm64
+{"config": "whispercpp-tiny.en-arm64", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-tiny.en.bin": 77704715}, "load_s": 0.031, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 160.2}
+== whispercpp-small.en arm64
+{"config": "whispercpp-small.en-arm64", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-small.en.bin": 487614201}, "load_s": 0.112, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 678.7}
+### 3-second clip timing loops (sherpa), x64 and arm64, threads 2/4/6
+### whisper.cpp 3-second clip timing, x64, threads 2/4/6
+SPEECH-BATCH-DONE

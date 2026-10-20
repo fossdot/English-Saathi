@@ -1,0 +1,28 @@
+{"model": "llama3.2:1b-instruct-q4_K_M", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 46.25, "size_mb": 800}
+{"model": "llama3.2:1b-instruct-q4_K_M", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 19.65, "size_mb": 800}
+{"model": "llama3.2:3b", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 15.2, "size_mb": 2012}
+{"model": "llama3.2:3b", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 6.7, "size_mb": 2012}
+{"model": "gemma3:1b", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 28.5, "size_mb": 800}
+{"model": "gemma3:1b", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 14.44, "size_mb": 800}
+{"model": "gemma3:4b", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 13.31, "size_mb": 2483}
+{"model": "gemma3:4b", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 6.25, "size_mb": 2483}
+{"model": "qwen3:1.7b", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 30.2, "size_mb": 1353}
+{"model": "qwen3:1.7b", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 13.98, "size_mb": 1353}
+{"model": "qwen3:4b", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 12.15, "size_mb": 2491}
+{"model": "qwen3:4b", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 6.02, "size_mb": 2491}
+{"model": "qwen2.5:3b", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 15.25, "size_mb": 1924}
+{"model": "qwen2.5:3b", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 7.4, "size_mb": 1924}
+{"model": "phi4-mini", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 13.79, "size_mb": 2484}
+{"model": "phi4-mini", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 6.18, "size_mb": 2484}
+{"model": "nemotron-mini", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 11.32, "size_mb": 2691}
+{"model": "nemotron-mini", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 4.75, "size_mb": 2691}
+{"model": "hf.co/itlwas/Nemotron-4-Mini-Hindi-4B-Instruct-Q4_K_M-GGUF", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 11.34, "size_mb": 2691}
+{"model": "hf.co/itlwas/Nemotron-4-Mini-Hindi-4B-Instruct-Q4_K_M-GGUF", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 4.75, "size_mb": 2691}
+{"model": "hf.co/arunmcops/Param-1-2.9B-Instruct-GGUF:Q4_K_M", "test": "pp", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 16.14, "size_mb": 1814}
+{"model": "hf.co/arunmcops/Param-1-2.9B-Instruct-GGUF:Q4_K_M", "test": "tg", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 6.79, "size_mb": 1814}
+{"model": "qwen3:4b-instruct", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 8.36, "size_mb": 2491}
+{"model": "qwen3:4b-instruct", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 4.36, "size_mb": 2491}
+{"model": "hf.co/QuantFactory/EuroLLM-1.7B-Instruct-GGUF:Q4_K_M", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 26.6, "size_mb": 1042}
+{"model": "hf.co/QuantFactory/EuroLLM-1.7B-Instruct-GGUF:Q4_K_M", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 11.97, "size_mb": 1042}
+{"model": "hf.co/tiiuae/Falcon-H1-3B-Instruct-GGUF:Q4_K_M", "n_prompt": 256, "n_gen": 0, "tokens_per_s": 10.34, "size_mb": 1886}
+{"model": "hf.co/tiiuae/Falcon-H1-3B-Instruct-GGUF:Q4_K_M", "n_prompt": 0, "n_gen": 64, "tokens_per_s": 5.32, "size_mb": 1886}

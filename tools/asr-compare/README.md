@@ -20,8 +20,24 @@ done
 .venv/bin/python score.py --models work/models --audio work/audio --results work/results > work/report.md
 ```
 
-`run_asr.py --help` lists every configuration. Run each one in its own
-process: the memory figure is the process's peak.
+`run_asr.py --help` lists every configuration (Whisper tiny.en, base.en and
+small.en, Moonshine). Run each one in its own process: the memory figure is
+the process's peak. `--tag` adds a label to the run name, e.g. the CPU
+architecture.
+
+Other measurements:
+
+```sh
+.venv/bin/python score.py ... --app-rules            # score as the app will: place names unscored, to/two/too etc. equal
+.venv/bin/python bench_speed.py --models work/models --config whisper-base.en-int8 \
+    --clip ../../app/src/androidTest/assets/asr-test/librispeech-0.wav --threads 6   # seconds per 3-second clip
+.venv/bin/python run_whispercpp.py --cli whisper.cpp/build/bin/whisper-cli --model ggml-base.en.bin \
+    --audio work/audio --threads 6 --config whispercpp-base.en --out work/results   # whisper.cpp, same scoring
+```
+
+On Apple Silicon, `arch -x86_64 python ...` with an x86_64 Python and the
+x86_64 wheels runs the Intel code under Rosetta (see
+`docs/intel-macbook-benchmarks.md` for what that does and doesn't tell you).
 
 ## Files
 
@@ -34,6 +50,8 @@ process: the memory figure is the process's peak.
 - `make_test_audio.py`: the test clips and `manifest.jsonl`.
 - `run_asr.py`: transcripts, decode time, load time and peak memory for one
   configuration.
+- `run_whispercpp.py`: the same for whisper.cpp's `whisper-cli`.
+- `bench_speed.py`: seconds per 3-second clip for one configuration.
 - `score.py`: the tables.
 
 `work/` is ignored by git. The macOS voices' licence doesn't allow sharing

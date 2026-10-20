@@ -1,0 +1,465 @@
+{
+ "model": "qwen3:1.7b",
+ "parameter_size": "2.0B",
+ "quantization": "Q4_K_M",
+ "family": "qwen3",
+ "task_a": [
+  {
+   "id": "bus_02",
+   "text": "When will the bus come?",
+   "output": "{\n \"text\": \"When will the bus come?\",\n \"hi\": \"बस कब आएगा?\",\n \"chunks\": [\n  \"When will\",\n  \"the bus come\"\n ],\n \"words\": {\n  \"when\": {\n   \"syllables\": [\n    \"when\"\n   ],\n   \"hint_hi\": \"वेयर\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"will\": {\n   \"syllables\": [\n    \"will\"\n   ],\n   \"hint_hi\": \"विल\",\n   \"hint_tag\": \"th\"\n  },\n  \"the\": {\n   \"syllables\": [\n    \"the\"\n   ],\n   \"hint_hi\": \"द\",\n   \"hint_tag\": \"th\"\n  },\n  \"bus\": {\n   \"syllables\": [\n    \"bus\"\n   ],\n   \"hint_hi\": \"बस\",\n   \"hint_tag\": \"short_vowel\"\n  },\n  \"come\": {\n   \"syllables\": [\n    \"come\"\n   ],\n   \"hint_hi\": \"कम\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 14.477,
+    "wall_s": 62.965,
+    "load_s": 0.007,
+    "prompt_tokens": 527,
+    "prompt_tokens_per_s": 36.4,
+    "output_tokens": 239,
+    "tokens_per_s": 4.93
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": true,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "bus_03",
+   "text": "One ticket to Patna, please.",
+   "output": "{\n \"text\": \"One ticket to Patna, please.\",\n \"hi\": \"पैटना तक पहुंचे एक टिकेट, आप दें.\",\n \"chunks\": [\n  \"One ticket to\",\n  \"Patna, please.\"\n ],\n \"words\": {\n  \"one\": {\n   \"syllables\": [\n    \"one\"\n   ],\n   \"hint_hi\": \"ओन\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"ticket\": {\n   \"syllables\": [\n    \"ticket\"\n   ],\n   \"hint_hi\": \"टिकेट\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"to\": {\n   \"syllables\": [\n    \"to\"\n   ],\n   \"hint_hi\": \"तो\",\n   \"hint_tag\": \"th\"\n  },\n  \"Patna\": {\n   \"syllables\": [\n    \"Patna\"\n   ],\n   \"hint_hi\": \"पैटना\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"please\": {\n   \"syllables\": [\n    \"please\"\n   ],\n   \"hint_hi\": \"प्लीज\",\n   \"hint_tag\": \"v_w\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 2.971,
+    "wall_s": 32.585,
+    "load_s": 0.015,
+    "prompt_tokens": 529,
+    "prompt_tokens_per_s": 179.6,
+    "output_tokens": 276,
+    "tokens_per_s": 9.32
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": false,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "bus_04",
+   "text": "How much is the ticket?",
+   "output": "{\n \"text\": \"How much is the ticket?\",\n \"hi\": \"कितना बजाय बिक्री है?\",\n \"chunks\": [\n  \"How much is\",\n  \"the ticket\"\n ],\n \"words\": {\n  \"how\": {\n   \"syllables\": [\n    \"how\"\n   ],\n   \"hint_hi\": \"हॉव\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"much\": {\n   \"syllables\": [\n    \"much\"\n   ],\n   \"hint_hi\": \"मुच\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"is\": {\n   \"syllables\": [\n    \"is\"\n   ],\n   \"hint_hi\": \"ईस\",\n   \"hint_tag\": \"th\"\n  },\n  \"the\": {\n   \"syllables\": [\n    \"the\"\n   ],\n   \"hint_hi\": \"द\",\n   \"hint_tag\": \"th\"\n  },\n  \"ticket\": {\n   \"syllables\": [\n    \"ticket\"\n   ],\n   \"hint_hi\": \"टिकेट\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.497,
+    "wall_s": 27.805,
+    "load_s": 0.008,
+    "prompt_tokens": 527,
+    "prompt_tokens_per_s": 355.2,
+    "output_tokens": 251,
+    "tokens_per_s": 9.54
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": true,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "bus_05",
+   "text": "Does this bus go to Bettiah?",
+   "output": "{\n \"text\": \"Does this bus go to Bettiah?\",\n \"hi\": \"इस बस बेट्टियां हाँ जाती है?\",\n \"chunks\": [\n  \"Does this\",\n  \"bus go to Bettiah\"\n ],\n \"words\": {\n  \"does\": {\n   \"syllables\": [\n    \"does\"\n   ],\n   \"hint_hi\": \"दोस\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"this\": {\n   \"syllables\": [\n    \"this\"\n   ],\n   \"hint_hi\": \"तिस\",\n   \"hint_tag\": \"th\"\n  },\n  \"bus\": {\n   \"syllables\": [\n    \"bus\"\n   ],\n   \"hint_hi\": \"बस\",\n   \"hint_tag\": \"short_vowel\"\n  },\n  \"go\": {\n   \"syllables\": [\n    \"go\"\n   ],\n   \"hint_hi\": \"गो\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"to\": {\n   \"syllables\": [\n    \"to\"\n   ],\n   \"hint_hi\": \"तो\",\n   \"hint_tag\": \"th\"\n  },\n  \"Bettiah\": {\n   \"syllables\": [\n    \"Bettiah\"\n   ],\n   \"hint_hi\": \"बेट्टियां है\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.74,
+    "wall_s": 35.582,
+    "load_s": 0.005,
+    "prompt_tokens": 529,
+    "prompt_tokens_per_s": 305.6,
+    "output_tokens": 312,
+    "tokens_per_s": 9.22
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": false,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "market_01",
+   "text": "How much is one kilo of rice?",
+   "output": "{\n \"text\": \"How much is one kilo of rice?\",\n \"hi\": \"एक किलो राई कितना है?\",\n \"chunks\": [\n  \"How much is\",\n  \"one kilo of rice\"\n ],\n \"words\": {\n  \"how\": {\n   \"syllables\": [\n    \"how\"\n   ],\n   \"hint_hi\": \"हॉव\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"much\": {\n   \"syllables\": [\n    \"much\"\n   ],\n   \"hint_hi\": \"मुच\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"one\": {\n   \"syllables\": [\n    \"one\"\n   ],\n   \"hint_hi\": \"ओन\",\n   \"hint_tag\": \"th\"\n  },\n  \"kilo\": {\n   \"syllables\": [\n    \"kilo\"\n   ],\n   \"hint_hi\": \"किलो\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"of\": {\n   \"syllables\": [\n    \"of\"\n   ],\n   \"hint_hi\": \"ओफ\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"rice\": {\n   \"syllables\": [\n    \"rice\"\n   ],\n   \"hint_hi\": \"राईस\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.789,
+    "wall_s": 32.845,
+    "load_s": 0.007,
+    "prompt_tokens": 530,
+    "prompt_tokens_per_s": 298.9,
+    "output_tokens": 299,
+    "tokens_per_s": 9.63
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": true,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "market_02",
+   "text": "Please give me two kilos of onions.",
+   "output": "{\n \"text\": \"Please give me two kilos of onions.\",\n \"hi\": \"प्लीज दें दो किलो आम.\",\n \"chunks\": [\n  \"Please give\",\n  \"me two kilos of onions\"\n ],\n \"words\": {\n  \"please\": {\n   \"syllables\": [\n    \"please\"\n   ],\n   \"hint_hi\": \"प्लीज\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"give\": {\n   \"syllables\": [\n    \"give\"\n   ],\n   \"hint_hi\": \"देना\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"me\": {\n   \"syllables\": [\n    \"me\"\n   ],\n   \"hint_hi\": \"मे\",\n   \"hint_tag\": \"th\"\n  },\n  \"two\": {\n   \"syllables\": [\n    \"two\"\n   ],\n   \"hint_hi\": \"तून\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"kilos\": {\n   \"syllables\": [\n    \"kilos\"\n   ],\n   \"hint_hi\": \"किलोस\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"of\": {\n   \"syllables\": [\n    \"of\"\n   ],\n   \"hint_hi\": \"ओफ\",\n   \"hint_tag\": \"th\"\n  },\n  \"onions\": {\n   \"syllables\": [\n    \"onions\"\n   ],\n   \"hint_hi\": \"ओनियस\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.756,
+    "wall_s": 38.219,
+    "load_s": 0.007,
+    "prompt_tokens": 530,
+    "prompt_tokens_per_s": 303.8,
+    "output_tokens": 345,
+    "tokens_per_s": 9.46
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": true,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "bank_01",
+   "text": "I want to open a bank account.",
+   "output": "{\n \"text\": \"I want to open a bank account.\",\n \"hi\": \"मैं एक बैंक खाता बनाना चाहता हूँ.\",\n \"chunks\": [\n  \"I want\",\n  \"to open\",\n  \"a bank account\"\n ],\n \"words\": {\n  \"I\": {\n   \"syllables\": [\n    \"I\"\n   ],\n   \"hint_hi\": \"ई\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"want\": {\n   \"syllables\": [\n    \"want\"\n   ],\n   \"hint_hi\": \"वांट\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"to\": {\n   \"syllables\": [\n    \"to\"\n   ],\n   \"hint_hi\": \"तो\",\n   \"hint_tag\": \"th\"\n  },\n  \"open\": {\n   \"syllables\": [\n    \"open\"\n   ],\n   \"hint_hi\": \"ओपन\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"a\": {\n   \"syllables\": [\n    \"a\"\n   ],\n   \"hint_hi\": \"अ\",\n   \"hint_tag\": \"th\"\n  },\n  \"bank\": {\n   \"syllables\": [\n    \"bank\"\n   ],\n   \"hint_hi\": \"बैंक\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"account\": {\n   \"syllables\": [\n    \"account\"\n   ],\n   \"hint_hi\": \"अकाउंट\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.795,
+    "wall_s": 39.414,
+    "load_s": 0.016,
+    "prompt_tokens": 529,
+    "prompt_tokens_per_s": 298.0,
+    "output_tokens": 353,
+    "tokens_per_s": 9.38
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": false,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "bank_02",
+   "text": "Where do I sign?",
+   "output": "{\n \"text\": \"Where do I sign?\",\n \"hi\": \"क्या मैं लिखूंगा?\",\n \"chunks\": [\n  \"Where do\",\n  \"I sign\"\n ],\n \"words\": {\n  \"where\": {\n   \"syllables\": [\n    \"where\"\n   ],\n   \"hint_hi\": \"वेयर\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"do\": {\n   \"syllables\": [\n    \"do\"\n   ],\n   \"hint_hi\": \"द\",\n   \"hint_tag\": \"th\"\n  },\n  \"I\": {\n   \"syllables\": [\n    \"I\"\n   ],\n   \"hint_hi\": \"ई\",\n   \"hint_tag\": \"th\"\n  },\n  \"sign\": {\n   \"syllables\": [\n    \"sign\"\n   ],\n   \"hint_hi\": \"सिंग\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.452,
+    "wall_s": 23.348,
+    "load_s": 0.009,
+    "prompt_tokens": 526,
+    "prompt_tokens_per_s": 366.3,
+    "output_tokens": 206,
+    "tokens_per_s": 9.41
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": false,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  },
+  {
+   "id": "hospital_01",
+   "text": "My child has had a fever since yesterday.",
+   "output": "{\n \"text\": \"My child has had a fever since yesterday.\",\n \"hi\": \"मेरा बेटा जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक गर्भवत्स था जिसके दिन तक एक",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 1.804,
+    "wall_s": 92.212,
+    "load_s": 0.008,
+    "prompt_tokens": 530,
+    "prompt_tokens_per_s": 295.9,
+    "output_tokens": 800,
+    "tokens_per_s": 8.85
+   },
+   "checks": {
+    "valid_json": false,
+    "valid_after_brace_repair": false
+   }
+  },
+  {
+   "id": "hospital_02",
+   "text": "Which doctor should I see?",
+   "output": "{\n \"text\": \"Which doctor should I see?\",\n \"hi\": \"कौन सा डॉक्टर मुझे देखें?\",\n \"chunks\": [\n  \"Which doctor\",\n  \"should I see\"\n ],\n \"words\": {\n  \"which\": {\n   \"syllables\": [\n    \"which\"\n   ],\n   \"hint_hi\": \"क्या\",\n   \"hint_tag\": \"v_w\"\n  },\n  \"doctor\": {\n   \"syllables\": [\n    \"doctor\"\n   ],\n   \"hint_hi\": \"डॉक्टर\",\n   \"hint_tag\": \"s_cluster\"\n  },\n  \"should\": {\n   \"syllables\": [\n    \"should\"\n   ],\n   \"hint_hi\": \"सही\",\n   \"hint_tag\": \"th\"\n  },\n  \"I\": {\n   \"syllables\": [\n    \"I\"\n   ],\n   \"hint_hi\": \"ई\",\n   \"hint_tag\": \"th\"\n  },\n  \"see\": {\n   \"syllables\": [\n    \"see\"\n   ],\n   \"hint_hi\": \"सेई\",\n   \"hint_tag\": \"s_cluster\"\n  }\n }\n}",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.56,
+    "wall_s": 28.335,
+    "load_s": 0.009,
+    "prompt_tokens": 527,
+    "prompt_tokens_per_s": 354.7,
+    "output_tokens": 259,
+    "tokens_per_s": 9.67
+   },
+   "checks": {
+    "valid_json": true,
+    "valid_after_brace_repair": true,
+    "has_keys": true,
+    "hi_is_devanagari": true,
+    "chunks_cover_sentence": true,
+    "word_keys_in_sentence": false,
+    "hints_devanagari": true,
+    "tags_valid": true,
+    "syllables_lists": true
+   }
+  }
+ ],
+ "task_b": [
+  {
+   "id": "bus_01-1",
+   "output": "आप बस स्टॉप कहाँ है? बस स्टॉप कहाँ है?",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 3.263,
+    "wall_s": 6.575,
+    "load_s": 0.006,
+    "prompt_tokens": 214,
+    "prompt_tokens_per_s": 66.5,
+    "output_tokens": 37,
+    "tokens_per_s": 11.17
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 2,
+    "at_most_2_sentences": true,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_01-2",
+   "output": "आप बस के लिए स्टॉप कहाँ है? आप बस के लिए स्टॉप कहाँ है? आप बस के लिए स्टॉप कहाँ है?",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.207,
+    "wall_s": 8.466,
+    "load_s": 0.003,
+    "prompt_tokens": 218,
+    "prompt_tokens_per_s": 181.6,
+    "output_tokens": 78,
+    "tokens_per_s": 10.75
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 3,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_01-3",
+   "output": "आप बस स्टॉप कहाँ है? आप बस शॉप कहाँ है?",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.187,
+    "wall_s": 4.674,
+    "load_s": 0.005,
+    "prompt_tokens": 218,
+    "prompt_tokens_per_s": 184.9,
+    "output_tokens": 39,
+    "tokens_per_s": 11.18
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 2,
+    "at_most_2_sentences": true,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_02-4",
+   "output": "आप बस कब आएगी लिखे जाएगी तो बस कब आएगी लिखे जाएगी तो बस कब आएगी लिखे जाएगी तो बस कब आएगी लिखे जाएगी तो बस कब आएगी लिखे जाएगी तो बस कब आएगी लिखे जाएगी तो बस कब आएगी लिख",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 1.524,
+    "wall_s": 16.698,
+    "load_s": 0.003,
+    "prompt_tokens": 209,
+    "prompt_tokens_per_s": 137.8,
+    "output_tokens": 160,
+    "tokens_per_s": 10.54
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 1,
+    "at_most_2_sentences": true,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_03-5",
+   "output": "आप बहुत सारे दिन बिताते हैं और अब आपके लिए एक बार बहुत सारे दिन बिताने वाला एक बार बहुत सारे दिन बिताने वाला एक बार बहुत सारे दिन बिताने वाला एक बार बहुत सारे दिन ब",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 1.707,
+    "wall_s": 17.127,
+    "load_s": 0.006,
+    "prompt_tokens": 227,
+    "prompt_tokens_per_s": 134.9,
+    "output_tokens": 160,
+    "tokens_per_s": 10.38
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 1,
+    "at_most_2_sentences": true,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_04-6",
+   "output": "आप टिकट कितने का है? आप टिकट कितने है?",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.542,
+    "wall_s": 4.799,
+    "load_s": 0.007,
+    "prompt_tokens": 213,
+    "prompt_tokens_per_s": 140.4,
+    "output_tokens": 36,
+    "tokens_per_s": 11.06
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 2,
+    "at_most_2_sentences": true,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_05-7",
+   "output": "आप यह बस बेतिया जाती है बोलें जबकि आप यह बस बेतिया जाती है बोलें जबकि आप यह बस बेतिया जाती है बोलें जबकि आप यह बस बेतिया जाती है बोलें जबकि आप यह बस बेतिया जाती",
+   "metrics": {
+    "done_reason": "length",
+    "ttft_s": 1.763,
+    "wall_s": 17.093,
+    "load_s": 0.004,
+    "prompt_tokens": 232,
+    "prompt_tokens_per_s": 132.2,
+    "output_tokens": 160,
+    "tokens_per_s": 10.44
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 1,
+    "at_most_2_sentences": true,
+    "mentions_word": false,
+    "latin_words": 0
+   }
+  },
+  {
+   "id": "bus_05-8",
+   "output": "आप यह बस बेतिया जाती है बोल रहे थे, लेकिन आपने \"do\" बोल दिया है। वैसे बोलें जैसे \"क्या यह बस बेतिया जाती है?\"",
+   "metrics": {
+    "done_reason": "stop",
+    "ttft_s": 1.302,
+    "wall_s": 11.58,
+    "load_s": 0.007,
+    "prompt_tokens": 231,
+    "prompt_tokens_per_s": 181.2,
+    "output_tokens": 108,
+    "tokens_per_s": 10.51
+   },
+   "checks": {
+    "devanagari": true,
+    "sentences": 3,
+    "at_most_2_sentences": false,
+    "mentions_word": false,
+    "latin_words": 1
+   }
+  }
+ ],
+ "load_s": 2.417,
+ "first_response_wall_s": 7.367,
+ "speech_after_llm": [
+  "After early nightfall, the yellow lamps would light.",
+  0.196
+ ],
+ "peak_ram_mb": {
+  "ollama_total_mb": 1996,
+  "children_mb": 1954,
+  "self_mb": 132
+ },
+ "medians": {
+  "task_a": {
+   "ttft_s": 1.77,
+   "tokens_per_s": 9.39,
+   "prompt_tokens_per_s": 301.35,
+   "wall_s": 34.21,
+   "output_tokens": 287.5
+  },
+  "task_b": {
+   "ttft_s": 1.53,
+   "tokens_per_s": 10.64,
+   "prompt_tokens_per_s": 139.1,
+   "wall_s": 10.02,
+   "output_tokens": 93.0
+  }
+ },
+ "format": {
+  "task_a_valid_json": 9,
+  "task_a_valid_after_brace_repair": 9,
+  "task_a_all_checks": 4,
+  "task_b_devanagari": 8,
+  "task_b_at_most_2_sentences": 6
+ }
+}

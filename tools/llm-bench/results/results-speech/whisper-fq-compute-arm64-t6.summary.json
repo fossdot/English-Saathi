@@ -1,0 +1,14 @@
+{
+ "config": "whisper-fq-compute-arm64",
+ "threads": 6,
+ "files": {
+  "whisper-fq-compute/tiny.en-encoder.int8.onnx": 12937772,
+  "whisper-fq-compute/tiny.en-decoder.int8.onnx": 30521939,
+  "whisper-fq-compute/tiny.en-tokens.txt": 835554
+ },
+ "load_s": 0.181,
+ "first_decode_s": 0.062,
+ "rss_before_mb": 127.2,
+ "rss_after_load_mb": 294.5,
+ "rss_peak_mb": 493.3
+}

@@ -1,0 +1,14 @@
+{
+ "config": "whisper-base.en-fp32-x64",
+ "threads": 6,
+ "files": {
+  "sherpa-onnx-whisper-base.en/base.en-encoder.onnx": 95087154,
+  "sherpa-onnx-whisper-base.en/base.en-decoder.onnx": 196546950,
+  "sherpa-onnx-whisper-base.en/base.en-tokens.txt": 835554
+ },
+ "load_s": 0.67,
+ "first_decode_s": 0.311,
+ "rss_before_mb": 123.6,
+ "rss_after_load_mb": 748.2,
+ "rss_peak_mb": 816.5
+}

@@ -15,6 +15,12 @@ from appmatch import align, normalize, normalize_heard
 
 PLACES = {"patna", "bettiah"}
 
+# The rules the owner decided after milestone b (docs/decisions.md), used with --app-rules:
+# place names are not scored, and these groups count as the same word.
+UNSCORED = {"patna", "bettiah"}
+HOMOPHONES = [{"to", "two", "too"}, {"for", "four"}, {"one", "won"}]
+ACCEPT = {w: group - {w} for group in HOMOPHONES for w in group}
+
 
 def pct(n, d):
     return f"{100 * n / d:.1f}%" if d else "–"
@@ -48,14 +54,21 @@ def load(results_dir, audio_dir):
     return runs
 
 
-def score_clip(meta, result):
+def score_clip(meta, result, app_rules=False):
     heard = normalize_heard(result["text"])
     out = {"heard": heard, "nothing": not heard}
     if meta["kind"] == "nonspeech":
         return out
     target = normalize(meta["target"])
-    statuses, extra = align(target, heard)
-    expected, _ = align(target, normalize(meta["said"]))
+    accept = ACCEPT if app_rules else None
+    statuses, extra = align(target, heard, accept)
+    expected, _ = align(target, normalize(meta["said"]), accept)
+    if app_rules:
+        # Unscored words stay in the alignment but are dropped from every count.
+        keep = [w not in UNSCORED for w in target]
+        target = [w for w, k in zip(target, keep) if k]
+        statuses = [st for st, k in zip(statuses, keep) if k]
+        expected = [st for st, k in zip(expected, keep) if k]
     out.update(target=target, statuses=statuses, extra=extra, expected=expected)
     return out
 
@@ -102,7 +115,8 @@ def latency(clips):
     times = sorted(t for t, _ in speech)
     p90 = times[int(0.9 * (len(times) - 1))]
     rtf = statistics.mean(t / sec for t, sec in speech)
-    return statistics.median(times), p90, rtf
+    three = [t for t, sec in speech if 2.5 <= sec <= 3.5]
+    return statistics.median(times), p90, rtf, (statistics.median(three) if three else None)
 
 
 def main():
@@ -111,6 +125,8 @@ def main():
     ap.add_argument("--audio", required=True)
     ap.add_argument("--results", required=True)
     ap.add_argument("--threads", type=int, default=2)
+    ap.add_argument("--app-rules", action="store_true",
+                    help="score as the app will: place names unscored, to/two/too, for/four, one/won equal")
     args = ap.parse_args()
     models, audio_dir = Path(args.models), Path(args.audio)
     runs = load(Path(args.results), audio_dir)
@@ -119,25 +135,27 @@ def main():
     for name, (summary, rows) in runs.items():
         if summary["threads"] != args.threads:
             continue
-        scored[name] = (summary, [(m, r, score_clip(m, r)) for m, r in rows])
+        scored[name] = (summary, [(m, r, score_clip(m, r, args.app_rules)) for m, r in rows])
 
-    print(f"## Overview ({args.threads} threads)\n")
+    rules = " (app rules: place names unscored, homophones equal)" if args.app_rules else ""
+    print(f"## Overview ({args.threads} threads){rules}\n")
     print("| Model | Files MB | Zipped MB | Words right | Sentences all right | Place names right | "
           "Other words right | Mistakes caught | False alarms | Silence/noise → nothing | "
-          "Median ms | p90 ms | RTF | Load s | Peak RAM +MB |")
-    print("|---" * 15 + "|")
+          "Median ms | p90 ms | 3 s clips ms | RTF | Load s | Peak RAM +MB |")
+    print("|---" * 16 + "|")
     for name, (summary, clips) in scored.items():
         s, _ = summarize(clips)
-        files = [models / f for f in summary["files"]]
+        files = [models / f for f in summary["files"] if (models / f).exists()]
         mb = sum(summary["files"].values()) / 1e6
-        med, p90, rtf = latency(clips)
+        med, p90, rtf, three = latency(clips)
         ns = [c for c in clips if c[0]["kind"] == "nonspeech" and c[0]["condition"] != "babble"]
         ns_nothing = sum(c[2]["nothing"] for c in ns)
-        print(f"| {summary['config']} | {mb:.1f} | {deflated_mb(files):.1f} | {pct(s['correct'], s['words'])} | "
+        zipped = f"{deflated_mb(files):.1f}" if files else "–"
+        ram = f"{summary['rss_peak_mb'] - summary['rss_before_mb']:.0f}" if summary.get("rss_before_mb") is not None else "–"
+        print(f"| {summary['config']} | {mb:.1f} | {zipped} | {pct(s['correct'], s['words'])} | "
               f"{pct(s['all_ok'], s['clips'])} | {pct(s['place_ok'], s['place'])} | {pct(s['other_ok'], s['other'])} | "
               f"{pct(s['m_caught'], s['m_planted'])} | {pct(s['m_false'], s['m_other'])} | {ns_nothing}/{len(ns)} | "
-              f"{med * 1000:.0f} | {p90 * 1000:.0f} | {rtf:.3f} | {summary['load_s']:.2f} | "
-              f"{summary['rss_peak_mb'] - summary['rss_before_mb']:.0f} |")
+              f"{med * 1000:.0f} | {p90 * 1000:.0f} | {three * 1000:.0f} | {rtf:.3f} | {summary['load_s']:.2f} | {ram} |")
 
     def breakdown(title, key, kind="correct"):
         values = sorted({c[0][key] for _, cl in scored.values() for c in cl if c[0]["kind"] == kind})

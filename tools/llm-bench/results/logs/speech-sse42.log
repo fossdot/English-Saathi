@@ -1,0 +1,6 @@
+### whisper.cpp extra full-clip runs
+{"config": "whispercpp-tiny.en-x64sse42", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-tiny.en.bin": 77704715}, "load_s": 0.05, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 182.8}
+{"config": "whispercpp-small.en-x64sse42", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-small.en.bin": 487614201}, "load_s": 0.195, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 704.4}
+{"config": "whispercpp-base.en-ac650-x64", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-base.en.bin": 147964211}, "load_s": 0.076, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 253.6}
+### whisper.cpp 3-second clip timing: AVX2 and SSE4.2 builds, with and without -ac 650, 6 threads
+SSE42-DONE

@@ -1,0 +1,375 @@
+{"clip": "wav/correct-bus_01-aman-normal-clean.wav", "text": "Where bus stop?", "decode_s": 1.3921}
+{"clip": "wav/correct-bus_01-aman-normal-noisy.wav", "text": "Where must I", "decode_s": 1.3981}
+{"clip": "wav/correct-bus_01-aman-normal-phone.wav", "text": "Weber stop.", "decode_s": 1.4008}
+{"clip": "wav/correct-bus_01-aman-slow-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.6095}
+{"clip": "wav/correct-bus_01-aman-slow-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.5236}
+{"clip": "wav/correct-bus_01-aman-slow-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.5767}
+{"clip": "wav/correct-bus_01-aman-halting-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.6401}
+{"clip": "wav/correct-bus_01-aman-halting-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.7331}
+{"clip": "wav/correct-bus_01-aman-halting-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.6635}
+{"clip": "wav/correct-bus_01-rishi-normal-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.535}
+{"clip": "wav/correct-bus_01-rishi-normal-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.5101}
+{"clip": "wav/correct-bus_01-rishi-normal-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.565}
+{"clip": "wav/correct-bus_01-rishi-slow-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.4855}
+{"clip": "wav/correct-bus_01-rishi-slow-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.5026}
+{"clip": "wav/correct-bus_01-rishi-slow-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.8048}
+{"clip": "wav/correct-bus_01-rishi-halting-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.7312}
+{"clip": "wav/correct-bus_01-rishi-halting-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.8205}
+{"clip": "wav/correct-bus_01-rishi-halting-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.7802}
+{"clip": "wav/correct-bus_01-tara-normal-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.5202}
+{"clip": "wav/correct-bus_01-tara-normal-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.549}
+{"clip": "wav/correct-bus_01-tara-normal-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.485}
+{"clip": "wav/correct-bus_01-tara-slow-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.5286}
+{"clip": "wav/correct-bus_01-tara-slow-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.5675}
+{"clip": "wav/correct-bus_01-tara-slow-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.5249}
+{"clip": "wav/correct-bus_01-tara-halting-clean.wav", "text": "The biggest thing is that the bus stop is the bus stop.", "decode_s": 2.4457}
+{"clip": "wav/correct-bus_01-tara-halting-noisy.wav", "text": "Dear Kois, thermal peace servicing, first to me a freaky rendering, we only is the bus stop.", "decode_s": 3.1299}
+{"clip": "wav/correct-bus_01-tara-halting-phone.wav", "text": "Dear Clovis thermal pizza, he thinks that Jimmy or Freaky, Rendonavian Nioni is the bus stop.", "decode_s": 3.2245}
+{"clip": "wav/correct-bus_01-lekha-latin-normal-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.4857}
+{"clip": "wav/correct-bus_01-lekha-latin-normal-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.4766}
+{"clip": "wav/correct-bus_01-lekha-latin-normal-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.478}
+{"clip": "wav/correct-bus_01-lekha-latin-slow-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.4699}
+{"clip": "wav/correct-bus_01-lekha-latin-slow-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.4621}
+{"clip": "wav/correct-bus_01-lekha-latin-slow-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.4685}
+{"clip": "wav/correct-bus_01-lekha-latin-halting-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.6337}
+{"clip": "wav/correct-bus_01-lekha-latin-halting-noisy.wav", "text": "This is the first God.", "decode_s": 1.686}
+{"clip": "wav/correct-bus_01-lekha-latin-halting-phone.wav", "text": "When is the bus stop?", "decode_s": 1.674}
+{"clip": "wav/correct-bus_01-lekha-deva-normal-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.427}
+{"clip": "wav/correct-bus_01-lekha-deva-normal-noisy.wav", "text": "Where is the best toy?", "decode_s": 1.4383}
+{"clip": "wav/correct-bus_01-lekha-deva-normal-phone.wav", "text": "We are in the bus stop.", "decode_s": 1.5034}
+{"clip": "wav/correct-bus_01-lekha-deva-slow-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.4751}
+{"clip": "wav/correct-bus_01-lekha-deva-slow-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.4988}
+{"clip": "wav/correct-bus_01-lekha-deva-slow-phone.wav", "text": "We are in the bus stop.", "decode_s": 1.5431}
+{"clip": "wav/correct-bus_01-lekha-deva-halting-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.5744}
+{"clip": "wav/correct-bus_01-lekha-deva-halting-noisy.wav", "text": "The Earth is the best top stage.", "decode_s": 1.7509}
+{"clip": "wav/correct-bus_01-lekha-deva-halting-phone.wav", "text": "We are in number one cause.", "decode_s": 1.934}
+{"clip": "wav/correct-bus_01-samantha-normal-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.6831}
+{"clip": "wav/correct-bus_01-samantha-normal-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.7399}
+{"clip": "wav/correct-bus_01-samantha-normal-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.8319}
+{"clip": "wav/correct-bus_01-samantha-slow-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.7864}
+{"clip": "wav/correct-bus_01-samantha-slow-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.7467}
+{"clip": "wav/correct-bus_01-samantha-slow-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.4748}
+{"clip": "wav/correct-bus_01-samantha-halting-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.7338}
+{"clip": "wav/correct-bus_01-samantha-halting-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.709}
+{"clip": "wav/correct-bus_01-samantha-halting-phone.wav", "text": "Where is the bus stop?", "decode_s": 1.7064}
+{"clip": "wav/correct-bus_02-aman-normal-clean.wav", "text": "When will the bus come?", "decode_s": 1.4928}
+{"clip": "wav/correct-bus_02-aman-normal-noisy.wav", "text": "When will the bus come?", "decode_s": 1.5414}
+{"clip": "wav/correct-bus_02-aman-normal-phone.wav", "text": "When will the bus come?", "decode_s": 1.416}
+{"clip": "wav/correct-bus_02-aman-slow-clean.wav", "text": "When will the bus come?", "decode_s": 1.4467}
+{"clip": "wav/correct-bus_02-aman-slow-noisy.wav", "text": "When will the bus come?", "decode_s": 1.5234}
+{"clip": "wav/correct-bus_02-aman-slow-phone.wav", "text": "When will the bus come?", "decode_s": 1.6542}
+{"clip": "wav/correct-bus_02-aman-halting-clean.wav", "text": "When will the bus come?", "decode_s": 1.6544}
+{"clip": "wav/correct-bus_02-aman-halting-noisy.wav", "text": "When will the bus come?", "decode_s": 1.705}
+{"clip": "wav/correct-bus_02-aman-halting-phone.wav", "text": "When will the bus come?", "decode_s": 1.6051}
+{"clip": "wav/correct-bus_02-rishi-normal-clean.wav", "text": "When will the bus come?", "decode_s": 1.4373}
+{"clip": "wav/correct-bus_02-rishi-normal-noisy.wav", "text": "When will the bus come?", "decode_s": 1.5089}
+{"clip": "wav/correct-bus_02-rishi-normal-phone.wav", "text": "When will the bus come?", "decode_s": 1.5097}
+{"clip": "wav/correct-bus_02-rishi-slow-clean.wav", "text": "When will the bus come?", "decode_s": 1.5165}
+{"clip": "wav/correct-bus_02-rishi-slow-noisy.wav", "text": "When will the bus come?", "decode_s": 1.4871}
+{"clip": "wav/correct-bus_02-rishi-slow-phone.wav", "text": "When will the bus come?", "decode_s": 1.4444}
+{"clip": "wav/correct-bus_02-rishi-halting-clean.wav", "text": "When will the bus come?", "decode_s": 1.387}
+{"clip": "wav/correct-bus_02-rishi-halting-noisy.wav", "text": "When will the buzz come?", "decode_s": 1.4075}
+{"clip": "wav/correct-bus_02-rishi-halting-phone.wav", "text": "When will the bus come?", "decode_s": 1.3859}
+{"clip": "wav/correct-bus_02-tara-normal-clean.wav", "text": "When will the bus come?", "decode_s": 1.2038}
+{"clip": "wav/correct-bus_02-tara-normal-noisy.wav", "text": "When will the bus come?", "decode_s": 1.192}
+{"clip": "wav/correct-bus_02-tara-normal-phone.wav", "text": "When will the bus come?", "decode_s": 1.2119}
+{"clip": "wav/correct-bus_02-tara-slow-clean.wav", "text": "When will the bus come?", "decode_s": 1.18}
+{"clip": "wav/correct-bus_02-tara-slow-noisy.wav", "text": "When will the bus come?", "decode_s": 1.2091}
+{"clip": "wav/correct-bus_02-tara-slow-phone.wav", "text": "When will the bus come?", "decode_s": 1.2236}
+{"clip": "wav/correct-bus_02-tara-halting-clean.wav", "text": "When will the bus come?", "decode_s": 1.3933}
+{"clip": "wav/correct-bus_02-tara-halting-noisy.wav", "text": "When will the bus come?", "decode_s": 1.3577}
+{"clip": "wav/correct-bus_02-tara-halting-phone.wav", "text": "When will the bot come?", "decode_s": 1.4092}
+{"clip": "wav/correct-bus_02-lekha-latin-normal-clean.wav", "text": "When will the boss come?", "decode_s": 1.2224}
+{"clip": "wav/correct-bus_02-lekha-latin-normal-noisy.wav", "text": "When will the boss clump?", "decode_s": 1.2185}
+{"clip": "wav/correct-bus_02-lekha-latin-normal-phone.wav", "text": "When will the boss come?", "decode_s": 1.215}
+{"clip": "wav/correct-bus_02-lekha-latin-slow-clean.wav", "text": "When will the boss come?", "decode_s": 1.2328}
+{"clip": "wav/correct-bus_02-lekha-latin-slow-noisy.wav", "text": "When will the boss come?", "decode_s": 1.2179}
+{"clip": "wav/correct-bus_02-lekha-latin-slow-phone.wav", "text": "When will the bus come?", "decode_s": 1.3188}
+{"clip": "wav/correct-bus_02-lekha-latin-halting-clean.wav", "text": "When will the bus come?", "decode_s": 1.3988}
+{"clip": "wav/correct-bus_02-lekha-latin-halting-noisy.wav", "text": "when will the first flaps", "decode_s": 1.3924}
+{"clip": "wav/correct-bus_02-lekha-latin-halting-phone.wav", "text": "When will the bath come?", "decode_s": 1.3767}
+{"clip": "wav/correct-bus_02-lekha-deva-normal-clean.wav", "text": "When will the bus come?", "decode_s": 1.2134}
+{"clip": "wav/correct-bus_02-lekha-deva-normal-noisy.wav", "text": "When will the bus come?", "decode_s": 1.2009}
+{"clip": "wav/correct-bus_02-lekha-deva-normal-phone.wav", "text": "Then will the bud come", "decode_s": 1.1621}
+{"clip": "wav/correct-bus_02-lekha-deva-slow-clean.wav", "text": "When will the bus come?", "decode_s": 1.2145}
+{"clip": "wav/correct-bus_02-lekha-deva-slow-noisy.wav", "text": "When will the bus come?", "decode_s": 1.2041}
+{"clip": "wav/correct-bus_02-lekha-deva-slow-phone.wav", "text": "Pain build the butt cum", "decode_s": 1.1705}
+{"clip": "wav/correct-bus_02-lekha-deva-halting-clean.wav", "text": "When will the bus come?", "decode_s": 1.3432}
+{"clip": "wav/correct-bus_02-lekha-deva-halting-noisy.wav", "text": "Then the bus comes.", "decode_s": 1.302}
+{"clip": "wav/correct-bus_02-lekha-deva-halting-phone.wav", "text": "When will the first come?", "decode_s": 1.384}
+{"clip": "wav/correct-bus_02-samantha-normal-clean.wav", "text": "When will the bus come?", "decode_s": 1.228}
+{"clip": "wav/correct-bus_02-samantha-normal-noisy.wav", "text": "When will the bus come?", "decode_s": 1.1907}
+{"clip": "wav/correct-bus_02-samantha-normal-phone.wav", "text": "When will the bus come?", "decode_s": 1.1858}
+{"clip": "wav/correct-bus_02-samantha-slow-clean.wav", "text": "When will the bus come?", "decode_s": 1.2199}
+{"clip": "wav/correct-bus_02-samantha-slow-noisy.wav", "text": "When will the bus come?", "decode_s": 1.216}
+{"clip": "wav/correct-bus_02-samantha-slow-phone.wav", "text": "When will the bus come?", "decode_s": 1.1929}
+{"clip": "wav/correct-bus_02-samantha-halting-clean.wav", "text": "When will the bus come?", "decode_s": 1.4117}
+{"clip": "wav/correct-bus_02-samantha-halting-noisy.wav", "text": "When will the fuss come?", "decode_s": 1.4056}
+{"clip": "wav/correct-bus_02-samantha-halting-phone.wav", "text": "When will the but come?", "decode_s": 1.4151}
+{"clip": "wav/correct-bus_03-aman-normal-clean.wav", "text": "One ticket to Patna please.", "decode_s": 1.2693}
+{"clip": "wav/correct-bus_03-aman-normal-noisy.wav", "text": "One ticket to Patnakhi's", "decode_s": 1.3196}
+{"clip": "wav/correct-bus_03-aman-normal-phone.wav", "text": "One ticket to Patnaan please.", "decode_s": 1.3484}
+{"clip": "wav/correct-bus_03-aman-slow-clean.wav", "text": "One ticket to Patna, please.", "decode_s": 1.3179}
+{"clip": "wav/correct-bus_03-aman-slow-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 1.3654}
+{"clip": "wav/correct-bus_03-aman-slow-phone.wav", "text": "One ticket to Patna, please.", "decode_s": 1.3936}
+{"clip": "wav/correct-bus_03-aman-halting-clean.wav", "text": "One ticket, ter Patna, please.", "decode_s": 1.6108}
+{"clip": "wav/correct-bus_03-aman-halting-noisy.wav", "text": "One ticket, two Patna, please.", "decode_s": 2.5441}
+{"clip": "wav/correct-bus_03-aman-halting-phone.wav", "text": "One ticket, two, Bhattna, three.", "decode_s": 2.5454}
+{"clip": "wav/correct-bus_03-rishi-normal-clean.wav", "text": "1 ticket to Patna, please", "decode_s": 2.9364}
+{"clip": "wav/correct-bus_03-rishi-normal-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 2.1292}
+{"clip": "wav/correct-bus_03-rishi-normal-phone.wav", "text": "One ticket to Patna, please.", "decode_s": 1.5503}
+{"clip": "wav/correct-bus_03-rishi-slow-clean.wav", "text": "One ticket to Patna, please.", "decode_s": 1.6384}
+{"clip": "wav/correct-bus_03-rishi-slow-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 2.6754}
+{"clip": "wav/correct-bus_03-rishi-slow-phone.wav", "text": "One ticket to Patna, please.", "decode_s": 2.9261}
+{"clip": "wav/correct-bus_03-rishi-halting-clean.wav", "text": "1. Ticket to Patna, please", "decode_s": 3.3491}
+{"clip": "wav/correct-bus_03-rishi-halting-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 3.3727}
+{"clip": "wav/correct-bus_03-rishi-halting-phone.wav", "text": "One ticket to Patna, please.", "decode_s": 4.5614}
+{"clip": "wav/correct-bus_03-tara-normal-clean.wav", "text": "One ticket to Patna, please.", "decode_s": 1.6161}
+{"clip": "wav/correct-bus_03-tara-normal-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 1.9293}
+{"clip": "wav/correct-bus_03-tara-normal-phone.wav", "text": "One ticket to Patnaal, please.", "decode_s": 3.0047}
+{"clip": "wav/correct-bus_03-tara-slow-clean.wav", "text": "One ticket to Patna, please.", "decode_s": 3.2891}
+{"clip": "wav/correct-bus_03-tara-slow-noisy.wav", "text": "One ticket to Bhagna, please.", "decode_s": 3.0098}
+{"clip": "wav/correct-bus_03-tara-slow-phone.wav", "text": "One ticket two-putt now, please.", "decode_s": 3.0893}
+{"clip": "wav/correct-bus_03-tara-halting-clean.wav", "text": "1. Ticket 2. Patna, please.", "decode_s": 3.5592}
+{"clip": "wav/correct-bus_03-tara-halting-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 3.3006}
+{"clip": "wav/correct-bus_03-tara-halting-phone.wav", "text": "One ticket to Patna, please.", "decode_s": 2.3117}
+{"clip": "wav/correct-bus_03-lekha-latin-normal-clean.wav", "text": "Own ticket to Patna, please.", "decode_s": 1.4698}
+{"clip": "wav/correct-bus_03-lekha-latin-normal-noisy.wav", "text": "Own ticket to Patna, please.", "decode_s": 1.4121}
+{"clip": "wav/correct-bus_03-lekha-latin-normal-phone.wav", "text": "On ticket 2 Patna, please.", "decode_s": 1.3797}
+{"clip": "wav/correct-bus_03-lekha-latin-slow-clean.wav", "text": "Own ticket to Patna, please.", "decode_s": 1.3679}
+{"clip": "wav/correct-bus_03-lekha-latin-slow-noisy.wav", "text": "On ticket to Patna, please.", "decode_s": 1.3426}
+{"clip": "wav/correct-bus_03-lekha-latin-slow-phone.wav", "text": "Phone ticket to Patna, please.", "decode_s": 1.3744}
+{"clip": "wav/correct-bus_03-lekha-latin-halting-clean.wav", "text": "On ticket to Patna, please.", "decode_s": 1.4847}
+{"clip": "wav/correct-bus_03-lekha-latin-halting-noisy.wav", "text": "On ticket 2, Bhajna, please.", "decode_s": 1.6162}
+{"clip": "wav/correct-bus_03-lekha-latin-halting-phone.wav", "text": "On ticket 2 Bhajna please.", "decode_s": 1.5402}
+{"clip": "wav/correct-bus_03-lekha-deva-normal-clean.wav", "text": "One ticket to Patna, please.", "decode_s": 1.3696}
+{"clip": "wav/correct-bus_03-lekha-deva-normal-noisy.wav", "text": "When he got to Patna, please", "decode_s": 1.3987}
+{"clip": "wav/correct-bus_03-lekha-deva-normal-phone.wav", "text": "One ticket to Patna, please.", "decode_s": 1.3875}
+{"clip": "wav/correct-bus_03-lekha-deva-slow-clean.wav", "text": "One ticket to Patna, please.", "decode_s": 1.3717}
+{"clip": "wav/correct-bus_03-lekha-deva-slow-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 1.3386}
+{"clip": "wav/correct-bus_03-lekha-deva-slow-phone.wav", "text": "One ticket to Patna, please.", "decode_s": 1.4165}
+{"clip": "wav/correct-bus_03-lekha-deva-halting-clean.wav", "text": "1 ticket to Patna, please.", "decode_s": 1.4899}
+{"clip": "wav/correct-bus_03-lekha-deva-halting-noisy.wav", "text": "One because", "decode_s": 1.2182}
+{"clip": "wav/correct-bus_03-lekha-deva-halting-phone.wav", "text": "Once, he got two fat na, please.", "decode_s": 1.5834}
+{"clip": "wav/correct-bus_03-samantha-normal-clean.wav", "text": "One ticket to Padna, please.", "decode_s": 1.3502}
+{"clip": "wav/correct-bus_03-samantha-normal-noisy.wav", "text": "One ticket to Pugnog, please.", "decode_s": 1.4395}
+{"clip": "wav/correct-bus_03-samantha-normal-phone.wav", "text": "One ticket to Padna, please.", "decode_s": 1.3418}
+{"clip": "wav/correct-bus_03-samantha-slow-clean.wav", "text": "One ticket to Padna, please.", "decode_s": 1.3862}
+{"clip": "wav/correct-bus_03-samantha-slow-noisy.wav", "text": "One ticket to Padna, please.", "decode_s": 1.3486}
+{"clip": "wav/correct-bus_03-samantha-slow-phone.wav", "text": "One ticket to Padna, please.", "decode_s": 1.3612}
+{"clip": "wav/correct-bus_03-samantha-halting-clean.wav", "text": "1. Ticket 2. Padna, please", "decode_s": 1.7102}
+{"clip": "wav/correct-bus_03-samantha-halting-noisy.wav", "text": "1. Ticket 2. Kagna, please", "decode_s": 1.5819}
+{"clip": "wav/correct-bus_03-samantha-halting-phone.wav", "text": "1. Ticket 2. Pigna, please.", "decode_s": 1.6443}
+{"clip": "wav/correct-bus_04-aman-normal-clean.wav", "text": "How much is the ticket?", "decode_s": 1.2102}
+{"clip": "wav/correct-bus_04-aman-normal-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.2343}
+{"clip": "wav/correct-bus_04-aman-normal-phone.wav", "text": "How much is the ticket?", "decode_s": 1.2558}
+{"clip": "wav/correct-bus_04-aman-slow-clean.wav", "text": "How much is the ticket?", "decode_s": 1.2615}
+{"clip": "wav/correct-bus_04-aman-slow-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.3424}
+{"clip": "wav/correct-bus_04-aman-slow-phone.wav", "text": "How much is the ticket?", "decode_s": 1.2405}
+{"clip": "wav/correct-bus_04-aman-halting-clean.wav", "text": "How much is the ticket?", "decode_s": 1.3331}
+{"clip": "wav/correct-bus_04-aman-halting-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.3515}
+{"clip": "wav/correct-bus_04-aman-halting-phone.wav", "text": "How much is the ticket?", "decode_s": 1.3752}
+{"clip": "wav/correct-bus_04-rishi-normal-clean.wav", "text": "How much is the ticket?", "decode_s": 1.2571}
+{"clip": "wav/correct-bus_04-rishi-normal-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.2421}
+{"clip": "wav/correct-bus_04-rishi-normal-phone.wav", "text": "How much is the picket?", "decode_s": 1.2798}
+{"clip": "wav/correct-bus_04-rishi-slow-clean.wav", "text": "How much is the ticket?", "decode_s": 1.3387}
+{"clip": "wav/correct-bus_04-rishi-slow-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.3091}
+{"clip": "wav/correct-bus_04-rishi-slow-phone.wav", "text": "How much is the ticket?", "decode_s": 2.2754}
+{"clip": "wav/correct-bus_04-rishi-halting-clean.wav", "text": "How much is the ticket?", "decode_s": 2.6317}
+{"clip": "wav/correct-bus_04-rishi-halting-noisy.wav", "text": "How much is the ticket?", "decode_s": 2.8683}
+{"clip": "wav/correct-bus_04-rishi-halting-phone.wav", "text": "How much is the ticket?", "decode_s": 1.7934}
+{"clip": "wav/correct-bus_04-tara-normal-clean.wav", "text": "How much is the ticket?", "decode_s": 1.3015}
+{"clip": "wav/correct-bus_04-tara-normal-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.432}
+{"clip": "wav/correct-bus_04-tara-normal-phone.wav", "text": "How much is the ticket?", "decode_s": 2.3721}
+{"clip": "wav/correct-bus_04-tara-slow-clean.wav", "text": "How much is the ticket?", "decode_s": 3.0566}
+{"clip": "wav/correct-bus_04-tara-slow-noisy.wav", "text": "How much is the ticket?", "decode_s": 2.9657}
+{"clip": "wav/correct-bus_04-tara-slow-phone.wav", "text": "How much is the ticket?", "decode_s": 3.0073}
+{"clip": "wav/correct-bus_04-tara-halting-clean.wav", "text": "How much is the ticket?", "decode_s": 3.1579}
+{"clip": "wav/correct-bus_04-tara-halting-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.7596}
+{"clip": "wav/correct-bus_04-tara-halting-phone.wav", "text": "How much is the ticket?", "decode_s": 2.3557}
+{"clip": "wav/correct-bus_04-lekha-latin-normal-clean.wav", "text": "How much is the ticket?", "decode_s": 2.8695}
+{"clip": "wav/correct-bus_04-lekha-latin-normal-noisy.wav", "text": "How much is the ticket?", "decode_s": 2.5737}
+{"clip": "wav/correct-bus_04-lekha-latin-normal-phone.wav", "text": "How much is the ticket?", "decode_s": 2.5716}
+{"clip": "wav/correct-bus_04-lekha-latin-slow-clean.wav", "text": "How much is the ticket?", "decode_s": 2.7815}
+{"clip": "wav/correct-bus_04-lekha-latin-slow-noisy.wav", "text": "How much is the ticket?", "decode_s": 2.4965}
+{"clip": "wav/correct-bus_04-lekha-latin-slow-phone.wav", "text": "How much is the ticket?", "decode_s": 2.701}
+{"clip": "wav/correct-bus_04-lekha-latin-halting-clean.wav", "text": "How much is the ticket?", "decode_s": 2.746}
+{"clip": "wav/correct-bus_04-lekha-latin-halting-noisy.wav", "text": "how much is the ticket", "decode_s": 1.8956}
+{"clip": "wav/correct-bus_04-lekha-latin-halting-phone.wav", "text": "How much is the ticket?", "decode_s": 1.4504}
+{"clip": "wav/correct-bus_04-lekha-deva-normal-clean.wav", "text": "How much is the ticket?", "decode_s": 1.2631}
+{"clip": "wav/correct-bus_04-lekha-deva-normal-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.2502}
+{"clip": "wav/correct-bus_04-lekha-deva-normal-phone.wav", "text": "How much is the ticket?", "decode_s": 1.2451}
+{"clip": "wav/correct-bus_04-lekha-deva-slow-clean.wav", "text": "How much is the ticket?", "decode_s": 1.2592}
+{"clip": "wav/correct-bus_04-lekha-deva-slow-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.346}
+{"clip": "wav/correct-bus_04-lekha-deva-slow-phone.wav", "text": "How much is the ticket?", "decode_s": 1.2546}
+{"clip": "wav/correct-bus_04-lekha-deva-halting-clean.wav", "text": "How much is the ticket?", "decode_s": 1.4235}
+{"clip": "wav/correct-bus_04-lekha-deva-halting-noisy.wav", "text": "How much is the pickle?", "decode_s": 1.4162}
+{"clip": "wav/correct-bus_04-lekha-deva-halting-phone.wav", "text": "How much is the ticket?", "decode_s": 1.367}
+{"clip": "wav/correct-bus_04-samantha-normal-clean.wav", "text": "How much is the ticket?", "decode_s": 1.4158}
+{"clip": "wav/correct-bus_04-samantha-normal-noisy.wav", "text": "How much is the ticket?", "decode_s": 2.2075}
+{"clip": "wav/correct-bus_04-samantha-normal-phone.wav", "text": "How much is the ticket?", "decode_s": 2.2564}
+{"clip": "wav/correct-bus_04-samantha-slow-clean.wav", "text": "How much is the ticket?", "decode_s": 2.2415}
+{"clip": "wav/correct-bus_04-samantha-slow-noisy.wav", "text": "How much is the ticket?", "decode_s": 2.1477}
+{"clip": "wav/correct-bus_04-samantha-slow-phone.wav", "text": "How much is the ticket?", "decode_s": 1.654}
+{"clip": "wav/correct-bus_04-samantha-halting-clean.wav", "text": "How much is the ticket?", "decode_s": 1.4265}
+{"clip": "wav/correct-bus_04-samantha-halting-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.4359}
+{"clip": "wav/correct-bus_04-samantha-halting-phone.wav", "text": "How much is the ticket?", "decode_s": 1.4249}
+{"clip": "wav/correct-bus_05-aman-normal-clean.wav", "text": "Does this bus go to Bethea?", "decode_s": 1.3588}
+{"clip": "wav/correct-bus_05-aman-normal-noisy.wav", "text": "Does this bus go to Berthia?", "decode_s": 1.3293}
+{"clip": "wav/correct-bus_05-aman-normal-phone.wav", "text": "Does this bus go to Bethya?", "decode_s": 1.3846}
+{"clip": "wav/correct-bus_05-aman-slow-clean.wav", "text": "Does this bus go to Bethea?", "decode_s": 1.3276}
+{"clip": "wav/correct-bus_05-aman-slow-noisy.wav", "text": "Does this bus go to Bethea?", "decode_s": 1.3671}
+{"clip": "wav/correct-bus_05-aman-slow-phone.wav", "text": "Does this bus go to Betya?", "decode_s": 1.3884}
+{"clip": "wav/correct-bus_05-aman-halting-clean.wav", "text": "Does this bus go to Bethea?", "decode_s": 1.5716}
+{"clip": "wav/correct-bus_05-aman-halting-noisy.wav", "text": "Does this bus go to Betiyama?", "decode_s": 1.6056}
+{"clip": "wav/correct-bus_05-aman-halting-phone.wav", "text": "Does this bus go to Bepia?", "decode_s": 1.6147}
+{"clip": "wav/correct-bus_05-rishi-normal-clean.wav", "text": "Does this bus go to Betiya?", "decode_s": 1.3438}
+{"clip": "wav/correct-bus_05-rishi-normal-noisy.wav", "text": "Does this bus go to Betiya?", "decode_s": 1.3443}
+{"clip": "wav/correct-bus_05-rishi-normal-phone.wav", "text": "Does this bus go to Bethia?", "decode_s": 1.413}
+{"clip": "wav/correct-bus_05-rishi-slow-clean.wav", "text": "Does this bus go to Beethiya?", "decode_s": 1.4359}
+{"clip": "wav/correct-bus_05-rishi-slow-noisy.wav", "text": "Does this bus go to Vethya?", "decode_s": 1.4218}
+{"clip": "wav/correct-bus_05-rishi-slow-phone.wav", "text": "Does this bus go to Bepia?", "decode_s": 1.4119}
+{"clip": "wav/correct-bus_05-rishi-halting-clean.wav", "text": "Does this bus go to Betiya?", "decode_s": 1.6008}
+{"clip": "wav/correct-bus_05-rishi-halting-noisy.wav", "text": "Does this bus go to Vethya?", "decode_s": 1.6374}
+{"clip": "wav/correct-bus_05-rishi-halting-phone.wav", "text": "Does this bus go to Vepia?", "decode_s": 1.6709}
+{"clip": "wav/correct-bus_05-tara-normal-clean.wav", "text": "Does this bus go to Bethya?", "decode_s": 1.3618}
+{"clip": "wav/correct-bus_05-tara-normal-noisy.wav", "text": "Does this bus go to Bethia?", "decode_s": 1.3191}
+{"clip": "wav/correct-bus_05-tara-normal-phone.wav", "text": "Does this bus go to Bethea?", "decode_s": 1.3484}
+{"clip": "wav/correct-bus_05-tara-slow-clean.wav", "text": "Does this bus go to Bethia?", "decode_s": 1.3755}
+{"clip": "wav/correct-bus_05-tara-slow-noisy.wav", "text": "Does this bus go to Bethiya?", "decode_s": 1.5309}
+{"clip": "wav/correct-bus_05-tara-slow-phone.wav", "text": "Does this bus go to Bethea?", "decode_s": 1.3262}
+{"clip": "wav/correct-bus_05-tara-halting-clean.wav", "text": "Does this bus go to Bethia?", "decode_s": 1.6736}
+{"clip": "wav/correct-bus_05-tara-halting-noisy.wav", "text": "Does this boss go to Patia?", "decode_s": 1.6035}
+{"clip": "wav/correct-bus_05-tara-halting-phone.wav", "text": "Does this bus go to Bethea?", "decode_s": 1.6125}
+{"clip": "wav/correct-bus_05-lekha-latin-normal-clean.wav", "text": "does this bus go to bachi?", "decode_s": 1.3259}
+{"clip": "wav/correct-bus_05-lekha-latin-normal-noisy.wav", "text": "Does this bus go to that?", "decode_s": 1.298}
+{"clip": "wav/correct-bus_05-lekha-latin-normal-phone.wav", "text": "Does this bus go to that line?", "decode_s": 1.3753}
+{"clip": "wav/correct-bus_05-lekha-latin-slow-clean.wav", "text": "Does this bus go to Bachiye?", "decode_s": 1.3848}
+{"clip": "wav/correct-bus_05-lekha-latin-slow-noisy.wav", "text": "Thus this must go to batchy-batchy.", "decode_s": 1.515}
+{"clip": "wav/correct-bus_05-lekha-latin-slow-phone.wav", "text": "Does this bus go to Batia?", "decode_s": 1.396}
+{"clip": "wav/correct-bus_05-lekha-latin-halting-clean.wav", "text": "Thus, this bus go to Batiye.", "decode_s": 1.6247}
+{"clip": "wav/correct-bus_05-lekha-latin-halting-noisy.wav", "text": "Thus, this, thus, go to that life.", "decode_s": 1.6832}
+{"clip": "wav/correct-bus_05-lekha-latin-halting-phone.wav", "text": "Does this bus go to the taxi line?", "decode_s": 1.5996}
+{"clip": "wav/correct-bus_05-lekha-deva-normal-clean.wav", "text": "Thus December bus go to Bitya", "decode_s": 1.3651}
+{"clip": "wav/correct-bus_05-lekha-deva-normal-noisy.wav", "text": "This December was good to be here", "decode_s": 1.3182}
+{"clip": "wav/correct-bus_05-lekha-deva-normal-phone.wav", "text": "Thus December must go to India", "decode_s": 1.2525}
+{"clip": "wav/correct-bus_05-lekha-deva-slow-clean.wav", "text": "Does December bus go to Betya?", "decode_s": 1.4162}
+{"clip": "wav/correct-bus_05-lekha-deva-slow-noisy.wav", "text": "Just December bus go to Vitya", "decode_s": 1.3638}
+{"clip": "wav/correct-bus_05-lekha-deva-slow-phone.wav", "text": "Just December bus go to India", "decode_s": 1.2896}
+{"clip": "wav/correct-bus_05-lekha-deva-halting-clean.wav", "text": "Thus, December bus go to Betya.", "decode_s": 1.6301}
+{"clip": "wav/correct-bus_05-lekha-deva-halting-noisy.wav", "text": "This December was good to be here.", "decode_s": 1.5559}
+{"clip": "wav/correct-bus_05-lekha-deva-halting-phone.wav", "text": "Just December 1st go to Betya", "decode_s": 1.5893}
+{"clip": "wav/correct-bus_05-samantha-normal-clean.wav", "text": "Does this bus go to Bechia?", "decode_s": 1.3626}
+{"clip": "wav/correct-bus_05-samantha-normal-noisy.wav", "text": "Does this bus go to Bechia?", "decode_s": 1.3838}
+{"clip": "wav/correct-bus_05-samantha-normal-phone.wav", "text": "Does this bus go to Betsey F?", "decode_s": 1.4758}
+{"clip": "wav/correct-bus_05-samantha-slow-clean.wav", "text": "Does this bus go to Bechia?", "decode_s": 1.3836}
+{"clip": "wav/correct-bus_05-samantha-slow-noisy.wav", "text": "Does this bus go to Bechia?", "decode_s": 1.3797}
+{"clip": "wav/correct-bus_05-samantha-slow-phone.wav", "text": "Does this bus go to Betsey, huh?", "decode_s": 1.4248}
+{"clip": "wav/correct-bus_05-samantha-halting-clean.wav", "text": "Does this bus go to Bechia?", "decode_s": 1.6003}
+{"clip": "wav/correct-bus_05-samantha-halting-noisy.wav", "text": "Does this bus go to Bechia?", "decode_s": 1.6371}
+{"clip": "wav/correct-bus_05-samantha-halting-phone.wav", "text": "Does this fuck go to Bechia?", "decode_s": 1.6473}
+{"clip": "wav/mistake00-bus_01-aman-clean.wav", "text": "Where is bus stop?", "decode_s": 1.152}
+{"clip": "wav/mistake00-bus_01-aman-noisy.wav", "text": "Where is Basta?", "decode_s": 1.1655}
+{"clip": "wav/mistake00-bus_01-rishi-clean.wav", "text": "Where is bus stop?", "decode_s": 1.1569}
+{"clip": "wav/mistake00-bus_01-rishi-noisy.wav", "text": "Where is bus stop?", "decode_s": 1.1532}
+{"clip": "wav/mistake00-bus_01-tara-clean.wav", "text": "Where is bus stop?", "decode_s": 1.1511}
+{"clip": "wav/mistake00-bus_01-tara-noisy.wav", "text": "Where is bus stop?", "decode_s": 1.16}
+{"clip": "wav/mistake00-bus_01-lekha-deva-clean.wav", "text": "Where is bus stop?", "decode_s": 1.1857}
+{"clip": "wav/mistake00-bus_01-lekha-deva-noisy.wav", "text": "[INAUDIBLE]", "decode_s": 1.1538}
+{"clip": "wav/mistake01-bus_01-aman-clean.wav", "text": "Where is the boss stop?", "decode_s": 1.2057}
+{"clip": "wav/mistake01-bus_01-aman-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.2124}
+{"clip": "wav/mistake01-bus_01-rishi-clean.wav", "text": "Where is the bus stop?", "decode_s": 1.2119}
+{"clip": "wav/mistake01-bus_01-rishi-noisy.wav", "text": "Where is the bus stop?", "decode_s": 1.2221}
+{"clip": "wav/mistake01-bus_01-tara-clean.wav", "text": "Where is the boss stop?", "decode_s": 1.1952}
+{"clip": "wav/mistake01-bus_01-tara-noisy.wav", "text": "Where is the ball stop?", "decode_s": 1.1917}
+{"clip": "wav/mistake01-bus_01-lekha-deva-clean.wav", "text": "Where is the boss stop?", "decode_s": 1.2006}
+{"clip": "wav/mistake01-bus_01-lekha-deva-noisy.wav", "text": "Where is the boss's shop?", "decode_s": 1.2656}
+{"clip": "wav/mistake02-bus_01-aman-clean.wav", "text": "Where is the bus shop?", "decode_s": 1.1751}
+{"clip": "wav/mistake02-bus_01-aman-noisy.wav", "text": "Where is the bus shop?", "decode_s": 1.2054}
+{"clip": "wav/mistake02-bus_01-rishi-clean.wav", "text": "Where is the bus shop?", "decode_s": 1.2134}
+{"clip": "wav/mistake02-bus_01-rishi-noisy.wav", "text": "Where is the bus shop?", "decode_s": 1.1792}
+{"clip": "wav/mistake02-bus_01-tara-clean.wav", "text": "Where is the bus shop?", "decode_s": 1.1967}
+{"clip": "wav/mistake02-bus_01-tara-noisy.wav", "text": "Where is the bus shop?", "decode_s": 1.1748}
+{"clip": "wav/mistake02-bus_01-lekha-deva-clean.wav", "text": "Where is the bus shop?", "decode_s": 1.2198}
+{"clip": "wav/mistake02-bus_01-lekha-deva-noisy.wav", "text": "Where is the bus shop?", "decode_s": 1.2397}
+{"clip": "wav/mistake03-bus_02-aman-clean.wav", "text": "When the bus will come.", "decode_s": 1.1961}
+{"clip": "wav/mistake03-bus_02-aman-noisy.wav", "text": "when the bus will come.", "decode_s": 1.1997}
+{"clip": "wav/mistake03-bus_02-rishi-clean.wav", "text": "when the bus will come.", "decode_s": 1.2259}
+{"clip": "wav/mistake03-bus_02-rishi-noisy.wav", "text": "when the bus will come.", "decode_s": 1.3715}
+{"clip": "wav/mistake03-bus_02-tara-clean.wav", "text": "when the bus will come.", "decode_s": 1.2531}
+{"clip": "wav/mistake03-bus_02-tara-noisy.wav", "text": "When the bus will come", "decode_s": 1.1943}
+{"clip": "wav/mistake03-bus_02-lekha-deva-clean.wav", "text": "When the bus will come", "decode_s": 1.1753}
+{"clip": "wav/mistake03-bus_02-lekha-deva-noisy.wav", "text": "When the bus will come?", "decode_s": 1.2099}
+{"clip": "wav/mistake04-bus_02-aman-clean.wav", "text": "When will the bus came?", "decode_s": 1.222}
+{"clip": "wav/mistake04-bus_02-aman-noisy.wav", "text": "When will the bus keep?", "decode_s": 1.1968}
+{"clip": "wav/mistake04-bus_02-rishi-clean.wav", "text": "When will the bus came?", "decode_s": 1.2549}
+{"clip": "wav/mistake04-bus_02-rishi-noisy.wav", "text": "When will the bus came?", "decode_s": 1.2424}
+{"clip": "wav/mistake04-bus_02-tara-clean.wav", "text": "When will the bus came?", "decode_s": 1.2699}
+{"clip": "wav/mistake04-bus_02-tara-noisy.wav", "text": "When will the bus came?", "decode_s": 1.2955}
+{"clip": "wav/mistake04-bus_02-lekha-deva-clean.wav", "text": "When will the bus came?", "decode_s": 1.2774}
+{"clip": "wav/mistake04-bus_02-lekha-deva-noisy.wav", "text": "When will the bus came?", "decode_s": 1.2423}
+{"clip": "wav/mistake05-bus_03-aman-clean.wav", "text": "Van ticket 2 Patna please.", "decode_s": 1.3395}
+{"clip": "wav/mistake05-bus_03-aman-noisy.wav", "text": "Van ticket to Patna please.", "decode_s": 1.3449}
+{"clip": "wav/mistake05-bus_03-rishi-clean.wav", "text": "1 ticket to Patna, please", "decode_s": 1.4063}
+{"clip": "wav/mistake05-bus_03-rishi-noisy.wav", "text": "One ticket to Patna, please.", "decode_s": 1.4053}
+{"clip": "wav/mistake05-bus_03-tara-clean.wav", "text": "Van ticket to Patna, please.", "decode_s": 1.3643}
+{"clip": "wav/mistake05-bus_03-tara-noisy.wav", "text": "Then ticket to Patna, please.", "decode_s": 1.3642}
+{"clip": "wav/mistake05-bus_03-lekha-deva-clean.wav", "text": "Vyant Dikat Thupatna, please.", "decode_s": 1.5732}
+{"clip": "wav/mistake05-bus_03-lekha-deva-noisy.wav", "text": "Please", "decode_s": 1.063}
+{"clip": "wav/mistake06-bus_03-aman-clean.wav", "text": "One ticket Patna, please.", "decode_s": 1.2674}
+{"clip": "wav/mistake06-bus_03-aman-noisy.wav", "text": "One ticket partner, feast.", "decode_s": 1.225}
+{"clip": "wav/mistake06-bus_03-rishi-clean.wav", "text": "1 ticket partner, please", "decode_s": 1.2499}
+{"clip": "wav/mistake06-bus_03-rishi-noisy.wav", "text": "One ticket padna, please.", "decode_s": 1.3188}
+{"clip": "wav/mistake06-bus_03-tara-clean.wav", "text": "One ticket Bhattna, please.", "decode_s": 1.344}
+{"clip": "wav/mistake06-bus_03-tara-noisy.wav", "text": "One ticket, Bhagna, please.", "decode_s": 1.3685}
+{"clip": "wav/mistake06-bus_03-lekha-deva-clean.wav", "text": "One ticket patna, please.", "decode_s": 1.3133}
+{"clip": "wav/mistake06-bus_03-lekha-deva-noisy.wav", "text": "When he cut Patna, please.", "decode_s": 1.3566}
+{"clip": "wav/mistake07-bus_04-aman-clean.wav", "text": "We will match the ticket.", "decode_s": 1.1906}
+{"clip": "wav/mistake07-bus_04-aman-noisy.wav", "text": "Who matched the ticket?", "decode_s": 1.1343}
+{"clip": "wav/mistake07-bus_04-rishi-clean.wav", "text": "How much the ticket", "decode_s": 1.1472}
+{"clip": "wav/mistake07-bus_04-rishi-noisy.wav", "text": "How much the ticket", "decode_s": 1.1444}
+{"clip": "wav/mistake07-bus_04-tara-clean.wav", "text": "How much the ticket?", "decode_s": 1.1655}
+{"clip": "wav/mistake07-bus_04-tara-noisy.wav", "text": "How much the ticket?", "decode_s": 1.1234}
+{"clip": "wav/mistake07-bus_04-lekha-deva-clean.wav", "text": "How much the ticket?", "decode_s": 1.1643}
+{"clip": "wav/mistake07-bus_04-lekha-deva-noisy.wav", "text": "How much is the ficca?", "decode_s": 1.2973}
+{"clip": "wav/mistake08-bus_04-aman-clean.wav", "text": "How match is the ticket?", "decode_s": 1.2165}
+{"clip": "wav/mistake08-bus_04-aman-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.2065}
+{"clip": "wav/mistake08-bus_04-rishi-clean.wav", "text": "How match is the ticket?", "decode_s": 1.2299}
+{"clip": "wav/mistake08-bus_04-rishi-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.2035}
+{"clip": "wav/mistake08-bus_04-tara-clean.wav", "text": "How match is the ticket?", "decode_s": 1.2202}
+{"clip": "wav/mistake08-bus_04-tara-noisy.wav", "text": "How much is the ticket?", "decode_s": 1.198}
+{"clip": "wav/mistake08-bus_04-lekha-deva-clean.wav", "text": "How match is the ticket?", "decode_s": 1.2323}
+{"clip": "wav/mistake08-bus_04-lekha-deva-noisy.wav", "text": "How much is the pickle?", "decode_s": 1.2768}
+{"clip": "wav/mistake09-bus_05-aman-clean.wav", "text": "Does this bus goes to Bethea?", "decode_s": 1.3574}
+{"clip": "wav/mistake09-bus_05-aman-noisy.wav", "text": "Does this bus goes to Bethea?", "decode_s": 1.3385}
+{"clip": "wav/mistake09-bus_05-rishi-clean.wav", "text": "Does this bus goes to Betiya?", "decode_s": 1.3587}
+{"clip": "wav/mistake09-bus_05-rishi-noisy.wav", "text": "Does this bus goes to Bethiya?", "decode_s": 1.4279}
+{"clip": "wav/mistake09-bus_05-tara-clean.wav", "text": "Does this bus goes to Bethea?", "decode_s": 1.3598}
+{"clip": "wav/mistake09-bus_05-tara-noisy.wav", "text": "Does this bus goes to Bethiya?", "decode_s": 1.3687}
+{"clip": "wav/mistake09-bus_05-lekha-deva-clean.wav", "text": "Thus December bus goes to Betya.", "decode_s": 1.4132}
+{"clip": "wav/mistake09-bus_05-lekha-deva-noisy.wav", "text": "Thus December bus goes to video.", "decode_s": 1.3293}
+{"clip": "wav/mistake10-bus_05-aman-clean.wav", "text": "Do this bus go to Bethea.", "decode_s": 1.3921}
+{"clip": "wav/mistake10-bus_05-aman-noisy.wav", "text": "Do this bus go to Bethea?", "decode_s": 1.4058}
+{"clip": "wav/mistake10-bus_05-rishi-clean.wav", "text": "Do this bus go to Beit Tia?", "decode_s": 1.508}
+{"clip": "wav/mistake10-bus_05-rishi-noisy.wav", "text": "Do this bus go to Beit Tia?", "decode_s": 1.5354}
+{"clip": "wav/mistake10-bus_05-tara-clean.wav", "text": "deal this bus go to betiya", "decode_s": 1.4376}
+{"clip": "wav/mistake10-bus_05-tara-noisy.wav", "text": "Do this bus go to Bhatia?", "decode_s": 1.545}
+{"clip": "wav/mistake10-bus_05-lekha-deva-clean.wav", "text": "Do December bus go to Beethya?", "decode_s": 1.5521}
+{"clip": "wav/mistake10-bus_05-lekha-deva-noisy.wav", "text": "Do December bus go to Vidya", "decode_s": 1.6241}
+{"clip": "wav/mistake11-bus_05-aman-clean.wav", "text": "Does this bus go Batia?", "decode_s": 1.3621}
+{"clip": "wav/mistake11-bus_05-aman-noisy.wav", "text": "Does this bus go better?", "decode_s": 1.2333}
+{"clip": "wav/mistake11-bus_05-rishi-clean.wav", "text": "Does this bus go betty?", "decode_s": 1.3051}
+{"clip": "wav/mistake11-bus_05-rishi-noisy.wav", "text": "Does this bus go back here?", "decode_s": 1.2901}
+{"clip": "wav/mistake11-bus_05-tara-clean.wav", "text": "Does this bus go better?", "decode_s": 1.2573}
+{"clip": "wav/mistake11-bus_05-tara-noisy.wav", "text": "Does this bus go better?", "decode_s": 1.2173}
+{"clip": "wav/mistake11-bus_05-lekha-deva-clean.wav", "text": "Does December bus go beta?", "decode_s": 1.2489}
+{"clip": "wav/mistake11-bus_05-lekha-deva-noisy.wav", "text": "Just December was good, yeah?", "decode_s": 1.2748}
+{"clip": "wav/nonspeech-silence-0.wav", "text": "[buzzing]", "decode_s": 1.0696}
+{"clip": "wav/nonspeech-silence-1.wav", "text": "(static)", "decode_s": 1.022}
+{"clip": "wav/nonspeech-silence-2.wav", "text": "(static)", "decode_s": 1.0016}
+{"clip": "wav/nonspeech-noise-0.wav", "text": "(water rushing)", "decode_s": 1.0564}
+{"clip": "wav/nonspeech-noise-1.wav", "text": "(water rushing)", "decode_s": 1.0489}
+{"clip": "wav/nonspeech-noise-2.wav", "text": "(water rushing)", "decode_s": 1.0486}
+{"clip": "wav/nonspeech-babble-0.wav", "text": "[BLANK_AUDIO]", "decode_s": 1.168}
+{"clip": "wav/nonspeech-babble-1.wav", "text": "(muffled speaking)", "decode_s": 1.1549}
+{"clip": "wav/nonspeech-babble-2.wav", "text": "[BLANK_AUDIO]", "decode_s": 1.1683}

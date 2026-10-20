@@ -1,0 +1,64 @@
+models (pass 2): qwen3:4b-instruct hf.co/QuantFactory/EuroLLM-1.7B-Instruct-GGUF:Q4_K_M hf.co/tiiuae/Falcon-H1-3B-Instruct-GGUF:Q4_K_M
+== qwen3:4b-instruct
+  A bus_02: 2.39 tok/s, ttft 29.27 s
+  A bus_03: 2.67 tok/s, ttft 4.157 s
+  A bus_04: 2.71 tok/s, ttft 3.526 s
+  A bus_05: 2.66 tok/s, ttft 4.151 s
+  A market_01: 2.7 tok/s, ttft 4.458 s
+  A market_02: 2.64 tok/s, ttft 4.482 s
+  A bank_01: 2.69 tok/s, ttft 4.153 s
+  A bank_02: 2.7 tok/s, ttft 3.218 s
+  A hospital_01: 2.67 tok/s, ttft 4.463 s
+  A hospital_02: 2.69 tok/s, ttft 3.52 s
+  B bus_01-1: 3.08 tok/s, ttft 10.547 s
+  B bus_01-2: 3.04 tok/s, ttft 8.941 s
+  B bus_01-3: 3.1 tok/s, ttft 8.67 s
+  B bus_02-4: 3.12 tok/s, ttft 4.891 s
+  B bus_03-5: 3.01 tok/s, ttft 5.131 s
+  B bus_04-6: 3.09 tok/s, ttft 5.056 s
+  B bus_05-7: 3.04 tok/s, ttft 5.294 s
+  B bus_05-8: 2.93 tok/s, ttft 3.738 s
+== hf.co/QuantFactory/EuroLLM-1.7B-Instruct-GGUF:Q4_K_M
+  A bus_02: 7.67 tok/s, ttft 9.983 s
+  A bus_03: 7.36 tok/s, ttft 1.436 s
+  A bus_04: 7.62 tok/s, ttft 1.3 s
+  A bus_05: 7.67 tok/s, ttft 1.534 s
+  A market_01: 7.6 tok/s, ttft 1.431 s
+  A market_02: 7.54 tok/s, ttft 1.728 s
+  A bank_01: 7.66 tok/s, ttft 1.471 s
+  A bank_02: 7.77 tok/s, ttft 1.145 s
+  A hospital_01: 7.5 tok/s, ttft 1.529 s
+  A hospital_02: 7.61 tok/s, ttft 1.331 s
+  B bus_01-1: 8.73 tok/s, ttft 3.473 s
+  B bus_01-2: 8.63 tok/s, ttft 1.294 s
+  B bus_01-3: 8.64 tok/s, ttft 1.198 s
+  B bus_02-4: 8.51 tok/s, ttft 1.757 s
+  B bus_03-5: 8.78 tok/s, ttft 1.756 s
+  B bus_04-6: 9.04 tok/s, ttft 1.841 s
+  B bus_05-7: 8.83 tok/s, ttft 1.776 s
+  B bus_05-8: 8.8 tok/s, ttft 1.36 s
+== hf.co/tiiuae/Falcon-H1-3B-Instruct-GGUF:Q4_K_M
+  A bus_02: 3.96 tok/s, ttft 31.524 s
+  A bus_03: 3.86 tok/s, ttft 5.037 s
+  A bus_04: 3.95 tok/s, ttft 4.604 s
+  A bus_05: 3.93 tok/s, ttft 5.278 s
+  A market_01: 3.93 tok/s, ttft 5.313 s
+  A market_02: 3.85 tok/s, ttft 5.277 s
+  A bank_01: 3.95 tok/s, ttft 5.061 s
+  A bank_02: 3.83 tok/s, ttft 4.36 s
+  A hospital_01: 3.93 tok/s, ttft 5.339 s
+  A hospital_02: 3.95 tok/s, ttft 4.599 s
+  B bus_01-1: 4.13 tok/s, ttft 12.495 s
+  B bus_01-2: 4.15 tok/s, ttft 5.234 s
+  B bus_01-3: 4.09 tok/s, ttft 5.244 s
+  B bus_02-4: 4.14 tok/s, ttft 4.998 s
+  B bus_03-5: 4.11 tok/s, ttft 5.501 s
+  B bus_04-6: 4.17 tok/s, ttft 5.105 s
+  B bus_05-7: 4.11 tok/s, ttft 5.566 s
+  B bus_05-8: 4.13 tok/s, ttft 5.564 s
+### llama-bench for pass 2 models
+### whisper.cpp AVX2 full-clip accuracy reruns
+{"config": "whispercpp-tiny.en-x64", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-tiny.en.bin": 77704715}, "load_s": 0.088, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 181.8}
+{"config": "whispercpp-base.en-x64", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-base.en.bin": 147964211}, "load_s": 0.139, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 278.8}
+{"config": "whispercpp-small.en-x64", "threads": 6, "files": {"/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-small.en.bin": 487614201}, "load_s": 0.386, "first_decode_s": null, "rss_before_mb": 0.0, "rss_after_load_mb": null, "rss_peak_mb": 701.0}
+AFTER-LLM-DONE

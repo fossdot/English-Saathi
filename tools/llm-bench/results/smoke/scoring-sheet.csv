@@ -1,0 +1,3 @@
+task,case,model,score_1_to_5,notes
+A,bus_02,llama3.2:1b,,
+B,bus_01-1,llama3.2:1b,,

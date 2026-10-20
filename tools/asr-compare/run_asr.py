@@ -20,8 +20,8 @@ MOONSHINE_V1 = "sherpa-onnx-moonshine-tiny-en-int8"
 MOONSHINE_V2 = "sherpa-onnx-moonshine-tiny-en-quantized-2026-02-27"
 
 
-def whisper(directory, encoder, decoder, tail_paddings=-1):
-    files = [f"{directory}/{encoder}", f"{directory}/{decoder}", f"{directory}/tiny.en-tokens.txt"]
+def whisper(directory, encoder, decoder, tail_paddings=-1, tokens="tiny.en-tokens.txt"):
+    files = [f"{directory}/{encoder}", f"{directory}/{decoder}", f"{directory}/{tokens}"]
 
     def build(root, threads):
         return sherpa_onnx.OfflineRecognizer.from_whisper(
@@ -70,6 +70,10 @@ CONFIGS = {
     "whisper-fq-compute-tp50": whisper("whisper-fq-compute", "tiny.en-encoder.int8.onnx", "tiny.en-decoder.int8.onnx", 50),
     "whisper-fq-compute-tp300": whisper("whisper-fq-compute", "tiny.en-encoder.int8.onnx", "tiny.en-decoder.int8.onnx", 300),
     "whisper-fq-compute-tp3000": whisper("whisper-fq-compute", "tiny.en-encoder.int8.onnx", "tiny.en-decoder.int8.onnx", 3000),
+    "whisper-base.en-int8": whisper("sherpa-onnx-whisper-base.en", "base.en-encoder.int8.onnx", "base.en-decoder.int8.onnx", tokens="base.en-tokens.txt"),
+    "whisper-base.en-fp32": whisper("sherpa-onnx-whisper-base.en", "base.en-encoder.onnx", "base.en-decoder.onnx", tokens="base.en-tokens.txt"),
+    "whisper-small.en-int8": whisper("sherpa-onnx-whisper-small.en", "small.en-encoder.int8.onnx", "small.en-decoder.int8.onnx", tokens="small.en-tokens.txt"),
+    "whisper-small.en-fp32": whisper("sherpa-onnx-whisper-small.en", "small.en-encoder.onnx", "small.en-decoder.onnx", tokens="small.en-tokens.txt"),
     "moonshine-tiny-v1-int8": moonshine_v1(),
     "moonshine-tiny-v2-quantized": moonshine_v2(),
 }
@@ -87,7 +91,9 @@ def main():
     ap.add_argument("--config", required=True, choices=sorted(CONFIGS))
     ap.add_argument("--threads", type=int, default=2)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--tag", default="", help="added to the run name, e.g. the CPU architecture")
     args = ap.parse_args()
+    run_name = args.config + (f"-{args.tag}" if args.tag else "")
 
     root, audio_dir = Path(args.models), Path(args.audio)
     manifest = [json.loads(line) for line in open(audio_dir / "manifest.jsonl")]
@@ -111,13 +117,13 @@ def main():
     _, first_s = decode(warmup, 16000)
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / f"{args.config}-t{args.threads}.jsonl", "w") as f:
+    with open(out_dir / f"{run_name}-t{args.threads}.jsonl", "w") as f:
         for row, (samples, sr) in zip(manifest, clips):
             text, seconds = decode(samples, sr)
             f.write(json.dumps({"clip": row["clip"], "text": text, "decode_s": round(seconds, 4)}) + "\n")
 
     summary = {
-        "config": args.config,
+        "config": run_name,
         "threads": args.threads,
         "files": {f: (root / f).stat().st_size for f in files},
         "load_s": round(load_s, 3),
@@ -126,7 +132,7 @@ def main():
         "rss_after_load_mb": round(rss_loaded, 1),
         "rss_peak_mb": round(peak_rss_mb(), 1),
     }
-    (out_dir / f"{args.config}-t{args.threads}.summary.json").write_text(json.dumps(summary, indent=1))
+    (out_dir / f"{run_name}-t{args.threads}.summary.json").write_text(json.dumps(summary, indent=1))
     print(json.dumps(summary))
 
 

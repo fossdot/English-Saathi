@@ -1,0 +1,7 @@
+== qwen3:4b-instruct
+success [K[?25h[?2026l
+== hf.co/QuantFactory/EuroLLM-1.7B-Instruct-GGUF:Q4_K_M
+success [K[?25h[?2026l
+== hf.co/tiiuae/Falcon-H1-3B-Instruct-GGUF:Q4_K_M
+success [K[?25h[?2026l
+PULLS3-DONE

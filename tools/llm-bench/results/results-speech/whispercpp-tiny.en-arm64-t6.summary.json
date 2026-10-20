@@ -1,0 +1,12 @@
+{
+ "config": "whispercpp-tiny.en-arm64",
+ "threads": 6,
+ "files": {
+  "/private/tmp/claude-501/-Users-fossdot-Developer-English-Bolo/172e7bb2-0c51-4bde-bc6f-ebcbedd324ef/scratchpad/intel/models/ggml/ggml-tiny.en.bin": 77704715
+ },
+ "load_s": 0.031,
+ "first_decode_s": null,
+ "rss_before_mb": 0.0,
+ "rss_after_load_mb": null,
+ "rss_peak_mb": 160.2
+}
