@@ -23,6 +23,7 @@ full one at the end of v0.1.
 | `speech/` | Speech code shared by the Android and desktop apps, with no Android imports: recording, end-of-speech detection, the speech engine |
 | `app/` | The Android app. `speech/` holds the microphone and the Whisper recognizer; `ui/` holds the screens |
 | `desktop/` | The macOS desktop app (`docs/desktop-plan.md`). So far: Whisper through sherpa-onnx's Java library, the speech check (`docs/desktop-speech.md`) and the lesson loader |
+| `NOTICE` | Third-party code in the repo (Sonic, for slow speech) and its licence |
 | `content/` | Lesson files in the agreed format (`docs/decisions.md`, "Word data scope") and the tip templates; all marked for teacher review |
 | `scripts/` | `fetch_deps.sh` downloads the speech library and model; `make_test_wavs.sh` makes test clips (macOS) |
 | `docs/decisions.md` | Everything agreed with the product owner, including where the Kotlin rules deliberately differ from the pilot |
@@ -74,6 +75,7 @@ for every APK, bundle and install.
 ./gradlew :app:testDebugUnitTest        # answer check, memory figures (JVM)
 ./gradlew :desktop:test                 # desktop speech recognizer (with the real models) and lesson loader
 ./gradlew :desktop:speechCheck          # times both models on the test clips (docs/desktop-speech.md)
+./gradlew :desktop:voiceCheck           # the voices the app picks; plays a sentence, its slow version and a Hindi line
 ./gradlew :app:connectedDebugAndroidTest  # on a running emulator or phone
 ./gradlew check                         # unit tests, lint and the offline check
 ```

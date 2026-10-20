@@ -126,3 +126,18 @@ tasks.register("speechCheck") {
     description = "Runs the D1 speech check for every model and thread count."
     dependsOn(speechChecks)
 }
+
+/*
+ * D2's voice check (docs/desktop-plan.md): lists the voices, shows which the
+ * app picks and how long each speech lasts, and plays them.
+ *
+ *   ./gradlew :desktop:voiceCheck
+ *   ./gradlew :desktop:voiceCheck -Psilent      # measure without playing
+ */
+tasks.register<JavaExec>("voiceCheck") {
+    group = "verification"
+    description = "Runs the D2 voice check."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("net.bodhya.speak.desktop.check.VoiceCheckKt")
+    if (hasProperty("silent")) args("--silent")
+}

@@ -1,0 +1,12 @@
+English Saathi
+
+This product includes third-party code:
+
+Sonic (speech speed change with the pitch kept), by Bill Cox
+  File:    desktop/src/main/java/sonic/Sonic.java, unchanged
+  Source:  https://github.com/waywardgeek/sonic, commit
+           b93885dcb70aae50c6f76b0fe4e0868f029a077e (Sonic.java last
+           changed in 1d7051354f32392a3b3cdb8a8bcfe56e6f8b744f)
+  Licence: Apache License 2.0, copied in desktop/src/main/java/sonic/LICENSE
+  "Copyright 2010, 2011 Bill Cox. This file is part of the Sonic Library.
+  This file is licensed under the Apache 2.0 license."

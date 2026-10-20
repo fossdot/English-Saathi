@@ -38,6 +38,10 @@ Status: done on the Apple M4, natively and under Rosetta
   MacBook is known.
 
 **D2. Voices**
+
+Status: done on the Apple M4 (`docs/desktop-speech.md`, "Speech out"). The
+voices on the MacBook are checked in D3's MacBook run.
+
 - Read `say -v '?'` once; pick an Indian English voice for sentences and
   words and a Hindi voice for instructions, preferring Enhanced or Premium
   ones. Check a voice exists before using it: `say` silently uses another

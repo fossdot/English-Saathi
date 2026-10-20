@@ -1,7 +1,8 @@
-# Speech on the desktop (milestone D1)
+# Speech on the desktop (milestones D1 and D2)
 
-Whisper through sherpa-onnx 1.13.8's Java library, behind the same
-`Transcriber` interface as the Android app (`docs/desktop-plan.md`, D1).
+Speech in: Whisper through sherpa-onnx 1.13.8's Java library, behind the
+same `Transcriber` interface as the Android app (`docs/desktop-plan.md`,
+D1). Speech out: the macOS voices (D2, "Speech out" below).
 Measured on 2026-10-20 on a MacBook Pro with an Apple M4, both natively and
 with Intel Java under Rosetta. **The real 2019 MacBook Pro hasn't run it
 yet** (see the end of this page).
@@ -90,3 +91,39 @@ caffeinate -i scripts/desktop_speech_check.sh
 It needs internet the first time (Gradle, libraries and models: about
 1 GB) and takes about 10 minutes. Send back
 `desktop/build/speech-check/x86_64.log`.
+
+## Speech out (D2)
+
+- **Voices:** the app reads `say -v '?'` once and picks an Indian English
+  voice (en_IN) for sentences and words and a Hindi voice (hi_IN) for
+  instructions: the best quality installed (Premium, then Enhanced), then
+  Rishi and Lekha first, since every Mac has a basic version of both. `say`
+  never reports a missing voice (it quietly uses another), so the app checks
+  the list first.
+- **Missing voices:** a message in English and Hindi gives the download
+  steps in Apple's wording for the Mac's macOS version (Tahoe: System
+  Settings › Accessibility › Read & Speak › System voice › ⓘ). Without an
+  Indian English voice, sentences use another English voice, as in the
+  pilot. The Hindi lines are drafted and need the teacher review.
+- **Speeds:** `say` renders each text once at its normal rate, into a
+  temporary file that is deleted as soon as it is read. The app then
+  stretches it with Sonic (`NOTICE`) to the pilot's speeds, keeping the
+  pitch, and plays it with Java Sound: 0.9 for sentences, 0.6 for "Slowly",
+  0.95 for Hindi help. `say -r` can't do this: rate 105 instead of 175 made
+  speech only 1.2× longer.
+- **Text** goes to `say` as UTF-8 on standard input: Java 17 would encode a
+  Hindi command-line argument by the system locale.
+
+Measured on the M4 (`./gradlew :desktop:voiceCheck -Psilent`):
+
+| Speech | 1× | Played at | Length | Ready after |
+|---|---|---|---|---|
+| Rishi, "Where is the bus stop?" | 1,320 ms | 0.9× | 1,474 ms | 880 ms (`say`) |
+| same | | 0.6× | 2,204 ms | 9 ms (stretched from the first) |
+| Rishi, "ticket" | 433 ms | 0.6× | 723 ms | 851 ms (`say`) |
+| Lekha, a Hindi instruction | 4,226 ms | 0.95× | 4,448 ms | 845 ms (`say`) |
+
+- 0.6× makes speech exactly 1.67× as long, single words included.
+- `say` takes about 0.85 s per new text here, longer on an Intel MacBook.
+  Screens should prepare their speech when they appear, so Listen plays at
+  once; everything stays in memory for the session.

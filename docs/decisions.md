@@ -56,6 +56,14 @@ Answers to the desktop plan's questions (`docs/desktop-plan.md`).
   kept: slow single words matter most, in fixing step 1. The time-stretch
   code must be our own or a permissively licensed library, named to the
   owner before it is added.
+  - **Sonic** (owner's choice, 2026-10-20): `desktop/src/main/java/sonic/Sonic.java`,
+    copied unchanged with its licence header from
+    https://github.com/waywardgeek/sonic at commit
+    `b93885dcb70aae50c6f76b0fe4e0868f029a077e` (the file last changed in
+    `1d7051354f32392a3b3cdb8a8bcfe56e6f8b744f`; SHA-256
+    `c23fb313fafa9cdab4c9aa291bfdc2426f33a42d0e19e3e8d1cfd3f85258d7df`).
+    Apache License 2.0: the licence text is next to it, and `NOTICE` names
+    it.
 - **Run JDK:** Amazon Corretto 17 on the MacBooks, not Temurin: Temurin's
   `java` lacks the microphone entitlement its hardened runtime needs, so
   it records silence (`docs/desktop-plan.md`, "Version set").
