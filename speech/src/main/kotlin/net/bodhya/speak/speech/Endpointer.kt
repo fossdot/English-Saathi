@@ -24,16 +24,45 @@ data class EndpointConfig(
     val minSpeechDbfs: Double = -55.0,
     /** How fast the background estimate may rise: it follows growing noise, but not speech. */
     val backgroundRiseDbPerSecond: Double = 2.5,
+    /**
+     * The first moments are not used for the background level: a Mac's
+     * microphone can start with a moment far quieter than the room, which
+     * would make the room itself sound like speech for many seconds.
+     */
+    val startupMs: Int = 100,
 ) {
     init {
         require(sampleRate > 0 && frameMs > 0 && sampleRate * frameMs % 1000 == 0) { "frames must be whole samples" }
         require(maxMs >= frameMs && maxMs % frameMs == 0) { "the limit must be a whole number of frames" }
-        require(silenceAfterSpeechMs > 0 && speechStartMs >= frameMs)
+        require(silenceAfterSpeechMs > 0 && speechStartMs >= frameMs && startupMs >= 0)
     }
 
     val maxFrames: Int get() = maxMs / frameMs
 
     val frameSamples: Int get() = sampleRate * frameMs / 1000
+}
+
+/**
+ * What the endpointer saw in one recording, for the log: levels in dBFS
+ * ([Endpointer.SILENT_DBFS] when there was nothing but digital silence).
+ */
+data class EndpointStats(
+    /** Quietest and loudest frames that weren't exact zeros. */
+    val quietestDbfs: Double,
+    val loudestDbfs: Double,
+    /** The quietest frame of the start-up moments, which the background ignores. */
+    val startupQuietestDbfs: Double,
+    /** The background estimate at the end. */
+    val backgroundDbfs: Double,
+    /** When loud audio had lasted long enough to count as speech; null if it never did. */
+    val speechStartMs: Int?,
+    /** Loud sounds too short to be speech (clicks, taps, breaths). */
+    val shortSounds: Int,
+) {
+    override fun toString() = "levels ${f(quietestDbfs)}..${f(loudestDbfs)} dBFS, start-up quietest ${f(startupQuietestDbfs)}, " +
+        "background ${f(backgroundDbfs)}, speech from ${speechStartMs?.let { "$it ms" } ?: "never"}, short sounds $shortSounds"
+
+    private fun f(x: Double) = if (x.isNaN()) "-" else "%.0f".format(x)
 }
 
 enum class EndReason {
@@ -54,7 +83,12 @@ enum class EndReason {
  *
  * A frame is loud when its level is [EndpointConfig.aboveBackgroundDb] above
  * the background. The background estimate drops at once to any quieter
- * frame and otherwise rises slowly.
+ * frame and otherwise rises slowly; the first [EndpointConfig.startupMs] are
+ * left out of it.
+ *
+ * Speech is loud audio lasting [EndpointConfig.speechStartMs]. Only speech
+ * restarts the [EndpointConfig.silenceAfterSpeechMs] of quiet: a click, a tap
+ * or a breath does not.
  */
 class Endpointer(private val config: EndpointConfig = EndpointConfig()) {
     private var backgroundDbfs = Double.NaN
@@ -74,6 +108,16 @@ class Endpointer(private val config: EndpointConfig = EndpointConfig()) {
     var lastLevelDbfs = SILENT_DBFS
         private set
 
+    private var quietest = Double.NaN
+    private var loudest = Double.NaN
+    private var startupQuietest = Double.NaN
+    private var speechStartFrame: Int? = null
+    private var shortSounds = 0
+
+    /** What this endpointer has seen so far. */
+    val stats: EndpointStats
+        get() = EndpointStats(quietest, loudest, startupQuietest, backgroundDbfs, speechStartFrame?.let { it * config.frameMs }, shortSounds)
+
     /** Takes the next frame; returns why recording should stop now, or null to go on. */
     fun accept(frame: FloatArray): EndReason? {
         require(frame.size == config.frameSamples) { "expected ${config.frameSamples} samples, got ${frame.size}" }
@@ -84,18 +128,24 @@ class Endpointer(private val config: EndpointConfig = EndpointConfig()) {
         // Exact digital silence (some devices start with zeros) says nothing about the room.
         if (level > SILENT_DBFS) {
             anySound = true
-            val rise = config.backgroundRiseDbPerSecond * config.frameMs / 1000
-            backgroundDbfs = if (backgroundDbfs.isNaN() || level < backgroundDbfs) level else backgroundDbfs + rise
+            if (quietest.isNaN() || level < quietest) quietest = level
+            if (loudest.isNaN() || level > loudest) loudest = level
+            if (frames * config.frameMs <= config.startupMs && (startupQuietest.isNaN() || level < startupQuietest)) startupQuietest = level
+            if (frames * config.frameMs > config.startupMs) {
+                val rise = config.backgroundRiseDbPerSecond * config.frameMs / 1000
+                backgroundDbfs = if (backgroundDbfs.isNaN() || level < backgroundDbfs) level else backgroundDbfs + rise
+            }
         }
         val loud = !backgroundDbfs.isNaN() &&
             level > max(backgroundDbfs + config.aboveBackgroundDb, config.minSpeechDbfs)
 
-        if (loud) {
-            loudFrames++
+        if (!loud && loudFrames > 0 && loudFrames * config.frameMs < config.speechStartMs) shortSounds++
+        loudFrames = if (loud) loudFrames + 1 else 0
+        if (loudFrames * config.frameMs >= config.speechStartMs) {
+            if (!speechStarted) speechStartFrame = frames - loudFrames
+            speechStarted = true
             quietFrames = 0
-            if (loudFrames * config.frameMs >= config.speechStartMs) speechStarted = true
         } else {
-            loudFrames = 0
             quietFrames++
         }
 

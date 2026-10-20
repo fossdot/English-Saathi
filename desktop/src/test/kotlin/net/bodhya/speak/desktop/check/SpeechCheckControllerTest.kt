@@ -66,6 +66,7 @@ class SpeechCheckControllerTest {
     private val recognition = FakeRecognition()
     private var microphone: () -> PcmSource = { ArrayPcmSource(spoken()) }
     private var permission = MicPermission.ALLOWED
+    private val saved = mutableListOf<String>()
 
     private val controller = SpeechCheckController(
         lesson, recognition, output,
@@ -75,6 +76,7 @@ class SpeechCheckControllerTest {
         log = { log += it },
         scope = CoroutineScope(Dispatchers.Unconfined),
         io = Dispatchers.Unconfined,
+        saveRecording = { id, _ -> saved += id; "/data/$id.wav" },
     )
 
     /** Room noise, then a second of a loud tone (speech, as far as the endpointer can tell). */
@@ -93,6 +95,8 @@ class SpeechCheckControllerTest {
         assertEquals(Score(5, 5, 3), r.score)
         assertEquals(SpeechModel.SMALL_EN, r.model)
         assertTrue(log.last(), log.last().startsWith("result | model=small.en | sentence=bus_01 | source=microphone"))
+        assertTrue("logs what the endpointer saw: ${log.last()}", "speech from" in log.last() && log.last().endsWith("| saved /data/bus_01.wav"))
+        assertEquals(listOf("bus_01"), saved)
         assertEquals("speech stops before the microphone opens", listOf("stop"), played)
         assertEquals(false, controller.state.value.listening)
     }
@@ -181,6 +185,7 @@ class SpeechCheckControllerTest {
     fun `test clips go through the same recorder`() {
         controller.runClip("bus_01.wav")
         assertEquals("bus_01.wav", controller.state.value.result!!.source)
+        assertEquals("test clips are not saved", emptyList<String>(), saved)
         assertEquals(Score(5, 5, 3), controller.state.value.result!!.score)
     }
 }

@@ -131,6 +131,46 @@ class EndpointerTest {
     }
 
     @Test
+    fun `a few very quiet frames as the microphone starts don't hide the room's level`() {
+        // A Mac's microphone can start with a moment far quieter than the room
+        // (but not exact zeros). The room here is above the -55 dBFS floor.
+        val audio = concat(
+            noise(60, -90.0), noise(500, -50.0, seed = 2), speech(1000, -25.0) plus noise(1000, -50.0, seed = 3), noise(4000, -50.0, seed = 4),
+        )
+        val (at, reason, speech) = run(audio)
+        assertEquals(EndReason.SILENCE_AFTER_SPEECH, reason)
+        assertTrue(speech)
+        assertTrue("stopped at $at", at!! in 2_600..2_800)
+        // Without the start-up rule, the quiet start makes the room count as speech: no stop at all.
+        assertEquals(null, run(audio, Endpointer(EndpointConfig(startupMs = 0))).second)
+    }
+
+    @Test
+    fun `clicks after the speech don't restart the 1,2 s of quiet`() {
+        // Only 60 ms of loud audio counts as speech (docs/decisions.md), so a
+        // 20 ms click, a tap or a breath doesn't keep the recording going.
+        val click = tone(20, -20.0)
+        val tail = concat(*Array(10) { concat(noise(380, -65.0, seed = 10 + it), click) })
+        val audio = concat(noise(400, -65.0), speech(1000, -25.0), tail, noise(3000, -65.0, seed = 99))
+        val (at, reason, _) = run(audio)
+        assertEquals(EndReason.SILENCE_AFTER_SPEECH, reason)
+        assertTrue("stopped at $at", at!! in 2_450..2_650)
+    }
+
+    @Test
+    fun `reports what it saw, for the log`() {
+        val e = Endpointer(config)
+        val click = tone(20, -20.0)
+        run(concat(noise(60, -90.0), noise(440, -60.0, seed = 2), click, noise(300, -60.0, seed = 3), speech(1000, -25.0) plus noise(1000, -60.0, seed = 4), noise(3000, -60.0, seed = 5)), e)
+        val stats = e.stats
+        assertEquals(-90.0, stats.startupQuietestDbfs, 1.0)
+        assertEquals(-90.0, stats.quietestDbfs, 1.0)
+        assertEquals(1, stats.shortSounds)
+        assertTrue("$stats", stats.speechStartMs!! in 820..900)
+        assertEquals(-60.0, stats.backgroundDbfs, 3.0)
+    }
+
+    @Test
     fun `background that rises and falls a few dB is not speech`() {
         // Like a fan or distant traffic: 6 dB swings, every 100 ms.
         val audio = concat(*Array(90) { noise(100, if (it % 2 == 0) -50.0 else -44.0, seed = it) })

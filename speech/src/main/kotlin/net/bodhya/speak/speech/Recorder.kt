@@ -32,6 +32,8 @@ class Recording(
      * call. (Shorter recordings say nothing: some phones start with zeros.)
      */
     val noSound: Boolean = false,
+    /** What the endpointer saw, for the log. */
+    val stats: EndpointStats? = null,
 ) {
     val durationMs: Long get() = samples.size * 1000L / sampleRate
 }
@@ -68,6 +70,7 @@ class Recorder(
         fun recording(end: EndReason) = Recording(
             out.copyOf(count), config.sampleRate, endpointer.speechStarted, end,
             noSound = !endpointer.anySound && count >= config.sampleRate,
+            stats = endpointer.stats,
         )
         source.use { src ->
             src.start()

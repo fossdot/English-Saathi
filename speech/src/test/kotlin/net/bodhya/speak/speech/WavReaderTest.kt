@@ -87,4 +87,11 @@ class WavReaderTest {
         val wav = Wav().fmt().data(1, 2, 3, 4).build()
         assertRejected(wav.copyOf(wav.size - 3), "cut off")
     }
+
+    @Test
+    fun `written files read back the same`() {
+        val samples = floatArrayOf(0f, 0.5f, -0.5f, 0.25f, -1f)
+        val back = WavReader.readPcm16Mono(WavWriter.pcm16Mono(samples, 16_000).inputStream())
+        assertEquals(samples.map { (it * 32768f).toInt().coerceIn(-32768, 32767).toShort() }, back.toList())
+    }
 }

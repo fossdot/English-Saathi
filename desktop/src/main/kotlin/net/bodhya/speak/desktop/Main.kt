@@ -58,6 +58,7 @@ import net.bodhya.speak.domain.GameConfig
 import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.speech.AsrSettings
 import net.bodhya.speak.speech.WavReader
+import net.bodhya.speak.speech.WavWriter
 import java.awt.Desktop
 import java.awt.desktop.PreferencesHandler
 import java.awt.event.WindowAdapter
@@ -75,6 +76,7 @@ private const val THREADS = 4
 /** Everything the window needs, made once at start, off the main thread. */
 internal class Setup(
     val projectDir: File,
+    val dataDir: File,
     val log: SessionLog,
     val lesson: Lesson,
     val recognition: ModelSwitcher,
@@ -129,7 +131,7 @@ internal class Setup(
                 (1..5).map { File(projectDir, "app/src/debug/assets/asr-test/bus_0$it.wav") }).filter { it.isFile }.associateBy { it.name }
 
             return Setup(
-                projectDir, log, loaded.lesson,
+                projectDir, dataDir, log, loaded.lesson,
                 ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), FIRST_MODEL).also { log.write("model ${FIRST_MODEL.id}, $THREADS threads") },
                 Speaker(renderer), english, hindi, notices, inputs, clips,
             )
@@ -269,6 +271,13 @@ private fun newController(ready: Setup) = SpeechCheckController(
     log = ready.log::write,
     scope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
     io = Dispatchers.IO,
+    saveRecording = { sentenceId, recording ->
+        // The latest recording of each sentence only, in the data folder (kept out of Time Machine).
+        val file = File(ready.dataDir, "recordings/speech-check/$sentenceId.wav")
+        file.parentFile.mkdirs()
+        file.writeBytes(WavWriter.pcm16Mono(recording.samples, recording.sampleRate))
+        file.path
+    },
 )
 
 @Composable

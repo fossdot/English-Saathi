@@ -53,6 +53,12 @@ class SpeechCheckScreenTest {
     }
 
     @Test
+    fun `one star is singular`() {
+        compose.setContent { SpeechCheckScreen(lesson, SpeechCheckState(result = result(0, "were")), ready, info, CheckActions({}, {}, {}, {})) }
+        compose.onNodeWithText("0 of 5 words correct · 1 star").assertExists()
+    }
+
+    @Test
     fun `messages show in English and Hindi`() {
         val m = ShownMessage(MessageKind.INFO, SpeechCheckController.DIDNT_HEAR)
         compose.setContent { SpeechCheckScreen(lesson, SpeechCheckState(message = m), ready, info, CheckActions({}, {}, {}, {})) }

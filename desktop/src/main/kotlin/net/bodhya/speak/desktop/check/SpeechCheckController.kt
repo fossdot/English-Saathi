@@ -29,6 +29,9 @@ import net.bodhya.speak.speech.Recorder
 import net.bodhya.speak.speech.Recording
 import java.io.IOException
 
+/** "1 star", "2 stars". */
+fun starsText(stars: Int): String = if (stars == 1) "1 star" else "$stars stars"
+
 /** One recognized answer, compared with the sentence on screen when recording started. */
 data class CheckResult(
     val sentenceId: String,
@@ -88,7 +91,10 @@ interface SpeechOutput {
  * Milestone D3's speech check window, without the window: record from the
  * Mac's microphone (or replay a test clip through the same recorder),
  * recognize, and compare with a lesson sentence using the domain rules.
- * Every result goes to [log] with its model.
+ * Every result goes to [log] with its model and what the endpointer saw;
+ * [saveRecording] keeps the latest microphone recording of each sentence
+ * (docs/decisions.md, "Recordings"), so the silence rules can be tuned on
+ * real audio.
  *
  * Actions run on [scope]; blocking work runs on [io]. A result that arrives
  * after the learner chose another sentence is dropped (docs/decisions.md,
@@ -103,6 +109,8 @@ class SpeechCheckController(
     private val readClip: (name: String) -> ShortArray,
     private val log: (String) -> Unit,
     private val scope: CoroutineScope,
+    /** Keeps [Recording] as the latest of sentence [String]; returns where, or null. Runs on [io]. */
+    private val saveRecording: (String, Recording) -> String? = { _, _ -> null },
     private val io: CoroutineDispatcher,
     private val config: GameConfig = GameConfig(),
     private val clock: () -> Long = System::currentTimeMillis,
@@ -224,12 +232,13 @@ class SpeechCheckController(
             try {
                 val recording = withContext(io) { capture() }
                 _state.update { it.copy(listening = false, working = true, level = 0f) }
+                val saved = if (source == "microphone") withContext(io) { runCatching { saveRecording(sentence.id, recording) }.getOrNull() } else null
                 val result = recognize(sentence.id, source, recording)
                 if (myScreen != screen) {
                     log("dropped a result for ${sentence.id}: the screen moved on")
                     return@launch
                 }
-                log(logLine(result))
+                log(logLine(result) + " | ${recording.stats ?: "-"}" + (saved?.let { " | saved $it" } ?: ""))
                 _state.update { it.copy(result = result, message = messageFor(recording, result)) }
             } catch (e: CancellationException) {
                 throw e
@@ -273,7 +282,7 @@ class SpeechCheckController(
     private fun logLine(r: CheckResult) = listOf(
         "result", "model=${r.model?.id ?: "-"}", "sentence=${r.sentenceId}", "source=${r.source}", "audio_ms=${r.audioMs}",
         "end=${r.endReason}", "wait_ms=${r.waitMs ?: "-"}", "heard=${r.heard ?: "(no speech)"}",
-        "score=${r.score?.let { "${it.correct}/${it.total} ${it.stars} stars" } ?: "didn't hear you"}",
+        "score=${r.score?.let { "${it.correct}/${it.total} ${starsText(it.stars)}" } ?: "didn't hear you"}",
     ).joinToString(" | ")
 
     companion object {

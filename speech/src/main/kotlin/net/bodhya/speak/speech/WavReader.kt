@@ -52,3 +52,18 @@ object WavReader {
         (b[at].toInt() and 0xff) or ((b[at + 1].toInt() and 0xff) shl 8) or
             ((b[at + 2].toInt() and 0xff) shl 16) or (b[at + 3].toInt() shl 24)
 }
+
+/** Writes 16-bit PCM mono WAV files, the format [WavReader] reads. */
+object WavWriter {
+
+    /** [samples] in [-1, 1] at [sampleRate], as a WAV file's bytes. */
+    fun pcm16Mono(samples: FloatArray, sampleRate: Int): ByteArray {
+        val data = samples.size * 2
+        val out = java.nio.ByteBuffer.allocate(44 + data).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+        out.put("RIFF".toByteArray()).putInt(36 + data).put("WAVE".toByteArray())
+        out.put("fmt ".toByteArray()).putInt(16).putShort(1).putShort(1).putInt(sampleRate).putInt(sampleRate * 2).putShort(2).putShort(16)
+        out.put("data".toByteArray()).putInt(data)
+        for (x in samples) out.putShort((x * 32768f).toInt().coerceIn(-32768, 32767).toShort())
+        return out.array()
+    }
+}

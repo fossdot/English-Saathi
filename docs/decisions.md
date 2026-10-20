@@ -325,6 +325,23 @@ change.
     or at 8 s.
   - The 1.2 s of silence stays in the clip, as in the model comparison.
   - The levels need checking on real phones (`docs/speech-on-device.md`).
+  - **Changed 2026-10-20 after the first live desktop test** (an M4's
+    built-in microphone: recording never stopped on silence, 9 of 9 takes
+    ran until stopped by hand or to 8 s):
+    - only speech (60 ms of loud audio, as above) restarts the 1.2 s of
+      quiet; before, a single 20 ms click, tap or breath did;
+    - the first 100 ms are not used for the background level: a
+      microphone that starts with a moment far quieter than the room made
+      the room itself count as speech for many seconds.
+    Both are reproduced in `EndpointerTest` with synthetic audio; the
+    real cause on the M4 is confirmed only once its recordings are
+    replayed. Android uses the same code.
+  - **Desktop check window:** each result logs what the endpointer saw
+    (quietest and loudest frame, start-up quietest, background, when speech
+    started, short sounds ignored), and the latest microphone recording of
+    each sentence is kept in the data folder
+    (`recordings/speech-check/<sentence>.wav`), so the levels can be tuned
+    on real audio.
 - **"Didn't hear you"**:
   - When nothing counted as speech, the recognizer is not run at all.
   - Otherwise, as decided in milestone a: the transcript has no words once

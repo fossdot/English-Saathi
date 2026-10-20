@@ -3,6 +3,8 @@ package net.bodhya.speak.desktop.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import net.bodhya.speak.desktop.speech.SpeechModel
  * speech model, the microphone input, the 1-second microphone check, and
  * test clips run through the same recorder.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SettingsPanel(
     model: SpeechModel,
@@ -48,7 +51,8 @@ fun SettingsPanel(
         PilotButton("Check the microphone (1 second)", "माइक जाँचिए", onCheckMicrophone)
         if (clips.isNotEmpty()) {
             Line("Test clips, through the same recorder", bold = true)
-            Row(horizontalArrangement = Gap) { for (c in clips) PilotButton(c.removeSuffix(".wav"), "चलाइए", { onClip(c) }) }
+            // A wrapping row: in a plain row the last buttons were squeezed until "bus_05" broke over two lines.
+            FlowRow(horizontalArrangement = Gap, verticalArrangement = Gap) { for (c in clips) PilotButton(c.removeSuffix(".wav"), "चलाइए", { onClip(c) }) }
         }
     }
 }

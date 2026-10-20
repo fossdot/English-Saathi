@@ -37,6 +37,7 @@ import net.bodhya.speak.desktop.check.CheckResult
 import net.bodhya.speak.desktop.check.MessageKind
 import net.bodhya.speak.desktop.check.MicStatus
 import net.bodhya.speak.desktop.check.SpeechCheckState
+import net.bodhya.speak.desktop.check.starsText
 import net.bodhya.speak.desktop.speech.RecognitionState
 import net.bodhya.speak.desktop.voice.Message
 import net.bodhya.speak.domain.Lesson
@@ -151,7 +152,7 @@ private fun MessageBox(kind: MessageKind, message: Message) {
 private fun ResultBlock(lesson: Lesson, r: CheckResult) {
     val sentence = lesson.sentences.first { it.id == r.sentenceId }
     Column(verticalArrangement = Gap) {
-        r.score?.let { Bilingual("${it.correct} of ${it.total} words correct · ${it.stars} stars", "${it.total} में से ${it.correct} शब्द सही", bold = true) }
+        r.score?.let { Bilingual("${it.correct} of ${it.total} words correct · ${starsText(it.stars)}", "${it.total} में से ${it.correct} शब्द सही", bold = true) }
         r.words?.let { words -> FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Chips(sentence.text, words) } }
         r.heard?.let { Bilingual("We heard: “${it.trim()}”", "हमने सुना") }
         Line(
