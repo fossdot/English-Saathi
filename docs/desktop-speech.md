@@ -67,7 +67,9 @@ Time per clip after the end of the recording (median); recordings are
 
 ## Running it on a MacBook
 
-On the 2019 MacBook Pro, once:
+The MacBook trip checklist, `docs/macbook-trip.md`, covers this check and
+D3's microphone test in one visit. The D1 part on its own, on the 2019
+MacBook Pro, once:
 
 1. Install **Amazon Corretto 17** for macOS x64 (the `.pkg`) from
    https://aws.amazon.com/corretto/. Not Temurin: its Java can't use the

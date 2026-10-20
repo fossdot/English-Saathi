@@ -56,6 +56,11 @@ Answers to the desktop plan's questions (`docs/desktop-plan.md`).
   kept: slow single words matter most, in fixing step 1. The time-stretch
   code must be our own or a permissively licensed library, named to the
   owner before it is added.
+  - **Speech is prepared per lesson** (owner, 2026-10-20): when a lesson
+    opens, every sentence and chunk (at 0.9 and 0.6) and every word (at 0.6)
+    is rendered and stretched in memory, so Listen is instant even where
+    `say` is slow. Memory only; nothing is written to disk but `say`'s
+    temporary file.
   - **Sonic** (owner's choice, 2026-10-20): `desktop/src/main/java/sonic/Sonic.java`,
     copied unchanged with its licence header from
     https://github.com/waywardgeek/sonic at commit
@@ -95,6 +100,32 @@ Answers to the desktop plan's questions (`docs/desktop-plan.md`).
   the tip, the Fix button and the big word.
 - **Packaging:** a .app with a bundled Corretto runtime comes after D9
   (`docs/later.md`).
+- **One MacBook trip** covers the D1 speech check and the D3 microphone test
+  (owner, 2026-10-20): `docs/macbook-trip.md`.
+
+### Choices made while building D3
+
+Within the plan; each is a setting or a small change.
+
+- **The model switch starts on tiny.en** until the MacBook trip measures
+  small.en (the 1.5 s rule above); Whisper runs with 4 threads (the trip's
+  D1 check also times 2 and 6).
+- **The microphone check runs at every start**, not only the first: one
+  silent second, so the macOS prompt appears while the facilitator is there
+  and a microphone that stopped working is caught before a student speaks.
+  It is also in Settings.
+- **The check log** is `logs/speech-check.log` in the data folder:
+  machine, Java and its microphone entitlement, the permission, inputs,
+  voices, graphics, and every result with its model. It holds what the
+  recognizer heard, never audio.
+- **Settings** opens with ⌘, (the standard macOS Settings item): model,
+  microphone input, the microphone check, test clips.
+- **Buttons never take keyboard focus**, so Space and Enter always reach
+  the shortcuts instead of clicking the last button used.
+- **Leaving the window** (another app comes to the front) stops listening
+  and speech, as leaving the Android app does.
+- **Mukta is not bundled yet:** the check window uses the Mac's own fonts,
+  which shape Hindi correctly. The font comes with the screens (D5).
 
 ## Owner answers
 
@@ -429,6 +460,10 @@ it as `unscored`: a word the recognizer can't be expected to hear.
 - A consequence seen in the re-recorded cases: a place name said right no
   longer counts either, so stars can drop. "one tickets to patna" was 3 of 5
   words (2 stars) and is now 2 of 4 (1 star, below the 0.6 needed for 2).
+- **Star thresholds: to be reviewed after the student pilots** (owner,
+  2026-10-20). With place names unscored, each remaining mistake weighs
+  more in a short sentence, so the 0.6 ratio for 2 stars (`twoStarRatio`)
+  may need changing.
 
 ### Fixing loop
 

@@ -62,6 +62,12 @@ voices on the MacBook are checked in D3's MacBook run.
   check command plays a sentence, its slow version and a Hindi line.
 
 **D3. Microphone and the first window (MacBook run)**
+
+Status: built and tested on the Apple M4 without opening the microphone
+(that would prompt on this Mac); waiting for the MacBook trip,
+`docs/macbook-trip.md`, which covers D1 too. Start it with
+`scripts/run_desktop.sh`.
+
 - 16 kHz mono 16-bit capture with Java Sound into the same `Recorder` and
   `Endpointer`: milestone b's silence rules unchanged. The line is reopened
   for every answer, so it follows input changes.

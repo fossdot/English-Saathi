@@ -6,7 +6,7 @@
 #
 # Needs: Amazon Corretto 17 (or another JDK 17), python3 3.11 or later for
 # scripts/fetch_deps.sh, and internet the first time (Gradle, libraries,
-# models: about 1 GB). See docs/desktop-speech.md, "Running it on a MacBook".
+# models: about 1 GB). The MacBook trip checklist is docs/macbook-trip.md.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

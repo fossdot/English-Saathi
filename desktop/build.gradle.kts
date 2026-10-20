@@ -2,6 +2,8 @@ import java.security.MessageDigest
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.compose.multiplatform)
 }
 
 kotlin {
@@ -15,8 +17,31 @@ dependencies {
     implementation(files("libs/sherpa-onnx-jvm-1.13.8.jar"))
     // Lesson and hint files (content/).
     implementation(libs.kotlinx.serialization.json)
+    // The window. currentOs is this Mac's Compose desktop build; both carry the Intel and Apple silicon graphics libraries.
+    implementation(compose.desktop.currentOs)
+    implementation(libs.cmp.foundation)
+    // Dispatchers.Main on the Swing thread: Compose 1.10.3 doesn't bring it.
+    implementation(libs.kotlinx.coroutines.swing)
 
     testImplementation(libs.junit)
+    testImplementation(libs.cmp.ui.test.junit4)
+}
+
+compose.desktop {
+    application {
+        mainClass = "net.bodhya.speak.desktop.MainKt"
+        // scripts/run_desktop.sh sets JAVA_HOME to Corretto 17: the app must run on a Java that may use the microphone.
+        System.getenv("JAVA_HOME")?.let { javaHome = it }
+        args(rootProject.projectDir.absolutePath)
+        jvmArgs(
+            "-Dapple.awt.application.name=English Saathi",
+            "-Xdock:name=English Saathi",
+            // On a 2019 MacBook Pro Skiko's "auto" picks the AMD GPU, which costs battery.
+            "-Dskiko.gpu.priority=integrated",
+            // Prints the graphics card Skiko uses, for the MacBook checklist.
+            "-Dskiko.hardwareInfo.enabled=true",
+        )
+    }
 }
 
 /**
@@ -139,5 +164,6 @@ tasks.register<JavaExec>("voiceCheck") {
     description = "Runs the D2 voice check."
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("net.bodhya.speak.desktop.check.VoiceCheckKt")
+    args(rootProject.projectDir.absolutePath)
     if (hasProperty("silent")) args("--silent")
 }

@@ -76,6 +76,7 @@ for every APK, bundle and install.
 ./gradlew :desktop:test                 # desktop speech recognizer (with the real models) and lesson loader
 ./gradlew :desktop:speechCheck          # times both models on the test clips (docs/desktop-speech.md)
 ./gradlew :desktop:voiceCheck           # the voices the app picks; plays a sentence, its slow version and a Hindi line
+scripts/run_desktop.sh                  # the desktop app (for now, the speech check window), on Corretto 17
 ./gradlew :app:connectedDebugAndroidTest  # on a running emulator or phone
 ./gradlew check                         # unit tests, lint and the offline check
 ```
