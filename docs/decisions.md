@@ -132,8 +132,16 @@ Within the plan; each is a setting or a small change.
   the shortcuts instead of clicking the last button used.
 - **Leaving the window** (another app comes to the front) stops listening
   and speech, as leaving the Android app does.
-- **Mukta is not bundled yet:** the check window uses the Mac's own fonts,
-  which shape Hindi correctly. The font comes with the screens (D5).
+- **Mukta is bundled** (2026-10-21): Regular, SemiBold and Bold, the
+  weights the pilot loads, version 2.538 from google/fonts at
+  `4ed247183585550f5ee6d09665680c282227df41` (SHA-256: Regular
+  `2958e4af…9688`, SemiBold `f437fb09…510a`, Bold `7d22891c…0a12`), with
+  `OFL.txt` next to them and an entry in `NOTICE`. Text uses the pilot's
+  line heights (1.35, big headings 1.15); glyphs Mukta lacks (⌘, ✓) come
+  from the Mac's fonts.
+- **Icons are drawn**, from the pilot's own SVG paths (`ui/Icons.kt`): the
+  mic and stop buttons, stars instead of "3 stars", and the chips' check,
+  retry and dash marks, which were text characters.
 
 ## Owner answers
 

@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,19 +36,45 @@ object Colors {
     val primaryInk = Color(0xFF1F2D78)
     val reward = Color(0xFFC25E00)
     val rewardSoft = Color(0xFFFFF0DC)
+    val rewardInk = Color(0xFF8A3F00)
     val okSoft = Color(0xFFE2F1E7)
     val okInk = Color(0xFF174F2F)
+    val ok = Color(0xFF1E6B3F)
     val badSoft = Color(0xFFFCE4D6)
     val badInk = Color(0xFF8A2F08)
     val bad = Color(0xFFA33A0B)
+    val locked = Color(0xFFEFEAE0)
+    val lockedInk = Color(0xFF6B655C)
 }
+
+/**
+ * The pilot's font, Mukta (SIL Open Font License), bundled so the app looks
+ * the same on every Mac and needs no internet (docs/desktop-plan.md,
+ * "Version set"). Its Devanagari covers the Hindi; anything it lacks falls
+ * back to the Mac's fonts.
+ */
+val Mukta: FontFamily = FontFamily(
+    muktaFont("Mukta-Regular", FontWeight.Normal),
+    muktaFont("Mukta-SemiBold", FontWeight.SemiBold),
+    muktaFont("Mukta-Bold", FontWeight.Bold),
+)
+
+private fun muktaFont(name: String, weight: FontWeight) = Font(
+    identity = name,
+    data = checkNotNull(Colors::class.java.getResourceAsStream("/fonts/$name.ttf")) { "fonts/$name.ttf is missing" }.use { it.readBytes() },
+    weight = weight,
+)
+
+/** Text in Mukta, with the pilot's line height: 1.35 for body text, 1.15 for big headings. */
+fun textStyle(size: TextUnit, color: Color = Colors.ink, weight: FontWeight = FontWeight.Normal, lineHeight: Float = 1.35f) =
+    TextStyle(fontFamily = Mukta, fontSize = size, color = color, fontWeight = weight, lineHeight = (size.value * lineHeight).sp)
 
 /** English above, Hindi below, at least 16 sp (docs/decisions.md, "Labels"). */
 @Composable
 fun Bilingual(en: String, hi: String, modifier: Modifier = Modifier, size: TextUnit = 18.sp, color: Color = Colors.ink, bold: Boolean = false) {
     Column(modifier) {
-        BasicText(en, style = TextStyle(fontSize = size, color = color, fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal))
-        BasicText(hi, style = TextStyle(fontSize = maxOf(16f, size.value * 0.85f).sp, color = color.copy(alpha = 0.8f)))
+        BasicText(en, style = textStyle(size, color, if (bold) FontWeight.Bold else FontWeight.Normal))
+        BasicText(hi, style = textStyle(maxOf(16f, size.value * 0.85f).sp, color.copy(alpha = 0.8f)))
     }
 }
 
@@ -74,6 +102,6 @@ fun PilotButton(en: String, hi: String, onClick: () -> Unit, modifier: Modifier 
 /** A short line of plain text. */
 @Composable
 fun Line(text: String, size: TextUnit = 16.sp, color: Color = Colors.ink, bold: Boolean = false) =
-    BasicText(text, style = TextStyle(fontSize = size, color = color, fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal))
+    BasicText(text, style = textStyle(size, color, if (bold) FontWeight.Bold else FontWeight.Normal))
 
 val Gap = Arrangement.spacedBy(12.dp)

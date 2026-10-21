@@ -10,3 +10,10 @@ Sonic (speech speed change with the pitch kept), by Bill Cox
   Licence: Apache License 2.0, copied in desktop/src/main/java/sonic/LICENSE
   "Copyright 2010, 2011 Bill Cox. This file is part of the Sonic Library.
   This file is licensed under the Apache 2.0 license."
+
+Mukta (the pilot's font), by Girish Dalvi, Ek Type
+  Files:   desktop/src/main/resources/fonts/Mukta-Regular.ttf, Mukta-SemiBold.ttf,
+           Mukta-Bold.ttf (version 2.538), unchanged
+  Source:  https://github.com/google/fonts/tree/4ed247183585550f5ee6d09665680c282227df41/ofl/mukta
+  Licence: SIL Open Font License 1.1, copied in desktop/src/main/resources/fonts/OFL.txt
+  "Copyright (c) 2014, Girish Dalvi, Ek Type. All rights reserved."

@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +36,6 @@ import net.bodhya.speak.desktop.check.CheckResult
 import net.bodhya.speak.desktop.check.MessageKind
 import net.bodhya.speak.desktop.check.MicStatus
 import net.bodhya.speak.desktop.check.SpeechCheckState
-import net.bodhya.speak.desktop.check.starsText
 import net.bodhya.speak.desktop.speech.RecognitionState
 import net.bodhya.speak.desktop.speech.SpeechModel
 import net.bodhya.speak.desktop.voice.Message
@@ -79,8 +77,8 @@ fun SpeechCheckScreen(lesson: Lesson, state: SpeechCheckState, recognition: Reco
         Row(horizontalArrangement = Arrangement.spacedBy(40.dp)) {
             Column(Modifier.weight(1.15f), verticalArrangement = Gap) {
                 Line("${lesson.titleEn}, sentence ${state.sentence + 1} (वाक्य ${state.sentence + 1})", color = Colors.muted)
-                BasicText(sentence.text, style = TextStyle(fontSize = 46.sp, fontWeight = FontWeight.Bold, color = Colors.ink))
-                BasicText(sentence.hi, style = TextStyle(fontSize = 24.sp, color = Colors.muted))
+                BasicText(sentence.text, style = textStyle(46.sp, weight = FontWeight.Bold, lineHeight = 1.15f))
+                BasicText(sentence.hi, style = textStyle(24.sp, Colors.muted))
                 Row(horizontalArrangement = Gap) {
                     PilotButton("Listen", "सुनिए", { actions.listen(false) }, Modifier.weight(1f))
                     PilotButton("Slowly 0.6×", "धीरे सुनिए", { actions.listen(true) }, Modifier.weight(1f))
@@ -120,7 +118,10 @@ private fun MicBlock(state: SpeechCheckState, recognition: RecognitionState, act
                 .border(10.dp, Colors.rewardSoft, CircleShape)
                 .clickable(enabled = ready && !state.working) { actions.toggleRecording() },
             contentAlignment = Alignment.Center,
-        ) { BasicText(if (state.listening) "■" else "🎤", style = TextStyle(fontSize = 44.sp, color = Colors.onPrimary)) }
+        ) {
+            if (state.listening) Icon(Icons.stop, 48.dp, Colors.onPrimary, description = "Stop listening")
+            else Icon(Icons.mic, 62.dp, Colors.onPrimary, description = "Press and speak")
+        }
         when {
             recognition.engine is EngineState.Loading -> Bilingual("Loading the speech model…", "आवाज़ पहचानने वाला मॉडल खुल रहा है…", color = Colors.muted)
             recognition.engine is EngineState.Failed -> Bilingual(
@@ -169,7 +170,10 @@ private fun MessageBox(kind: MessageKind, message: Message) {
 private fun ResultBlock(lesson: Lesson, r: CheckResult) {
     val sentence = lesson.sentences.first { it.id == r.sentenceId }
     Column(verticalArrangement = Gap) {
-        r.score?.let { Bilingual("${it.correct} of ${it.total} words correct · ${starsText(it.stars)}", "${it.total} में से ${it.correct} शब्द सही", bold = true) }
+        r.score?.let {
+            Stars(it.stars, 40.dp)
+            Bilingual("${it.correct} of ${it.total} words correct", "${it.total} में से ${it.correct} शब्द सही", bold = true)
+        }
         r.words?.let { words -> FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Chips(sentence.text, words) } }
         r.heard?.let { Bilingual("We heard: “${it.trim()}”", "हमने सुना") }
         Line(
@@ -202,10 +206,10 @@ private fun Chips(text: String, words: List<WordResult>) {
 private fun Chip(label: String, status: WordStatus?) {
     val shape = RoundedCornerShape(12.dp)
     val (bg, fg, icon) = when (status) {
-        WordStatus.CORRECT -> Triple(Colors.okSoft, Colors.okInk, "✓ ")
-        WordStatus.WRONG -> Triple(Colors.badSoft, Colors.badInk, "↻ ")
-        WordStatus.MISSING -> Triple(Color.Transparent, Colors.badInk, "– ")
-        null -> Triple(Colors.bg, Colors.muted, "")
+        WordStatus.CORRECT -> Triple(Colors.okSoft, Colors.okInk, Icons.check)
+        WordStatus.WRONG -> Triple(Colors.badSoft, Colors.badInk, Icons.retry)
+        WordStatus.MISSING -> Triple(Color.Transparent, Colors.badInk, Icons.dash)
+        null -> Triple(Colors.bg, Colors.muted, null)
     }
     Box(
         Modifier.background(bg, shape)
@@ -214,7 +218,12 @@ private fun Chip(label: String, status: WordStatus?) {
                 drawRoundRect(Colors.bad, style = Stroke(width = 2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))), cornerRadius = CornerRadius(12.dp.toPx()))
             } else Modifier)
             .padding(horizontal = 12.dp, vertical = 6.dp),
-    ) { BasicText(icon + label, style = TextStyle(fontSize = 26.sp, fontWeight = FontWeight.SemiBold, color = fg)) }
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            icon?.let { Icon(it, 20.dp, fg) }
+            BasicText(label, style = textStyle(26.sp, fg, FontWeight.SemiBold))
+        }
+    }
 }
 
 @Composable

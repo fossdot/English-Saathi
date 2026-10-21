@@ -1,6 +1,7 @@
 package net.bodhya.speak.desktop.ui
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -47,15 +48,17 @@ class SpeechCheckScreenTest {
         compose.setContent {
             SpeechCheckScreen(lesson, SpeechCheckState(sentence = 2, result = result(2, "1 ticket 2 but now please")), ready, info, CheckActions({}, {}, {}, {}))
         }
-        compose.onNodeWithText("4 of 4 words correct · 3 stars").assertExists()
+        compose.onNodeWithText("4 of 4 words correct").assertExists()
+        compose.onNodeWithContentDescription("3 of 3 stars").assertExists()
         compose.onNodeWithText("Patna").assertExists() // unscored: neutral, written as in the sentence
         compose.onNodeWithText("We heard: “1 ticket 2 but now please”").assertExists()
     }
 
     @Test
-    fun `one star is singular`() {
+    fun `stars are drawn, one lit for a poor attempt`() {
         compose.setContent { SpeechCheckScreen(lesson, SpeechCheckState(result = result(0, "were")), ready, info, CheckActions({}, {}, {}, {})) }
-        compose.onNodeWithText("0 of 5 words correct · 1 star").assertExists()
+        compose.onNodeWithText("0 of 5 words correct").assertExists()
+        compose.onNodeWithContentDescription("1 of 3 stars").assertExists()
     }
 
     @Test
