@@ -330,12 +330,16 @@ change.
     ran until stopped by hand or to 8 s):
     - only speech (60 ms of loud audio, as above) restarts the 1.2 s of
       quiet; before, a single 20 ms click, tap or breath did;
-    - the first 100 ms are not used for the background level: a
+    - the first 300 ms are not used for the background level: a
       microphone that starts with a moment far quieter than the room made
-      the room itself count as speech for many seconds.
-    Both are reproduced in `EndpointerTest` with synthetic audio; the
-    real cause on the M4 is confirmed only once its recordings are
-    replayed. Android uses the same code.
+      the room itself count as speech for many seconds. The first fix
+      left out 100 ms; the M4's own recording then showed its microphone
+      takes 180 ms to settle (fading out, 80 ms of exact zeros, then
+      -71 dBFS in a -47 dBFS room).
+    Both are reproduced in `EndpointerTest`. Replaying the M4 take with a
+    1.5 s pause inserted after the first sentence: the old rules never
+    stopped; the new ones stop 1.2 s after the sentence. Android uses the
+    same code.
   - **Desktop check window:** each result logs what the endpointer saw
     (quietest and loudest frame, start-up quietest, background, when speech
     started, short sounds ignored), and the latest microphone recording of

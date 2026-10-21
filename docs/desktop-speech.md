@@ -94,6 +94,25 @@ It needs internet the first time (Gradle, libraries and models: about
 1 GB) and takes about 10 minutes. Send back
 `desktop/build/speech-check/x86_64.log`.
 
+## Findings from the first live test (Apple M4, 2026-10-20)
+
+- **The microphone's start:** the M4's built-in microphone fades out, sends
+  80 ms of exact zeros and settles after about 180 ms, far below the room
+  (-71 against -47 dBFS). That made the room count as speech; the
+  endpointer now leaves the first 300 ms out of its background level
+  (`docs/decisions.md`, milestone b, "End of speech").
+- **small.en drops repeats.** "One ticket to Patna, please" said three
+  times in one 8 s take came back once from small.en. Each third of the
+  same recording, recognized on its own, gave the sentence every time, and
+  tiny.en wrote all three. Whisper learned from tidied transcripts, so it
+  tends to leave out repeated words; larger models do it more. For scoring
+  this changes nothing (extra words never cost stars), and once recording
+  stops after each sentence a repeat within one take is rare. The related
+  behaviour that does matter is the same tidying applied to mistakes:
+  writing the fluent sentence where the learner said a word wrong (only
+  small.en caught "How match is the ticket?", 4 of 8 times). The student
+  recordings will measure it.
+
 ## Speech out (D2)
 
 - **Voices:** the app reads `say -v '?'` once and picks an Indian English

@@ -146,6 +146,22 @@ class EndpointerTest {
     }
 
     @Test
+    fun `the start of an M4's built-in microphone doesn't hide the room's level`() {
+        // Its first 180 ms, measured: 20 ms frames at -50, -64, -76 and -94 dBFS,
+        // 80 ms of exact zeros, then -71 dBFS; the room was about -47 dBFS.
+        val start = concat(*listOf(-50.0, -64.0, -76.0, -94.0).map { noise(20, it, seed = it.toInt()) }.toTypedArray(), zeros(80), noise(20, -71.0))
+        val audio = concat(start, noise(400, -47.0, seed = 2), speech(1500, -25.0) plus noise(1500, -47.0, seed = 3), noise(4000, -47.0, seed = 4))
+        val (at, reason, speech) = run(audio)
+        assertEquals(EndReason.SILENCE_AFTER_SPEECH, reason)
+        assertTrue(speech)
+        assertTrue("stopped at $at", at!! in 3_100..3_300)
+        // With only the first 100 ms left out (the first fix), the room counted as speech until the
+        // slowly rising background caught up: about 2.6 s late here, and never in a real 8 s take.
+        val (lateAt, _, _) = run(audio, Endpointer(EndpointConfig(startupMs = 100)))
+        assertTrue("stopped at $lateAt", lateAt == null || lateAt > 5_000)
+    }
+
+    @Test
     fun `clicks after the speech don't restart the 1,2 s of quiet`() {
         // Only 60 ms of loud audio counts as speech (docs/decisions.md), so a
         // 20 ms click, a tap or a breath doesn't keep the recording going.
@@ -219,8 +235,9 @@ class EndpointerTest {
 
     @Test
     fun `when silence and the limit fall due together, silence after speech wins`() {
-        // Speech ends exactly 1.2 s before the 8 s limit.
-        val (at, reason, _) = run(concat(noise(300, -65.0), tone(6500, -20.0), noise(3000, -65.0, seed = 2)))
+        // Speech ends exactly 1.2 s before the 8 s limit. (The room plays for longer than the
+        // start-up moments, which the background leaves out.)
+        val (at, reason, _) = run(concat(noise(400, -65.0), tone(6400, -20.0), noise(3000, -65.0, seed = 2)))
         assertEquals(8_000, at)
         assertEquals(EndReason.SILENCE_AFTER_SPEECH, reason)
     }

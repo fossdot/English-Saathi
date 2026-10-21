@@ -27,9 +27,11 @@ data class EndpointConfig(
     /**
      * The first moments are not used for the background level: a Mac's
      * microphone can start with a moment far quieter than the room, which
-     * would make the room itself sound like speech for many seconds.
+     * would make the room itself sound like speech for many seconds. An M4's
+     * built-in microphone took 180 ms to settle (fading out, 80 ms of zeros,
+     * then -71 dBFS in a -47 dBFS room).
      */
-    val startupMs: Int = 100,
+    val startupMs: Int = 300,
 ) {
     init {
         require(sampleRate > 0 && frameMs > 0 && sampleRate * frameMs % 1000 == 0) { "frames must be whole samples" }
