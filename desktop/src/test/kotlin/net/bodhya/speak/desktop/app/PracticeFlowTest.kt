@@ -247,6 +247,115 @@ class PracticeFlowTest {
         assertTrue("only once a day", app.state.value.screen is Screen.Practice)
     }
 
+    /** Says "were is the bus stop" for sentence 1 and opens the fixing loop for "Where". */
+    private fun fixWhere() {
+        practise(0)
+        recognition.heard = "were is the bus stop"
+        app.toggleRecording()
+        app.fix()
+    }
+
+    private fun say(text: String) {
+        recognition.heard = text
+        app.toggleRecording()
+    }
+
+    private val step get() = app.state.value.fix!!.state.step
+
+    @Test
+    fun `the fixing loop goes through its five steps, logs each try and goes on after step 5`() {
+        fixWhere()
+        assertEquals(Screen.Fix(0), app.state.value.screen)
+        val view = app.state.value.fix!!
+        assertEquals("Where", view.written)
+        assertEquals(listOf("where"), view.syllables)
+        assertEquals("वेयर", view.soundHi)
+        assertEquals(1, step)
+        app.toggleRecording() // steps 1 and 2 need Next, not the mic
+        assertEquals(1, step)
+        app.fixNext()
+        app.fixNext()
+        assertEquals(3, step)
+        app.fixNext() // step 3 needs the mic
+        assertEquals(3, step)
+
+        say("where")
+        assertEquals(4, step)
+        assertEquals(MessageKind.OK, app.state.value.message!!.kind)
+        say("where is")
+        assertEquals(5, step)
+        say("where is the bus stop")
+        assertEquals("step 5 passed: on to the next sentence", Screen.Practice(1), app.state.value.screen)
+
+        val progress = store.progress(id)
+        assertEquals("20 for the attempt, 5 for each of steps 3-5", 35, progress.xpTotal)
+        val rows = rows()
+        assertEquals(listOf("sentence", "fix step 3", "fix step 4", "fix step 5"), rows.map { it.mode })
+        assertEquals(listOf("Where is the bus stop?", "Where", "Where is", "Where is the bus stop?"), rows.map { it.target })
+        assertEquals(listOf(AttemptResult.SCORED, AttemptResult.PASSED, AttemptResult.PASSED, AttemptResult.PASSED), rows.map { it.result })
+        assertEquals(listOf(1, 2, 5), rows.drop(1).map { it.total })
+        assertTrue("fix steps have no stars", rows.drop(1).all { it.stars == null })
+        assertTrue("only sentence attempts keep a recording", store.recordingFile(id, "bus_01").isFile)
+    }
+
+    @Test
+    fun `two failed tries at a step go back one step, and didn't hear you doesn't count`() {
+        fixWhere()
+        app.fixNext()
+        app.fixNext()
+        say("[BLANK_AUDIO]")
+        assertEquals(3, step)
+        assertEquals(0, app.state.value.fix!!.state.fails)
+        say("were")
+        assertEquals(3, step)
+        assertTrue(app.state.value.message!!.message.en.startsWith("Try once more. We heard: “were”"))
+        say("were")
+        assertEquals(2, step)
+        assertEquals("Let’s go back one step.", app.state.value.message!!.message.en)
+        assertEquals(
+            listOf(AttemptResult.SCORED, AttemptResult.NOT_HEARD, AttemptResult.FAILED, AttemptResult.FAILED),
+            rows().map { it.result },
+        )
+        assertEquals("fix step 3", rows()[1].mode)
+    }
+
+    @Test
+    fun `L and S play the word slowly on steps 1-3, the phrase or sentence on steps 4-5`() {
+        fixWhere()
+        spoken.clear()
+        app.fixListen(slow = false)
+        app.fixListen(slow = true)
+        app.fixNext()
+        app.fixNext()
+        say("where")
+        app.fixListen(slow = false)
+        app.fixListen(slow = true)
+        assertEquals(listOf("en 0.6 where", "en 0.6 where", "en 0.9 Where is", "en 0.6 Where is"), spoken)
+    }
+
+    @Test
+    fun `back goes to the feedback again, and skip goes on`() {
+        fixWhere()
+        app.backToFeedback()
+        assertEquals(Screen.Feedback(0), app.state.value.screen)
+        assertEquals("Where", app.state.value.result!!.toFixWritten)
+        app.fix()
+        app.next()
+        assertEquals(Screen.Practice(1), app.state.value.screen)
+        assertNull(app.state.value.fix)
+    }
+
+    @Test
+    fun `the goal screen lists tomorrow's words as written, in the order they entered the box`() {
+        val all = lesson.sentences.map { it.id }
+        store.saveProgress(id, LearnerProgress(doneByDay = mapOf(today to all.drop(1))))
+        practise(0)
+        say("were is a bus stop")
+        app.next()
+        assertEquals(Screen.GoalDone, app.state.value.screen)
+        assertEquals(listOf("Where", "the"), app.wordsForTomorrow())
+    }
+
     @Test
     fun `the fix word is shown as written`() {
         val s = Sentence("t", "Is the bus-stop near Patna, sir?", "", emptyList())

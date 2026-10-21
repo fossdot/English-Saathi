@@ -49,16 +49,17 @@ import net.bodhya.speak.desktop.ui.CheckInfo
 import net.bodhya.speak.desktop.ui.Colors
 import net.bodhya.speak.desktop.ui.FeedbackActions
 import net.bodhya.speak.desktop.ui.FeedbackScreen
+import net.bodhya.speak.desktop.ui.FixActions
+import net.bodhya.speak.desktop.ui.FixScreen
+import net.bodhya.speak.desktop.ui.GoalActions
+import net.bodhya.speak.desktop.ui.GoalScreen
 import net.bodhya.speak.desktop.ui.HomeActions
 import net.bodhya.speak.desktop.ui.HomeScreen
-import net.bodhya.speak.desktop.ui.Icons
 import net.bodhya.speak.desktop.ui.Line
 import net.bodhya.speak.desktop.ui.NewStudentActions
 import net.bodhya.speak.desktop.ui.NewStudentScreen
-import net.bodhya.speak.desktop.ui.Page
 import net.bodhya.speak.desktop.ui.PracticeActions
 import net.bodhya.speak.desktop.ui.PracticeScreen
-import net.bodhya.speak.desktop.ui.RoundIconButton
 import net.bodhya.speak.desktop.ui.SettingsActions
 import net.bodhya.speak.desktop.ui.SettingsPanel
 import net.bodhya.speak.desktop.ui.Shortcut
@@ -70,6 +71,7 @@ import net.bodhya.speak.desktop.ui.StudentsScreen
 import net.bodhya.speak.desktop.voice.Speaker
 import net.bodhya.speak.desktop.voice.Speeds
 import net.bodhya.speak.desktop.voice.Voice
+import net.bodhya.speak.domain.Streaks
 import net.bodhya.speak.speech.EngineState
 import net.bodhya.speak.speech.WavReader
 import net.bodhya.speak.speech.WavWriter
@@ -159,6 +161,14 @@ fun main(args: Array<String>) {
                         Shortcut.LISTEN -> a.listen(slow = false)
                         else -> return@Window false
                     }
+                    // Steps 1–2: Enter is Next; steps 3–5: Space speaks. L and S play the word, phrase or sentence.
+                    is Screen.Fix -> when (shortcut) {
+                        Shortcut.SPEAK -> a.toggleRecording()
+                        Shortcut.PRIMARY -> a.fixNext()
+                        Shortcut.LISTEN -> a.fixListen(slow = false)
+                        Shortcut.SLOWLY -> a.fixListen(slow = true)
+                    }
+                    Screen.GoalDone -> if (shortcut == Shortcut.PRIMARY) a.startPractice() else return@Window false
                     Screen.SpeechCheck -> {
                         val c = check ?: return@Window false
                         when (shortcut) {
@@ -282,8 +292,13 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean) {
         is Screen.Feedback -> state.result?.let { result ->
             FeedbackScreen(state.learner!!, result, ready.lesson, FeedbackActions({ a.listen(slow = false) }, a::fix, a::next, a::showStudents, a::hindiHelp))
         }
-        is Screen.Fix -> ToCome("Fix “${state.result?.toFixWritten}”", "शब्द ठीक करने की स्क्रीन अगले चरण (D7) में आएगी।", a::next)
-        Screen.GoalDone -> ToCome("Goal complete, ${state.learner?.name}!", "लक्ष्य की स्क्रीन अगले चरण (D7) में आएगी।", a::home)
+        is Screen.Fix -> state.fix?.let { fix ->
+            FixScreen(state, fix, mic, recognition, FixActions(a::fixNext, a::toggleRecording, a::fixListen, a::backToFeedback, a::next, a::showStudents, a::hindiHelp))
+        }
+        Screen.GoalDone -> {
+            val streak = Streaks.view(state.progress.streak, state.today, a.config)
+            GoalScreen(state, streak.days, streak.status, remember(state.progress) { a.wordsForTomorrow() }, GoalActions(a::startPractice, a::showStudents, a::home, a::hindiHelp))
+        }
         Screen.SpeechCheck -> SpeechCheckScreen(
             ready.lesson, checkState, recognition,
             CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared),
@@ -328,15 +343,6 @@ private fun AlreadyOpen(exit: () -> Unit) {
             )
             BigButton("OK", "ठीक है", exit)
         }
-    }
-}
-
-/** Until milestone D7 builds the fixing loop and the goal screen. */
-@Composable
-private fun ToCome(title: String, note: String, onward: () -> Unit) {
-    Page {
-        RoundIconButton(Icons.close, "Go on", onward, plain = true)
-        Bilingual(title, note, size = 28.sp, bold = true)
     }
 }
 

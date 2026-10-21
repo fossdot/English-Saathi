@@ -21,6 +21,9 @@ import net.bodhya.speak.desktop.voice.Speeds
 import net.bodhya.speak.domain.AfterSentence
 import net.bodhya.speak.domain.Alignment
 import net.bodhya.speak.domain.FeedbackSelector
+import net.bodhya.speak.domain.FixOutcome
+import net.bodhya.speak.domain.FixState
+import net.bodhya.speak.domain.FixingLoop
 import net.bodhya.speak.domain.GameConfig
 import net.bodhya.speak.domain.Hints
 import net.bodhya.speak.domain.LearnerProgress
@@ -55,10 +58,10 @@ sealed interface Screen {
     /** How sentence [sentence] was said ([AppState.result]). */
     data class Feedback(val sentence: Int) : Screen
 
-    /** Fixing the word to fix of sentence [sentence] (D7). */
+    /** The five-step fixing loop for the word to fix of sentence [sentence] ([AppState.fix]). */
     data class Fix(val sentence: Int) : Screen
 
-    /** The daily goal was just reached (D7). */
+    /** The daily goal was just reached: shown once per learner per day. */
     data object GoalDone : Screen
 
     /** Milestone D3's speech check, for the facilitator (Settings). */
@@ -83,6 +86,17 @@ data class SentenceResult(
     val tip: Tip?,
 )
 
+/** The fixing loop as the screen shows it. */
+data class FixView(
+    val state: FixState,
+    /** The word as written in the sentence ("Where"). */
+    val written: String,
+    /** Step 2: the word's syllables, its Hindi sound hint and the tip for its sound. */
+    val syllables: List<String>,
+    val soundHi: String?,
+    val tipHi: String,
+)
+
 data class AppState(
     val screen: Screen = Screen.Students,
     val students: List<StudentCard> = emptyList(),
@@ -92,15 +106,17 @@ data class AppState(
     val today: LocalDate,
     val message: ShownMessage? = null,
     val result: SentenceResult? = null,
+    val fix: FixView? = null,
 )
 
 /**
- * The flow between the student picker, home, practice and feedback
- * (milestones D5 and D6), without the window, following the pilot with the
+ * The flow between the student picker, home, practice, feedback, the
+ * fixing loop and the goal screen (milestones D5–D7), without the window,
+ * following the pilot with the
  * agreed changes (docs/decisions.md). Every change to a learner's progress
  * is saved at once, so quitting or a power cut loses nothing, and every
- * recording of a sentence is added to the attempt log, "Didn't hear you"
- * included.
+ * recording of a sentence or a fixing step is added to the attempt log,
+ * "Didn't hear you" included.
  */
 class AppController(
     private val store: LearnerStore,
@@ -186,7 +202,7 @@ class AppController(
         go { AppState(Screen.Home, cards(today), learner, progress, today) }
     }
 
-    fun home() = go { it.copy(screen = Screen.Home, today = today(), message = null, result = null) }
+    fun home() = go { it.copy(screen = Screen.Home, today = today(), message = null, result = null, fix = null) }
 
     /** "Start practice" / "Practise more" on home (Enter). */
     fun startPractice() {
@@ -199,7 +215,7 @@ class AppController(
     fun openSentence(index: Int) {
         require(index in lesson.sentences.indices)
         current = index
-        go { it.copy(screen = Screen.Practice(index), today = today(), message = null, result = null) }
+        go { it.copy(screen = Screen.Practice(index), today = today(), message = null, result = null, fix = null) }
     }
 
     /** Listen (L) and Slowly (S) on the practice screen; "Hear the correct sentence" (L) on feedback. */
@@ -212,19 +228,28 @@ class AppController(
         output.english(sentence.text, if (slow) Speeds.SLOW else Speeds.NORMAL)
     }
 
-    /** The mic button and Space on the practice screen: start recording, or stop early. */
+    /** The mic button and Space on the practice screen and fixing steps 3–5: start recording, or stop early. */
     fun toggleRecording() {
-        val screen = _state.value.screen as? Screen.Practice ?: return
+        val s = _state.value
+        val index = when (val screen = s.screen) {
+            is Screen.Practice -> screen.sentence
+            is Screen.Fix -> screen.sentence.takeIf { s.fix != null && FixingLoop.isRecordingStep(s.fix.state.step) } ?: return
+            else -> return
+        }
         val l = listening ?: return
         if (l.state.value.listening) return l.stop()
         if (l.state.value.busy || !micReady()) return
         output.stop()
         _state.update { it.copy(message = null) }
         val token = screenToken
-        val sentence = lesson.sentences[screen.sentence]
+        val sentence = lesson.sentences[index]
+        val fixing = s.fix?.state.takeIf { s.screen is Screen.Fix }
         l.start { heard ->
-            if (token != screenToken) log("dropped a result for ${sentence.id}: the screen moved on")
-            else onSentenceHeard(screen.sentence, sentence, heard)
+            when {
+                token != screenToken -> log("dropped a result for ${sentence.id}: the screen moved on")
+                fixing != null -> onFixHeard(sentence, fixing, heard)
+                else -> onSentenceHeard(index, sentence, heard)
+            }
         }
     }
 
@@ -276,16 +301,109 @@ class AppController(
         if (after.progress != s.progress) store.saveProgress(learner.id, after.progress)
         _state.update { it.copy(progress = after.progress) }
         when (val next = after.next) {
-            AfterSentence.GoalComplete -> go { it.copy(screen = Screen.GoalDone, message = null, result = null) }
+            AfterSentence.GoalComplete -> go { it.copy(screen = Screen.GoalDone, today = today(), message = null, result = null, fix = null) }
             is AfterSentence.Next -> openSentence(next.index)
         }
     }
 
-    /** Fix "word" on the feedback screen (D7). */
+    /** Fix "word" on the feedback screen: step 1 of the fixing loop for the word to fix. */
     fun fix() {
-        val screen = _state.value.screen as? Screen.Feedback ?: return
-        if (_state.value.result?.toFix == null) return
-        go { it.copy(screen = Screen.Fix(screen.sentence), message = null) }
+        val s = _state.value
+        val screen = s.screen as? Screen.Feedback ?: return
+        val result = s.result ?: return
+        val toFix = result.toFix ?: return
+        val sentence = lesson.sentences[screen.sentence]
+        val tip = result.tip ?: FeedbackSelector.tip(toFix.word, lesson, hints)
+        val view = FixView(
+            FixingLoop.start(sentence, toFix.index), result.toFixWritten ?: toFix.word,
+            lesson.syllablesOf(toFix.word), tip.soundHi, tip.template.textHi,
+        )
+        go { it.copy(screen = Screen.Fix(screen.sentence), fix = view, message = null) }
+    }
+
+    /** "Next" on fixing steps 1 and 2, and Enter there (steps 3–5 use the mic). */
+    fun fixNext() {
+        val view = _state.value.fix ?: return
+        if (_state.value.screen !is Screen.Fix || FixingLoop.isRecordingStep(view.state.step)) return
+        output.stop()
+        _state.update { it.copy(fix = view.copy(state = FixingLoop.next(view.state)), message = null) }
+    }
+
+    /** The back arrow on the fixing screen: the feedback again. */
+    fun backToFeedback() {
+        val screen = _state.value.screen as? Screen.Fix ?: return
+        go { it.copy(screen = Screen.Feedback(screen.sentence), fix = null, message = null) }
+    }
+
+    /**
+     * L and S while fixing, as in the pilot: on steps 1–3 both play the word
+     * slowly; on steps 4 and 5, the phrase or sentence at normal speed (L) or
+     * slowly (S). The prepared lesson speech has words in their normalized
+     * form, so Listen is instant.
+     */
+    fun fixListen(slow: Boolean) {
+        val view = _state.value.fix ?: return
+        val f = view.state
+        if (f.step <= 3) output.english(f.word, Speeds.SLOW)
+        else output.english(FixingLoop.target(f)!!, if (slow) Speeds.SLOW else Speeds.NORMAL)
+    }
+
+    private fun onFixHeard(sentence: Sentence, fixing: FixState, heard: Heard) {
+        val s = _state.value
+        val learner = s.learner ?: return
+        val view = s.fix ?: return
+        val target = FixingLoop.target(fixing)!!
+        // The word itself is logged as written ("Where"); the phrase and sentence are the lesson's text.
+        val shownTarget = if (fixing.step == 3) view.written else target
+        val mode = AttemptRecord.fixStep(fixing.step)
+        val today = today()
+        fun notHeard(text: String, model: String? = null, waitMs: Long? = null, recording: Recording?, message: ShownMessage) {
+            logAttempt(learner, sentence, text, AttemptResult.NOT_HEARD, model = model, waitMs = waitMs, recording = recording, mode = mode, target = shownTarget)
+            _state.update { it.copy(message = message) }
+        }
+        when (heard) {
+            is Heard.Words -> {
+                val attempt = Practice.attemptFixStep(s.progress, fixing, lesson, sentence, heard.text, today, config)
+                val r = attempt.result
+                if (r.outcome == FixOutcome.NOTHING_HEARD) {
+                    return notHeard(heard.text, heard.model.id, heard.waitMs, heard.recording, ShownMessage(MessageKind.INFO, SpeechCheckController.DIDNT_HEAR))
+                }
+                if (attempt.progress != s.progress) store.saveProgress(learner.id, attempt.progress)
+                // Words the recognizer can't be expected to hear don't count in the phrase or sentence either.
+                val counted = r.alignment!!.withUnscored(lesson.unscoredIn(sentence))
+                val passed = r.outcome == FixOutcome.PASSED || r.outcome == FixOutcome.SENTENCE_FIXED
+                logAttempt(
+                    learner, sentence, heard.text, if (passed) AttemptResult.PASSED else AttemptResult.FAILED, counted.correctCount, counted.total,
+                    model = heard.model.id, waitMs = heard.waitMs, recording = heard.recording, mode = mode, target = shownTarget,
+                )
+                val message = when (r.outcome) {
+                    FixOutcome.PASSED -> ShownMessage(MessageKind.OK, Message("Correct! +${r.xp} XP", "सही! अगला कदम"))
+                    FixOutcome.TRY_AGAIN -> ShownMessage(MessageKind.PROBLEM, Message("Try once more. We heard: “${heard.text.trim()}”", "एक बार और कोशिश कीजिए।"))
+                    FixOutcome.DROPPED_BACK -> ShownMessage(MessageKind.PROBLEM, Message("Let’s go back one step.", "एक कदम पीछे चलते हैं।"))
+                    else -> null
+                }
+                _state.update { it.copy(progress = attempt.progress, today = today, fix = view.copy(state = r.state), message = message) }
+                // Step 5 passed: the sentence is fixed, and the pilot goes straight on.
+                if (r.outcome == FixOutcome.SENTENCE_FIXED) next()
+            }
+            is Heard.NothingLoud -> notHeard("", recording = heard.recording, message = ShownMessage(MessageKind.INFO, SpeechCheckController.DIDNT_HEAR))
+            is Heard.Silent -> notHeard("", recording = heard.recording, message = ShownMessage(MessageKind.PROBLEM, SpeechCheckController.silent(heard.permission)))
+            is Heard.NoMicrophone -> show(MessageKind.PROBLEM, SpeechCheckController.unavailable(heard.detail))
+            is Heard.Failed -> show(MessageKind.PROBLEM, SOMETHING_WRONG)
+        }
+    }
+
+    /** Words for the goal screen's "Practise again tomorrow", as written in the lesson, in the order they entered the box. */
+    fun wordsForTomorrow(): List<String> {
+        val s = _state.value
+        return Practice.wordsForTomorrow(s.progress, s.today, config).map { writtenInLesson(it) }
+    }
+
+    /** [word] as the lesson writes it: an occurrence inside a sentence if there is one, so a capital only at the start isn't copied. */
+    private fun writtenInLesson(word: String): String {
+        val places = lesson.sentences.flatMap { sentence -> sentence.targetWords.withIndex().filter { it.value == word }.map { sentence to it.index } }
+        val (sentence, index) = places.firstOrNull { it.second > 0 } ?: places.firstOrNull() ?: return word
+        return writtenWord(sentence, index)
     }
 
     /** Enter on the feedback screen: Fix when there is a word to fix, otherwise Next sentence (as in the pilot). */
@@ -350,10 +468,10 @@ class AppController(
         model: String? = null,
         waitMs: Long? = null,
         recording: Recording? = null,
+        mode: String = AttemptRecord.SENTENCE,
+        target: String = sentence.text,
     ) {
-        val record = AttemptRecord(
-            LearnerStore.now(clock), lesson.id, sentence.id, AttemptRecord.SENTENCE, sentence.text, heard, correct, total, stars, model, result, waitMs,
-        )
+        val record = AttemptRecord(LearnerStore.now(clock), lesson.id, sentence.id, mode, target, heard, correct, total, stars, model, result, waitMs)
         store.logAttempt(learner.id, record)
         // The session log also gets what the endpointer saw, for tuning the silence rules on real audio.
         log("attempt | learner=${learner.id} | ${record.mode} | sentence=${sentence.id} | ${result.text} | heard=$heard | " +
@@ -407,7 +525,14 @@ class AppController(
             is Screen.Feedback -> state.result?.let { r ->
                 "${r.score.total} में से ${r.score.correct} शब्द सही। " + (r.tip?.template?.textHi ?: "")
             }.orEmpty().trim()
-            is Screen.Fix -> "माइक दबाइए और सिर्फ़ यह शब्द बोलिए।"
+            // The pilot's line for each step.
+            is Screen.Fix -> when (state.fix?.state?.step) {
+                1 -> "यह शब्द धीरे सुनिए, फिर आगे दबाइए।"
+                2 -> "शब्द को टुकड़ों में देखिए और सुनिए।"
+                3 -> "माइक दबाइए और सिर्फ़ यह शब्द बोलिए।"
+                4 -> "माइक दबाइए और यह हिस्सा बोलिए।"
+                else -> "माइक दबाइए और पूरा वाक्य बोलिए।"
+            }
             Screen.GoalDone -> "बहुत बढ़िया! आज का लक्ष्य पूरा हुआ। कल फिर आइए।"
         }
     }

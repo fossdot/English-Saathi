@@ -137,7 +137,10 @@ in the MacBook trip's part D.
 - Model-loading and microphone states. A result arriving after the learner
   moved on is dropped.
 
-**D7. Fixing loop and goal screen** (after the pilots)
+**D7. Fixing loop and goal screen**
+
+Status: built and tested on the Apple M4 (headless and off-screen tests);
+in the MacBook trip's part D.
 - Five steps with the step list, Skip always visible, back one step after
   two failures.
 - The goal screen once per learner per day, with "Practise again tomorrow"

@@ -135,6 +135,10 @@ scripts/run_desktop.sh
       talking: the result shows stars, the words as chips, what was heard
       and XP. If a word is marked, the tip names it as written.
 - [ ] Press Space and say nothing: "Didn't hear you", and no stars.
+- [ ] Say a sentence with one word wrong on purpose, then **Fix**: step 1
+      shows the word big, step 2 its parts, step 3 asks for the word. Say
+      it wrong twice: it goes back one step. Go on to step 5 and say the
+      whole sentence: it moves on to the next sentence.
 - [ ] **Next sentence** (or **Skip for now**) moves on to the next
       sentence; the cross at the top left goes home, where the sentence
       now shows its stars and the goal counts it.

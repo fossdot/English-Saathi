@@ -217,6 +217,25 @@ Within the plan; each is a setting or a small change.
 - The session log (`logs/speech-check.log`) also gets a line per attempt
   with what the endpointer saw, as the speech check's results do.
 
+### Choices made while building D7
+
+- **Fixing steps follow the pilot:** steps 1–2 need Next (Enter), steps
+  3–5 the mic (Space); L and S play the word slowly on steps 1–3, and the
+  phrase or sentence at normal speed (L) or slowly (S) on steps 4–5. The
+  back arrow returns to the feedback; Skip goes on to the next sentence.
+  Passing step 5 goes straight on, as in the pilot.
+- **Each fixing try goes into the attempt log** as `fix step 3` to
+  `fix step 5`, with `passed`, `failed` or `not heard`. The target is
+  what the screen asked for: the word as written ("Where"; the pilot
+  logged the normalized "where"), the lesson's phrase, or the sentence.
+  `correct`/`total` count the words of that target, leaving out unscored
+  words such as Patna; there are no stars. Fixing tries keep no recording.
+- **"Practise again tomorrow"** shows each word as the lesson writes it
+  inside a sentence ("the", "ticket"); a word that only starts sentences
+  keeps its capital ("Where"). Plain chips, as in the pilot.
+- **The goal screen's streak** is the count home shows; Enter is One more
+  sentence, as in the pilot.
+
 ## Owner answers
 
 - **Profiles:** each learner picks a colour and one of about 8 drawn symbols.

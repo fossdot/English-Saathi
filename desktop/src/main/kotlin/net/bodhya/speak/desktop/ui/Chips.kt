@@ -42,9 +42,13 @@ fun WordChips(text: String, words: List<WordResult>) {
     }
 }
 
-/** The pilot's chip: check for right, retry for wrong, a dashed outline for missing; [status] null is neutral. */
+/**
+ * The pilot's chip: check for right, retry for wrong, a dashed outline for
+ * missing; [status] null is neutral. [marked] false leaves out the mark, as
+ * the pilot's "Practise again tomorrow" does.
+ */
 @Composable
-fun WordChip(label: String, status: WordStatus?, size: TextUnit = 26.sp) {
+fun WordChip(label: String, status: WordStatus?, size: TextUnit = 26.sp, marked: Boolean = true) {
     val shape = RoundedCornerShape(12.dp)
     val (bg, fg, icon) = when (status) {
         WordStatus.CORRECT -> Triple(Colors.okSoft, Colors.okInk, Icons.check)
@@ -61,7 +65,7 @@ fun WordChip(label: String, status: WordStatus?, size: TextUnit = 26.sp) {
             .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            icon?.let { Icon(it, (size.value * 0.75f).dp, fg) }
+            if (marked) icon?.let { Icon(it, (size.value * 0.75f).dp, fg) }
             BasicText(label, style = textStyle(size, fg, FontWeight.SemiBold))
         }
     }
