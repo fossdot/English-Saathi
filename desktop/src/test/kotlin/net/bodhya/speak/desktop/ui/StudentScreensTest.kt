@@ -47,7 +47,7 @@ class StudentScreensTest {
             listOf(StudentCard(anita, StreakView(3, StreakStatus.PAUSED)), StudentCard(ravi, StreakView(0, StreakStatus.NONE))),
             today = today,
         )
-        compose.setContent { StudentsScreen(state, {}, StudentsActions({ picked = it }, {}, {})) }
+        compose.setContent { StudentsScreen(state, {}, StudentsActions({ picked = it }, {}, {}, {})) }
         compose.onNodeWithText("Anita").assertExists()
         compose.onNodeWithText("3 days · paused").assertExists()
         compose.onNodeWithText("New · नया").assertExists()
@@ -58,7 +58,7 @@ class StudentScreensTest {
 
     @Test
     fun `with no students the picker says how to add one`() {
-        compose.setContent { StudentsScreen(AppState(today = today), {}, StudentsActions({}, {}, {})) }
+        compose.setContent { StudentsScreen(AppState(today = today), {}, StudentsActions({}, {}, {}, {})) }
         compose.onNodeWithText("No students yet. Press New student to add one.").assertExists()
     }
 

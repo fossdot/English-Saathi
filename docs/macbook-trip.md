@@ -144,6 +144,10 @@ scripts/run_desktop.sh
       now shows its stars and the goal counts it.
 - [ ] Click the name at the top left: back at the picker, the new card is
       there with "1 day".
+- [ ] Back at the picker, **Results**: the student's attempts are in both
+      tables. **Save as CSV…** saves it to Documents; open it in Numbers or
+      Excel: the times are this Mac's, and "Didn't hear you" rows have
+      empty counts.
 - [ ] In a second Terminal window, run `scripts/run_desktop.sh` again: a
       small window says English Saathi is already open. Press OK.
 - [ ] ⌘, › Students › **Delete…** › **Delete …**: the student disappears
@@ -155,5 +159,6 @@ scripts/run_desktop.sh
 - [ ] `~/Library/Application Support/English Saathi/logs/speech-check.log`
       (D3: the machine, Java, permission, voices, graphics and every result
       with its model). It holds what the recognizer heard, not recordings.
+- [ ] The CSV saved in part D.
 - [ ] This checklist with your notes, and a screenshot of the window
       (⇧⌘4, then Space, then click the window).

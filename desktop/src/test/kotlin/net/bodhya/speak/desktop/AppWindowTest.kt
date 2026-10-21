@@ -1,11 +1,14 @@
 package net.bodhya.speak.desktop
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import net.bodhya.speak.desktop.data.AttemptRecord
+import net.bodhya.speak.desktop.data.AttemptResult
 import net.bodhya.speak.desktop.data.Card
 import net.bodhya.speak.desktop.data.CardColour
 import net.bodhya.speak.desktop.data.CardSymbol
@@ -70,6 +73,33 @@ class AppWindowTest {
         compose.onNodeWithText("Delete Ravi").performClick()
         compose.onNodeWithText("No students yet.").assertExists()
         assertEquals(0, ready.store.learners().size)
+    }
+
+    @Test
+    fun `Results reads the attempt log and saves the CSV where the facilitator chose`() {
+        val anita = ready.store.add("Anita", Card(CardColour.BLUE, CardSymbol.FISH))
+        ready.store.logAttempt(
+            anita.id,
+            AttemptRecord("2026-10-21T13:45:30+05:30", "bus_stand", "bus_01", "sentence", "Where is the bus stop?", "where is the bus stop", 5, 5, 3, "tiny.en", AttemptResult.SCORED, 420),
+        )
+        parts.app.showStudents()
+        val target = File(tmp.root, "chosen/results.csv").also { it.parentFile.mkdirs() }
+        compose.setContent { Screens(ready, parts, prepared = true, chooseCsvFile = { name -> assertEquals(parts.app.csvFileName(), name); target }) }
+        compose.onNodeWithText("Results").performClick()
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("5 of 5").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Save as CSV…").performClick()
+        compose.waitUntil(5_000) { target.isFile }
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("Results saved: results.csv").fetchSemanticsNodes().isNotEmpty() }
+        val lines = target.readText().removePrefix("\uFEFF").lines()
+        assertEquals("2026-10-21 13:45:30,Anita,bus_01,sentence,Where is the bus stop?,where is the bus stop,5,5,3,tiny.en,scored,420", lines[1])
+    }
+
+    @Test
+    fun `Settings shows the teacher note, the voices and the data folder`() {
+        compose.setContent { Settings(ready, parts) }
+        compose.onNodeWithText("To be checked by an English teacher").assertExists()
+        compose.onNodeWithText("English: ", substring = true).assertExists()
+        compose.onNodeWithText(ready.dataDir.path).assertExists()
     }
 
     @Test

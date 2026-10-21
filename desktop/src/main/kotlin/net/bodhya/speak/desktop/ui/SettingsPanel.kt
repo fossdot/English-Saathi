@@ -44,12 +44,25 @@ class SettingsActions(
     /** Returns what is wrong with the name, or null once renamed. */
     val rename: (id: String, name: String) -> Message?,
     val delete: (id: String) -> Unit,
+    /** Shows the data folder in Finder. */
+    val openDataFolder: () -> Unit,
+)
+
+/** What Settings shows about this Mac. */
+class SettingsInfo(
+    val english: String?,
+    val hindi: String?,
+    /** Where to download clearer voices, in Apple's words for this Mac's macOS. */
+    val voicesPath: String,
+    val dataFolder: String,
+    val logFile: String,
 )
 
 /**
  * The facilitator's settings (⌘,; no button on the student screens): the
  * students, the speech model, the microphone input and its 1-second check,
- * and the speech check with its test clips.
+ * the voices found, the data folder, and the speech check with its test
+ * clips (milestone D8).
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -59,10 +72,12 @@ fun SettingsPanel(
     inputs: List<String>,
     clips: List<String>,
     students: List<Learner>,
+    info: SettingsInfo,
     actions: SettingsActions,
 ) {
     Column(Modifier.fillMaxSize().background(Colors.bg).verticalScroll(rememberScrollState()).padding(28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Bilingual("Settings", "सेटिंग", size = 26.sp, bold = true)
+        MessageBox(MessageKind.INFO, TEACHER_NOTE)
         Line("Students", bold = true)
         if (students.isEmpty()) Line("No students yet.", color = Colors.muted)
         for (learner in students) StudentRow(learner, actions)
@@ -80,6 +95,13 @@ fun SettingsPanel(
             }
         }
         PilotButton("Check the microphone (1 second)", "माइक जाँचिए", actions.checkMicrophone)
+        Line("Voices", bold = true)
+        Line("English: ${info.english ?: "missing"} · Hindi: ${info.hindi ?: "missing"}", color = if (info.english == null || info.hindi == null) Colors.badInk else Colors.ink)
+        Line("Clearer voices are a free download: ${info.voicesPath}", color = Colors.muted)
+        Line("Data folder", bold = true)
+        Line(info.dataFolder, color = Colors.muted)
+        Line("Log: ${info.logFile}", color = Colors.muted)
+        PilotButton("Open the data folder", "डेटा फ़ोल्डर खोलिए", actions.openDataFolder)
         Line("Speech check (milestone D3): record any sentence and see what the model heard", bold = true)
         PilotButton("Open the speech check", "बोलकर जाँचिए", actions.openSpeechCheck)
         if (clips.isNotEmpty()) {

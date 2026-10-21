@@ -236,6 +236,28 @@ Within the plan; each is a setting or a small change.
 - **The goal screen's streak** is the count home shows; Enter is One more
   sentence, as in the pilot.
 
+### Choices made while building D8
+
+- **Results opens from the picker**, as in the pilot (a Results button next
+  to Hindi help). It and Settings show the "To be checked by an English
+  teacher" note; no student screen does.
+- **The summary** has the pilot's columns plus "Not heard" (owner's
+  answer), from sentence attempts only, in the order students first appear
+  in the log. **Every attempt** shows the newest 200, as in the pilot, and
+  says how many there are in all; the CSV has every row.
+- **Save as CSV…** opens the macOS Save dialog in Documents with the name
+  `english-saathi-results-<date>.csv` (the pilot's was
+  `english-pilot-results-<date>.csv`) and writes the file safely; the
+  screen says when it is saved or why it couldn't be. Rows are oldest
+  first, all students together, with each student's current name; fixing
+  tries are included, as in the pilot.
+- **Settings** gains the voices found (and where to download clearer
+  ones), the data folder and log with "Open the data folder" (Finder), and
+  the teacher note, alongside the students, model, microphone and speech
+  check.
+- The attempt log is read off the main thread when Results opens, so a
+  long log never freezes the window.
+
 ## Owner answers
 
 - **Profiles:** each learner picks a colour and one of about 8 drawn symbols.

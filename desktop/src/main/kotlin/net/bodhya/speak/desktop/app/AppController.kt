@@ -13,6 +13,10 @@ import net.bodhya.speak.desktop.data.AttemptResult
 import net.bodhya.speak.desktop.data.Card
 import net.bodhya.speak.desktop.data.Learner
 import net.bodhya.speak.desktop.data.LearnerStore
+import net.bodhya.speak.desktop.data.LoggedAttempt
+import net.bodhya.speak.desktop.data.Results
+import net.bodhya.speak.desktop.data.SafeFiles
+import net.bodhya.speak.desktop.data.StudentSummary
 import net.bodhya.speak.desktop.data.NameProblem
 import net.bodhya.speak.desktop.practice.Heard
 import net.bodhya.speak.desktop.practice.Listening
@@ -39,6 +43,7 @@ import net.bodhya.speak.domain.Tip
 import net.bodhya.speak.domain.WordToFix
 import net.bodhya.speak.speech.Recording
 import net.bodhya.speak.speech.WavWriter
+import java.io.File
 import java.time.Clock
 import java.time.LocalDate
 
@@ -64,9 +69,15 @@ sealed interface Screen {
     /** The daily goal was just reached: shown once per learner per day. */
     data object GoalDone : Screen
 
+    /** All students' results and the CSV, for the facilitator (milestone D8). */
+    data object Results : Screen
+
     /** Milestone D3's speech check, for the facilitator (Settings). */
     data object SpeechCheck : Screen
 }
+
+/** What the Results screen shows: every row of the attempt log, the summary and the latest attempts. */
+data class ResultsData(val rows: List<LoggedAttempt>, val summary: List<StudentSummary>, val recent: List<LoggedAttempt>)
 
 /** A learner as the picker shows them: their card, name and streak. */
 data class StudentCard(val learner: Learner, val streak: StreakView)
@@ -418,6 +429,34 @@ class AppController(
     /** The facilitator's speech check, from Settings. */
     fun speechCheck() = go { it.copy(screen = Screen.SpeechCheck, message = null) }
 
+    /** Results, from the picker. */
+    fun results() = go { it.copy(screen = Screen.Results, message = null) }
+
+    /** Reads the whole attempt log. Blocking: call it off the main thread. */
+    fun loadResults(): ResultsData {
+        val rows = store.allAttempts()
+        return ResultsData(rows, Results.summary(rows), Results.recent(rows))
+    }
+
+    /** The name the Save dialog suggests for the CSV. */
+    fun csvFileName(): String = Results.fileName(today())
+
+    /**
+     * Writes [rows] as the CSV to [file], the place chosen in the Save
+     * dialog, and says whether it worked. Blocking: call it off the main thread.
+     */
+    fun saveCsv(file: File, rows: List<LoggedAttempt>) {
+        val message = try {
+            SafeFiles.write(file, Results.csv(rows))
+            log("results saved: ${rows.size} rows to $file")
+            ShownMessage(MessageKind.OK, Message("Results saved: ${file.name}", "नतीजे सेव हो गए।"))
+        } catch (e: Exception) {
+            log("results not saved to $file: $e")
+            ShownMessage(MessageKind.PROBLEM, Message("The file couldn’t be saved: ${e.message ?: e}", "फ़ाइल सेव नहीं हुई।"))
+        }
+        _state.update { it.copy(message = message) }
+    }
+
     /** Hindi help: the current screen's instruction, spoken. */
     fun hindiHelp() = output.hindi(helpText(_state.value))
 
@@ -534,6 +573,7 @@ class AppController(
                 else -> "माइक दबाइए और पूरा वाक्य बोलिए।"
             }
             Screen.GoalDone -> "बहुत बढ़िया! आज का लक्ष्य पूरा हुआ। कल फिर आइए।"
+            Screen.Results -> "यहाँ सभी छात्रों के नतीजे हैं।"
         }
     }
 }

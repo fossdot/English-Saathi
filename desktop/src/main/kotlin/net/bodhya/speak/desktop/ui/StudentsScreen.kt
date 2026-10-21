@@ -57,6 +57,7 @@ import net.bodhya.speak.domain.StreakStatus
 class StudentsActions(
     val pick: (id: String) -> Unit,
     val newStudent: () -> Unit,
+    val results: () -> Unit,
     val help: () -> Unit,
 )
 
@@ -71,6 +72,7 @@ fun StudentsScreen(state: AppState, facilitator: @Composable () -> Unit, actions
     Page {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Gap) {
             Bilingual("Who is practising?", "कौन सीख रहा है?", Modifier.weight(1f), size = 28.sp, bold = true)
+            PilotButton("Results", "नतीजे", actions.results, leading = { Icon(Icons.chart, 22.dp, Colors.primaryInk) })
             HelpButton(actions.help)
         }
         facilitator()

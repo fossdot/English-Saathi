@@ -6,14 +6,16 @@ Offline Android app that helps Hindi speakers in rural Bihar practise spoken
 English. A learner says a sentence; the app finds the words that went wrong
 and walks them through fixing them.
 
-**Status:** milestones a and b of v0.1 are done.
-- a: the domain logic and its tests.
-- b: recording and on-device speech recognition, proven on test WAVs on the
-  emulator. The app has one temporary "Speech check" screen.
+**Status:** students will practise on a shared macOS laptop first, so the
+desktop app (`desktop/`, `docs/desktop-plan.md`) is ahead: D1–D8 are built
+(speech, voices, microphone, saved data, student picker, home, practice,
+feedback, the fixing loop, results and the CSV), in the web pilot's layout
+until the desktop designs arrive. Its MacBook trip (`docs/macbook-trip.md`)
+is still to come.
 
-The practice screens come in milestones c–f. Milestone c is on hold until
-the student pilots of the web version finish. This README will grow into the
-full one at the end of v0.1.
+On Android, milestones a (domain logic) and b (recording and on-device
+speech recognition) are done; Android is paused. This README will grow into
+the full one at the end of v0.1.
 
 ## Layout
 
@@ -22,8 +24,8 @@ full one at the end of v0.1.
 | `domain/` | Pure Kotlin rules, with no Android imports: normalizer, aligner, scoring, tip selection, fixing loop, streak, Leitner box, sentence choice |
 | `speech/` | Speech code shared by the Android and desktop apps, with no Android imports: recording, end-of-speech detection, the speech engine |
 | `app/` | The Android app. `speech/` holds the microphone and the Whisper recognizer; `ui/` holds the screens |
-| `desktop/` | The macOS desktop app (`docs/desktop-plan.md`). So far: Whisper through sherpa-onnx's Java library, the speech check (`docs/desktop-speech.md`) and the lesson loader |
-| `NOTICE` | Third-party code in the repo (Sonic, for slow speech) and its licence |
+| `desktop/` | The macOS desktop app (`docs/desktop-plan.md`): Whisper through sherpa-onnx's Java library, macOS voices, the student screens, saved data, results and the CSV, and the facilitator's speech check (`docs/desktop-speech.md`) |
+| `NOTICE` | Third-party code and fonts in the repo (Sonic, for slow speech; the Mukta font) and their licences |
 | `content/` | Lesson files in the agreed format (`docs/decisions.md`, "Word data scope") and the tip templates; all marked for teacher review |
 | `scripts/` | `fetch_deps.sh` downloads the speech library and model; `make_test_wavs.sh` makes test clips (macOS) |
 | `docs/decisions.md` | Everything agreed with the product owner, including where the Kotlin rules deliberately differ from the pilot |
@@ -76,7 +78,7 @@ for every APK, bundle and install.
 ./gradlew :desktop:test                 # desktop speech recognizer (with the real models) and lesson loader
 ./gradlew :desktop:speechCheck          # times both models on the test clips (docs/desktop-speech.md)
 ./gradlew :desktop:voiceCheck           # the voices the app picks; plays a sentence, its slow version and a Hindi line
-scripts/run_desktop.sh                  # the desktop app (for now, the speech check window), on Corretto 17
+scripts/run_desktop.sh                  # the desktop app, on Corretto 17 (--check opens the facilitator's speech check)
 ./gradlew :app:connectedDebugAndroidTest  # on a running emulator or phone
 ./gradlew check                         # unit tests, lint and the offline check
 ```

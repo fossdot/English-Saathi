@@ -146,7 +146,10 @@ in the MacBook trip's part D.
 - The goal screen once per learner per day, with "Practise again tomorrow"
   (words shown as written).
 
-**D8. Results, CSV, Settings** (after the pilots)
+**D8. Results, CSV, Settings**
+
+Status: built and tested on the Apple M4 (headless and off-screen tests);
+in the MacBook trip's part D. Opening the CSV in Excel is D9's check.
 - The pilot's two results tables; CSV through the macOS Save dialog with
   the pilot's nine columns plus `model`, `result` and `wait_ms`.
 - Settings (⌘,): model, voices found, microphone check, open the data

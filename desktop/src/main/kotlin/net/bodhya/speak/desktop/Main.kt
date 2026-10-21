@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -33,8 +34,10 @@ import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.bodhya.speak.desktop.app.AppController
+import net.bodhya.speak.desktop.app.ResultsData
 import net.bodhya.speak.desktop.app.Screen
 import net.bodhya.speak.desktop.check.SpeechCheckController
 import net.bodhya.speak.desktop.check.SpeechOutput
@@ -60,6 +63,9 @@ import net.bodhya.speak.desktop.ui.NewStudentActions
 import net.bodhya.speak.desktop.ui.NewStudentScreen
 import net.bodhya.speak.desktop.ui.PracticeActions
 import net.bodhya.speak.desktop.ui.PracticeScreen
+import net.bodhya.speak.desktop.ui.ResultsActions
+import net.bodhya.speak.desktop.ui.ResultsScreen
+import net.bodhya.speak.desktop.ui.SettingsInfo
 import net.bodhya.speak.desktop.ui.SettingsActions
 import net.bodhya.speak.desktop.ui.SettingsPanel
 import net.bodhya.speak.desktop.ui.Shortcut
@@ -71,11 +77,13 @@ import net.bodhya.speak.desktop.ui.StudentsScreen
 import net.bodhya.speak.desktop.voice.Speaker
 import net.bodhya.speak.desktop.voice.Speeds
 import net.bodhya.speak.desktop.voice.Voice
+import net.bodhya.speak.desktop.voice.VoiceHelp
 import net.bodhya.speak.domain.Streaks
 import net.bodhya.speak.speech.EngineState
 import net.bodhya.speak.speech.WavReader
 import net.bodhya.speak.speech.WavWriter
 import java.awt.Desktop
+import java.awt.FileDialog
 import java.awt.desktop.PreferencesHandler
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -217,7 +225,7 @@ fun main(args: Array<String>) {
                             }
                             prepared = true
                         }
-                        Screens(ready, parts, prepared)
+                        Screens(ready, parts, prepared, chooseCsvFile = { name -> chooseSaveFile(window, name) })
                         if (showSettings) {
                             DialogWindow(onCloseRequest = { showSettings = false }, title = "Settings", state = rememberDialogState(size = DpSize(760.dp, 720.dp))) {
                                 Settings(ready, parts)
@@ -264,9 +272,13 @@ internal class AppParts(val app: AppController, val check: SpeechCheckController
     }
 }
 
-/** The main window's current screen. */
+/**
+ * The main window's current screen. [chooseCsvFile] shows the macOS Save
+ * dialog with a suggested name and returns the chosen file, or null if the
+ * facilitator cancelled.
+ */
 @Composable
-internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean) {
+internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsvFile: (String) -> File? = { null }) {
     val a = parts.app
     val c = parts.check
     val state by a.state.collectAsState()
@@ -278,7 +290,7 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean) {
         Screen.Students -> StudentsScreen(
             state,
             facilitator = { StartNotes(recognition, ready.notices, checkState, problems) },
-            StudentsActions(a::pick, a::newStudent, a::hindiHelp),
+            StudentsActions(a::pick, a::newStudent, a::results, a::hindiHelp),
         )
         Screen.NewStudent -> NewStudentScreen(
             state.students.map { it.learner.card }.toSet(), state.message?.message,
@@ -299,6 +311,22 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean) {
             val streak = Streaks.view(state.progress.streak, state.today, a.config)
             GoalScreen(state, streak.days, streak.status, remember(state.progress) { a.wordsForTomorrow() }, GoalActions(a::startPractice, a::showStudents, a::home, a::hindiHelp))
         }
+        Screen.Results -> {
+            var data by remember { mutableStateOf<ResultsData?>(null) }
+            LaunchedEffect(Unit) { data = withContext(Dispatchers.IO) { a.loadResults() } }
+            val scope = rememberCoroutineScope()
+            ResultsScreen(
+                state, data, ready.lesson.sentences.size,
+                ResultsActions(
+                    back = a::showStudents,
+                    save = {
+                        val rows = data?.rows.orEmpty()
+                        chooseCsvFile(a.csvFileName())?.let { file -> scope.launch(Dispatchers.IO) { a.saveCsv(file, rows) } }
+                    },
+                    help = a::hindiHelp,
+                ),
+            )
+        }
         Screen.SpeechCheck -> SpeechCheckScreen(
             ready.lesson, checkState, recognition,
             CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared),
@@ -318,6 +346,7 @@ internal fun Settings(ready: Setup, parts: AppParts) {
     val recognition by ready.recognition.state.collectAsState()
     SettingsPanel(
         recognition.model, checkState.input, ready.inputs, ready.clips.keys.toList(), state.students.map { it.learner },
+        SettingsInfo(ready.english?.name, ready.hindi?.name, VoiceHelp.settingsPath(System.getProperty("os.version")), ready.dataDir.path, ready.log.file.path),
         SettingsActions(
             chooseModel = c::chooseModel,
             chooseInput = c::chooseInput,
@@ -326,8 +355,19 @@ internal fun Settings(ready: Setup, parts: AppParts) {
             runClip = { clip -> a.speechCheck(); c.runClip(clip) },
             rename = a::renameStudent,
             delete = a::deleteStudent,
+            openDataFolder = { runCatching { Desktop.getDesktop().open(ready.dataDir) }.onFailure { ready.log.write("could not open the data folder: $it") } },
         ),
     )
+}
+
+/** The macOS Save dialog for the CSV, suggesting [name] in Documents; a ".csv" is added if the name lost it. */
+private fun chooseSaveFile(parent: java.awt.Frame, name: String): File? {
+    val dialog = FileDialog(parent, "Save the results", FileDialog.SAVE)
+    dialog.directory = File(System.getProperty("user.home"), "Documents").path
+    dialog.file = name
+    dialog.isVisible = true
+    val file = dialog.file ?: return null
+    return File(dialog.directory, if (file.endsWith(".csv", ignoreCase = true)) file else "$file.csv")
 }
 
 /** A second copy of the app was started: say so and quit, leaving the first one's data alone. */
