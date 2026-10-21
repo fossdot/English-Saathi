@@ -65,10 +65,11 @@ class CheckActions(
 
 /** Milestone D3's speech check, in the pilot's laptop layout: the sentence on the left, the mic and result on the right. */
 @Composable
-fun SpeechCheckScreen(lesson: Lesson, state: SpeechCheckState, recognition: RecognitionState, info: CheckInfo, actions: CheckActions) {
+fun SpeechCheckScreen(lesson: Lesson, state: SpeechCheckState, recognition: RecognitionState, info: CheckInfo, actions: CheckActions, onBack: (() -> Unit)? = null) {
     val sentence = lesson.sentences[state.sentence]
     Column(Modifier.fillMaxSize().background(Colors.bg).verticalScroll(rememberScrollState()).padding(horizontal = 40.dp, vertical = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Gap) {
+            onBack?.let { RoundIconButton(Icons.back, "Back to students", it, plain = true) }
             Bilingual("Speech check", "बोलकर जाँचिए", Modifier.weight(1f), size = 28.sp, bold = true)
             ModelBadge(recognition)
             PilotButton("Hindi help", "हिंदी में सुनिए", actions.hindiHelp, enabled = info.hindi != null)
@@ -94,7 +95,7 @@ fun SpeechCheckScreen(lesson: Lesson, state: SpeechCheckState, recognition: Reco
             }
             Column(Modifier.weight(1f).background(Colors.surface, RoundedCornerShape(28.dp)).padding(28.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 MicBlock(state, recognition, actions)
-                state.message?.let { MessageBox(it.kind, it.message) }
+                state.message?.let { MessageBox(it.kind, it.message, onPanel = true) }
                 state.result?.let { ResultBlock(lesson, it) }
             }
         }
@@ -140,7 +141,7 @@ private fun MicBlock(state: SpeechCheckState, recognition: RecognitionState, act
 
 /** The model in use, at the top where a facilitator can't miss it (every result depends on it). */
 @Composable
-private fun ModelBadge(recognition: RecognitionState) {
+fun ModelBadge(recognition: RecognitionState) {
     val (bg, fg, status) = when (recognition.engine) {
         EngineState.Loading -> Triple(Colors.surface, Colors.ink, " · loading…")
         is EngineState.Ready -> Triple(Colors.primarySoft, Colors.primaryInk, "")
@@ -150,18 +151,6 @@ private fun ModelBadge(recognition: RecognitionState) {
     val hi = if (recognition.model == SpeechModel.TINY_EN) "तेज़" else "ज़्यादा सही"
     Box(Modifier.background(bg, RoundedCornerShape(16.dp)).padding(horizontal = 16.dp, vertical = 8.dp).testTag("model")) {
         Bilingual("Speech model: ${recognition.model.id}$status", "मॉडल: $hi", size = 20.sp, color = fg, bold = true)
-    }
-}
-
-@Composable
-private fun MessageBox(kind: MessageKind, message: Message) {
-    val (bg, fg) = when (kind) {
-        MessageKind.PROBLEM -> Colors.badSoft to Colors.badInk
-        MessageKind.OK -> Colors.okSoft to Colors.okInk
-        MessageKind.INFO -> Colors.bg to Colors.ink
-    }
-    Box(Modifier.fillMaxWidth().background(bg, RoundedCornerShape(16.dp)).padding(14.dp).testTag("message")) {
-        Bilingual(message.en, message.hi, size = 17.sp, color = fg)
     }
 }
 

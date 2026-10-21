@@ -1,7 +1,9 @@
 package net.bodhya.speak.desktop
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -22,6 +24,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -31,31 +34,37 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
+import net.bodhya.speak.desktop.app.AppController
+import net.bodhya.speak.desktop.app.Screen
 import net.bodhya.speak.desktop.check.SpeechCheckController
 import net.bodhya.speak.desktop.check.SpeechOutput
-import net.bodhya.speak.desktop.content.LessonLoader
+import net.bodhya.speak.desktop.data.AppLock
 import net.bodhya.speak.desktop.mic.JavaSoundPcmSource
 import net.bodhya.speak.desktop.mic.MicAccess
-import net.bodhya.speak.desktop.speech.ModelSwitcher
-import net.bodhya.speak.desktop.speech.NativeLibraries
+import net.bodhya.speak.desktop.ui.BigButton
+import net.bodhya.speak.desktop.ui.Bilingual
 import net.bodhya.speak.desktop.ui.CheckActions
 import net.bodhya.speak.desktop.ui.CheckInfo
 import net.bodhya.speak.desktop.ui.Colors
+import net.bodhya.speak.desktop.ui.HomeActions
+import net.bodhya.speak.desktop.ui.HomeScreen
+import net.bodhya.speak.desktop.ui.Icons
 import net.bodhya.speak.desktop.ui.Line
+import net.bodhya.speak.desktop.ui.NewStudentActions
+import net.bodhya.speak.desktop.ui.NewStudentScreen
+import net.bodhya.speak.desktop.ui.Page
+import net.bodhya.speak.desktop.ui.RoundIconButton
+import net.bodhya.speak.desktop.ui.SettingsActions
 import net.bodhya.speak.desktop.ui.SettingsPanel
 import net.bodhya.speak.desktop.ui.Shortcut
 import net.bodhya.speak.desktop.ui.ShortcutKeys
 import net.bodhya.speak.desktop.ui.SpeechCheckScreen
-import net.bodhya.speak.desktop.voice.Message
-import net.bodhya.speak.desktop.voice.SayRenderer
+import net.bodhya.speak.desktop.ui.StartNotes
+import net.bodhya.speak.desktop.ui.StudentsActions
+import net.bodhya.speak.desktop.ui.StudentsScreen
 import net.bodhya.speak.desktop.voice.Speaker
 import net.bodhya.speak.desktop.voice.Speeds
 import net.bodhya.speak.desktop.voice.Voice
-import net.bodhya.speak.desktop.voice.VoiceHelp
-import net.bodhya.speak.desktop.voice.VoiceRole
-import net.bodhya.speak.domain.GameConfig
-import net.bodhya.speak.domain.Lesson
-import net.bodhya.speak.speech.AsrSettings
 import net.bodhya.speak.speech.WavReader
 import net.bodhya.speak.speech.WavWriter
 import java.awt.Desktop
@@ -65,103 +74,6 @@ import java.awt.event.WindowEvent
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
-
-/** Threads for Whisper: D1 measured 4 as the useful number under Rosetta; the MacBook trip checks 2, 4 and 6. */
-private const val THREADS = 4
-
-/** Everything the window needs, made once at start, off the main thread. */
-internal class Setup(
-    val projectDir: File,
-    val dataDir: File,
-    val log: SessionLog,
-    val lesson: Lesson,
-    val recognition: ModelSwitcher,
-    val speaker: Speaker,
-    val english: Voice?,
-    val hindi: Voice?,
-    val notices: List<Message>,
-    val inputs: List<String>,
-    /** The input to start on: the saved one, or the built-in microphone when it isn't connected. */
-    val input: String?,
-    val settings: SettingsFile,
-    val clips: Map<String, File>,
-) {
-    companion object {
-        fun create(projectDir: File, dataDir: File = DataFolder.default): Setup {
-            val excluded = DataFolder.prepare(dataDir)
-            val log = SessionLog(File(dataDir, "logs/speech-check.log"))
-            log.write("== English Saathi speech check (milestone D3)")
-            log.write("machine: ${command("sysctl", "-n", "machdep.cpu.brand_string")}; macOS ${System.getProperty("os.version")}; " +
-                "os.arch ${System.getProperty("os.arch")} (${if (command("sysctl", "-n", "sysctl.proc_translated") == "1") "under Rosetta" else "native"})")
-            log.write("data folder $dataDir: ${if (excluded) "excluded from Time Machine" else "NOT excluded from Time Machine"}")
-            val notices = mutableListOf<Message>()
-
-            val java = MicAccess.checkJava()
-            log.write("java: ${java.vendor} ${System.getProperty("java.runtime.version")} at ${java.javaPath}; hardened runtime ${java.hardened}, " +
-                "audio-input entitlement ${java.hasAudioEntitlement} -> ${if (java.canRecord) "can record" else "CANNOT record"}")
-            if (!java.canRecord) {
-                notices += Message(
-                    "This Java (${java.vendor}) can't use the microphone: it only ever records silence. Install Amazon Corretto 17 and start English Saathi with scripts/run_desktop.sh.",
-                    "यह Java माइक इस्तेमाल नहीं कर सकता। Amazon Corretto 17 इंस्टॉल करके scripts/run_desktop.sh से खोलिए।",
-                )
-            }
-            log.write("microphone permission (for the app that started Gradle): ${MicAccess.permission()}")
-            val inputs = MicAccess.inputs()
-            log.write("inputs: ${inputs.joinToString()}")
-
-            val settings = SettingsFile(File(dataDir, "settings.json"))
-            val saved = settings.read { log.write("settings: $it") }
-            val input = MicAccess.restoreInput(saved.input, inputs, MicAccess::builtInInput)
-            log.write("settings: model ${saved.model.id}, microphone ${saved.input ?: "Mac's default"}" +
-                if (input != saved.input) " (not connected: using ${input ?: "Mac's default"})" else "")
-            if (input != saved.input) notices += inputMissing(saved.input!!, input)
-
-            NativeLibraries.use(File(projectDir, "desktop/native"))
-            val config = GameConfig()
-            val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
-            val loaded = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, config)
-            loaded.warnings.forEach { log.write("lesson warning: $it") }
-
-            val renderer = SayRenderer()
-            val voices = renderer.listVoices()
-            val macOs = System.getProperty("os.version")
-            val english = voices.choose(VoiceRole.ENGLISH) ?: voices.englishFallback().also {
-                notices += VoiceHelp.englishMissing(macOs, it)
-            }
-            val hindi = voices.choose(VoiceRole.HINDI)
-            if (hindi == null) notices += VoiceHelp.hindiMissing(macOs)
-            log.write("voices: English ${english?.name ?: "none"}, Hindi ${hindi?.name ?: "none"} (en_IN: " +
-                "${voices.all.filter { it.locale == "en_IN" }.joinToString { it.name }}; hi_IN: ${voices.all.filter { it.locale == "hi_IN" }.joinToString { it.name }})")
-
-            val clips = (listOf(File(projectDir, "app/src/androidTest/assets/asr-test/librispeech-0.wav")) +
-                (1..5).map { File(projectDir, "app/src/debug/assets/asr-test/bus_0$it.wav") }).filter { it.isFile }.associateBy { it.name }
-
-            return Setup(
-                projectDir, dataDir, log, loaded.lesson,
-                ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), saved.model).also { log.write("model ${saved.model.id}, $THREADS threads") },
-                Speaker(renderer), english, hindi, notices, inputs, input, settings, clips,
-            )
-        }
-
-        /** Drafted for the desktop app; needs the teacher review. */
-        fun inputMissing(saved: String, using: String?): Message = if (using != null) {
-            Message(
-                "The chosen microphone \"$saved\" isn't connected, so the Mac's built-in microphone ($using) is used. To use \"$saved\", connect it and open English Saathi again.",
-                "चुना हुआ माइक \"$saved\" जुड़ा नहीं है, इसलिए Mac में लगा माइक इस्तेमाल हो रहा है। \"$saved\" के लिए उसे जोड़कर English Saathi फिर से खोलिए।",
-            )
-        } else {
-            Message(
-                "The chosen microphone \"$saved\" isn't connected, and no built-in microphone was found, so the Mac's default microphone is used. Check the microphone in Settings (⌘,).",
-                "चुना हुआ माइक \"$saved\" जुड़ा नहीं है, इसलिए Mac का अपना माइक इस्तेमाल हो रहा है। Settings (⌘,) में माइक जाँचिए।",
-            )
-        }
-
-        private fun command(vararg cmd: String) = runCatching {
-            val p = ProcessBuilder(*cmd).redirectErrorStream(true).start()
-            p.inputStream.bufferedReader().readText().trim().also { p.waitFor() }
-        }.getOrDefault("?")
-    }
-}
 
 /**
  * Plays English and Hindi speech one at a time on its own thread. [stop]
@@ -196,17 +108,26 @@ private class MacSpeechOutput(private val speaker: Speaker, private val englishV
 
 fun main(args: Array<String>) {
     val projectDir = File(args.firstOrNull() ?: ".").absoluteFile
+    // Taken before anything else: a second copy would overwrite the first one's progress.
+    val lock = AppLock.acquire(DataFolder.default)
+    // scripts/run_desktop.sh --check opens the facilitator's speech check (the MacBook trip).
+    val startOnCheck = System.getenv("ENGLISH_SAATHI_SCREEN") == "check"
     application {
+        if (lock == null) {
+            AlreadyOpen(::exitApplication)
+            return@application
+        }
         var setup by remember { mutableStateOf<Result<Setup>?>(null) }
         LaunchedEffect(Unit) { setup = withContext(Dispatchers.IO) { runCatching { Setup.create(projectDir) } } }
         val windowState = rememberWindowState(size = DpSize(1280.dp, 880.dp))
         var showSettings by remember { mutableStateOf(false) }
         val keys = remember { ShortcutKeys() }
-        var controller by remember { mutableStateOf<SpeechCheckController?>(null) }
+        var app by remember { mutableStateOf<AppController?>(null) }
+        var check by remember { mutableStateOf<SpeechCheckController?>(null) }
 
         Window(
             onCloseRequest = ::exitApplication,
-            title = "English Saathi · Speech check",
+            title = "English Saathi",
             state = windowState,
             onKeyEvent = { e ->
                 val down = e.type == KeyEventType.KeyDown
@@ -214,12 +135,21 @@ fun main(args: Array<String>) {
                     showSettings = true
                     return@Window true
                 }
-                val c = controller ?: return@Window false
-                when (keys.onKey(e.key, down, e.isMetaPressed || e.isCtrlPressed || e.isAltPressed, typing = false)) {
-                    Shortcut.SPEAK, Shortcut.PRIMARY -> c.toggleRecording()
-                    Shortcut.LISTEN -> c.listen(slow = false)
-                    Shortcut.SLOWLY -> c.listen(slow = true)
-                    null -> return@Window false
+                val a = app ?: return@Window false
+                val screen = a.state.value.screen
+                val shortcut = keys.onKey(e.key, down, e.isMetaPressed || e.isCtrlPressed || e.isAltPressed, typing = screen == Screen.NewStudent)
+                    ?: return@Window false
+                when (screen) {
+                    Screen.Home -> if (shortcut == Shortcut.PRIMARY) a.startPractice() else return@Window false
+                    Screen.SpeechCheck -> {
+                        val c = check ?: return@Window false
+                        when (shortcut) {
+                            Shortcut.SPEAK, Shortcut.PRIMARY -> c.toggleRecording()
+                            Shortcut.LISTEN -> c.listen(slow = false)
+                            Shortcut.SLOWLY -> c.listen(slow = true)
+                        }
+                    }
+                    else -> return@Window false
                 }
                 true
             },
@@ -235,15 +165,17 @@ fun main(args: Array<String>) {
                 null -> Message("Starting… (loading the speech library, the lesson and the voices)")
                 else -> s.fold(
                     onSuccess = { ready ->
-                        val c = remember(ready) { newController(ready) }
-                        LaunchedEffect(c) {
-                            controller = c
+                        val parts = remember(ready) { AppParts.create(ready, startOnCheck) }
+                        LaunchedEffect(parts) {
+                            app = parts.app
+                            check = parts.check
                             ready.log.write("window: render API ${window.renderApi}")
-                            c.checkMicrophone()
+                            // At every start, so the macOS prompt appears while the facilitator is there.
+                            parts.check.checkMicrophone()
                         }
-                        DisposableEffect(c) {
+                        DisposableEffect(parts) {
                             val focus = object : WindowAdapter() {
-                                override fun windowLostFocus(e: WindowEvent) = c.leave()
+                                override fun windowLostFocus(e: WindowEvent) = parts.leave()
                             }
                             window.addWindowFocusListener(focus)
                             onDispose { window.removeWindowFocusListener(focus) }
@@ -257,19 +189,10 @@ fun main(args: Array<String>) {
                             }
                             prepared = true
                         }
-                        val state by c.state.collectAsState()
-                        val recognition by ready.recognition.state.collectAsState()
-                        SpeechCheckScreen(
-                            ready.lesson, state, recognition,
-                            CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared),
-                            CheckActions(c::selectSentence, c::listen, c::hindiHelp, c::toggleRecording),
-                        )
+                        Screens(ready, parts, prepared)
                         if (showSettings) {
-                            DialogWindow(onCloseRequest = { showSettings = false }, title = "Settings", state = rememberDialogState(size = DpSize(760.dp, 640.dp))) {
-                                SettingsPanel(
-                                    recognition.model, state.input, ready.inputs, ready.clips.keys.toList(),
-                                    onModel = c::chooseModel, onInput = c::chooseInput, onCheckMicrophone = c::checkMicrophone, onClip = c::runClip,
-                                )
+                            DialogWindow(onCloseRequest = { showSettings = false }, title = "Settings", state = rememberDialogState(size = DpSize(760.dp, 720.dp))) {
+                                Settings(ready, parts)
                             }
                         }
                     },
@@ -280,10 +203,102 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun newController(ready: Setup) = SpeechCheckController(
+/** The controllers behind the main window, made once [Setup] is ready. */
+internal class AppParts(val app: AppController, val check: SpeechCheckController) {
+    /** Leaving the window (another app comes to the front) stops listening and speech. */
+    fun leave() = check.leave()
+
+    companion object {
+        fun create(ready: Setup, startOnCheck: Boolean = false): AppParts {
+            val output = MacSpeechOutput(ready.speaker, ready.english, ready.hindi, ready.log)
+            val app = AppController(ready.store, ready.lesson, output, log = ready.log::write)
+            if (startOnCheck) app.speechCheck()
+            return AppParts(app, newController(ready, output))
+        }
+    }
+}
+
+/** The main window's current screen. */
+@Composable
+internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean) {
+    val a = parts.app
+    val c = parts.check
+    val state by a.state.collectAsState()
+    val checkState by c.state.collectAsState()
+    val recognition by ready.recognition.state.collectAsState()
+    val problems by ready.dataProblems.collectAsState()
+    when (val screen = state.screen) {
+        Screen.Students -> StudentsScreen(
+            state,
+            facilitator = { StartNotes(recognition, ready.notices, checkState, problems) },
+            StudentsActions(a::pick, a::newStudent, a::hindiHelp),
+        )
+        Screen.NewStudent -> NewStudentScreen(
+            state.students.map { it.learner.card }.toSet(), state.message?.message,
+            NewStudentActions(a::addStudent, a::showStudents, a::hindiHelp),
+        )
+        Screen.Home -> HomeScreen(state, ready.lesson, a.config, HomeActions(a::startPractice, a::openSentence, a::showStudents, a::hindiHelp))
+        is Screen.Practice -> PracticeToCome(ready.lesson.sentences[screen.sentence].text, a::home)
+        Screen.SpeechCheck -> SpeechCheckScreen(
+            ready.lesson, checkState, recognition,
+            CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared),
+            CheckActions(c::selectSentence, c::listen, c::hindiHelp, c::toggleRecording),
+            onBack = a::showStudents,
+        )
+    }
+}
+
+/** The Settings window's content (⌘,). */
+@Composable
+internal fun Settings(ready: Setup, parts: AppParts) {
+    val a = parts.app
+    val c = parts.check
+    val state by a.state.collectAsState()
+    val checkState by c.state.collectAsState()
+    val recognition by ready.recognition.state.collectAsState()
+    SettingsPanel(
+        recognition.model, checkState.input, ready.inputs, ready.clips.keys.toList(), state.students.map { it.learner },
+        SettingsActions(
+            chooseModel = c::chooseModel,
+            chooseInput = c::chooseInput,
+            checkMicrophone = c::checkMicrophone,
+            openSpeechCheck = a::speechCheck,
+            runClip = { clip -> a.speechCheck(); c.runClip(clip) },
+            rename = a::renameStudent,
+            delete = a::deleteStudent,
+        ),
+    )
+}
+
+/** A second copy of the app was started: say so and quit, leaving the first one's data alone. */
+@Composable
+private fun AlreadyOpen(exit: () -> Unit) {
+    Window(onCloseRequest = exit, title = "English Saathi", state = rememberWindowState(size = DpSize(560.dp, 300.dp)), resizable = false) {
+        Column(Modifier.fillMaxSize().background(Colors.bg).padding(28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+            // Drafted for the desktop app; needs the teacher review.
+            Bilingual(
+                "English Saathi is already open. Use the window that is open, or quit it first (⌘Q).",
+                "English Saathi पहले से खुला है। खुली हुई विंडो इस्तेमाल कीजिए।",
+                size = 20.sp,
+            )
+            BigButton("OK", "ठीक है", exit)
+        }
+    }
+}
+
+/** Until milestone D6 builds the practice screen. */
+@Composable
+private fun PracticeToCome(sentence: String, home: () -> Unit) {
+    Page {
+        RoundIconButton(Icons.close, "Close and go home", home, plain = true)
+        Bilingual(sentence, "अभ्यास की स्क्रीन अगले चरण (D6) में आएगी।", size = 28.sp, bold = true)
+    }
+}
+
+private fun newController(ready: Setup, output: SpeechOutput) = SpeechCheckController(
     lesson = ready.lesson,
     recognition = ready.recognition,
-    output = MacSpeechOutput(ready.speaker, ready.english, ready.hindi, ready.log),
+    output = output,
     openMicrophone = { input -> JavaSoundPcmSource(input) },
     permission = MicAccess::permission,
     readClip = { name -> ready.clips.getValue(name).inputStream().use { WavReader.readPcm16Mono(it) } },

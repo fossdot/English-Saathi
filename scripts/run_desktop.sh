@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
-# Starts the desktop app from Terminal (docs/desktop-plan.md). For now this is
-# milestone D3's speech check window. macOS asks whether *Terminal* may use
-# the microphone: the app runs inside Terminal's permission.
+# Starts the desktop app from Terminal (docs/desktop-plan.md). It opens at the
+# student picker; `scripts/run_desktop.sh --check` opens the facilitator's
+# speech check instead (the MacBook trip, docs/macbook-trip.md). macOS asks
+# whether *Terminal* may use the microphone: the app runs inside Terminal's
+# permission.
 #
 # It runs on Amazon Corretto 17 when installed: Temurin's Java can't use the
 # microphone (docs/desktop-plan.md, "Why Corretto, not Temurin").
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+if [ "${1:-}" = "--check" ]; then
+  export ENGLISH_SAATHI_SCREEN=check
+fi
 
 corretto=""
 for home in /Library/Java/JavaVirtualMachines/*/Contents/Home; do

@@ -8,6 +8,10 @@ for now (no signing or notarization).
 
 **Go-ahead:** D1–D4 now. D5–D9 wait until this week's student pilots are
 done, because the pilots may change the practice and feedback screens.
+**Changed 2026-10-21:** students use the desktop app for the next three
+months, so D5–D8 start now, in the pilot's layout until the desktop screen
+designs arrive; D8 (results and CSV) is in scope from the start, as the
+evidence at the end of the three months.
 
 Milestones are called D1–D9 so they don't clash with the Android
 milestones a–f. "MacBook run" means one command on a real 2019 MacBook
@@ -105,7 +109,10 @@ Status: done. `:domain` has the two rules and the lesson-level word table;
 - Done when every domain test passes, and the only tests that changed are
   the ones `docs/decisions.md` says will change.
 
-**D5. Saved data, student picker, home** (after the pilots)
+**D5. Saved data, student picker, home**
+
+Status: built and tested on the Apple M4 (headless and off-screen tests);
+the student screens are in the MacBook trip's part D.
 - `~/Library/Application Support/English Saathi`: learners, progress
   (Leitner order kept), attempt log, latest recording per sentence per
   learner (sentence attempts only), settings. Excluded from Time Machine.

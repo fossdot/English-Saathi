@@ -5,11 +5,11 @@ after milestone b ("Content decisions for milestone c"). These settle the
 gaps between the spec, the design mockup (`design/`) and the web pilot
 (`docs/pilot/english-practice-pilot.html`).
 
-**Status (2026-10-20):** the macOS desktop app comes first and Android is
+**Status (2026-10-21):** the macOS desktop app comes first and Android is
 paused (see "Direction change" below). The desktop plan is
-`docs/desktop-plan.md` (milestones D1–D9). D1–D4 are approved; D5–D9 (the
-screens) wait until this week's student pilots are done, because they may
-change the practice and feedback screens.
+`docs/desktop-plan.md` (milestones D1–D9). D1–D4 are done. Students will use
+the desktop app for the next three months, so D5–D8 started on 2026-10-21
+without waiting for the pilots (see "Desktop screens: owner answers").
 
 ## Direction change: macOS desktop app first (2026-10-19)
 
@@ -142,6 +142,58 @@ Within the plan; each is a setting or a small change.
 - **Icons are drawn**, from the pilot's own SVG paths (`ui/Icons.kt`): the
   mic and stop buttons, stars instead of "3 stars", and the chips' check,
   retry and dash marks, which were text characters.
+
+## Desktop screens: owner answers (2026-10-21)
+
+- **Start D5–D8 now** (owner): students use the desktop app for the next
+  three months. Data layer and student picker first; the desktop screen
+  designs come separately, so the screens follow the pilot's laptop layout
+  until then. D8 (results and CSV) is in scope from the start: it is the
+  evidence at the end of the three months.
+- **Results summary:** "Sentence attempts" counts heard attempts only, as
+  in the pilot, and a separate "Not heard" column counts the "Didn't hear
+  you" attempts (owner's choice of the recommended option).
+- **CSV time:** the Mac's local time, `2026-10-21 13:45:30`, which Excel
+  reads as a date and time (the pilot wrote UTC,
+  `2026-10-21T08:15:30.000Z`).
+- **Commits:** one per milestone, pushed once its tests pass.
+
+### Choices made while building D5
+
+Within the plan; each is a setting or a small change.
+
+- **One folder per learner** in the data folder:
+  `learners/<id>/learner.json` (name, card, when added),
+  `progress.json`, `attempts/<day>.jsonl` (the attempt log, one row per
+  line, rewritten whole for each row) and `recordings/<sentence>.wav`.
+  Deleting a student renames the folder first and then removes it, so the
+  student disappears at once even if the delete is cut short; the next
+  start finishes it.
+- **No half-written files:** every file is written to a temporary file,
+  flushed to the disk and moved over the old one. A file that can't be
+  read is reported on the picker and in the log, never silently replaced:
+  a damaged progress file is kept as `progress.damaged-<time>.json` before
+  the learner starts afresh.
+- **A second copy refuses to start**: it shows a small window saying
+  English Saathi is already open. The lock is released by macOS when the
+  app ends, even after a crash.
+- **Names and cards are unique** (names compared without case or extra
+  spaces), because Results and the CSV show the name. Names are up to 40
+  letters, as in the pilot. Rename and delete are in Settings (⌘,), not on
+  student screens; delete asks for a confirmation.
+- **Cards:** 8 colours × 8 drawn symbols (sun, moon, star, flower, leaf,
+  fish, kite, house), so up to 64 learners. Provisional until the desktop
+  designs arrive. The learner chooses the card on the new-student screen;
+  the facilitator types the name there.
+- **The picker shows what the facilitator should know** before a student
+  starts: the speech model, problems found at start (voices, Java, a
+  microphone that isn't connected, the start-up microphone check) and saved
+  data that couldn't be read.
+- **The speech check** moved behind Settings ("Open the speech check");
+  `scripts/run_desktop.sh --check` opens it directly for the MacBook trip.
+- **Hindi help on the picker and the new-student screen** uses drafted
+  lines (the pilot's picker line describes typing a name), marked for
+  teacher review with the other new messages.
 
 ## Owner answers
 

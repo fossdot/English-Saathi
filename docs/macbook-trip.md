@@ -40,10 +40,12 @@ caffeinate -i scripts/desktop_speech_check.sh
 ## C. D3: microphone and the window (about 25 minutes)
 
 Do this in the room where sessions happen, at a normal time of day.
+`--check` opens the facilitator's speech check instead of the student
+picker.
 
 ```sh
 cd ~/English-Saathi
-scripts/run_desktop.sh
+scripts/run_desktop.sh --check
 ```
 
 Starting up:
@@ -80,9 +82,9 @@ The other model:
       to load).
 - [ ] Repeat the 5 sentences. Note the "result after … s" figures: ____
       Is that wait acceptable for a student? ____
-- [ ] Quit the app (⌘Q) and run `scripts/run_desktop.sh` again. The top
-      of the window says **Speech model: small.en**, and Settings still
-      has the microphone chosen before.
+- [ ] Quit the app (⌘Q) and run `scripts/run_desktop.sh --check` again.
+      The top of the window says **Speech model: small.en**, and Settings
+      still has the microphone chosen before.
 
 Listening and keys:
 
@@ -98,8 +100,9 @@ When the microphone is blocked:
 - [ ] Quit the app (⌘Q). In System Settings › Privacy & Security ›
       Microphone, turn **Terminal** off (macOS may ask to quit Terminal:
       do it, and open Terminal again).
-- [ ] Run `scripts/run_desktop.sh` again. The app shows a red message that
-      the microphone is blocked, naming Terminal and the setting.
+- [ ] Run `scripts/run_desktop.sh --check` again. The app shows a red
+      message that the microphone is blocked, naming Terminal and the
+      setting.
 - [ ] Turn Terminal back on in System Settings, quit and restart the app,
       and check that recording works again.
 
@@ -117,7 +120,25 @@ Optional, if you have one:
 - [ ] AirPods or another Bluetooth headset: recording works, and note
       whether speech sounds worse while the microphone is in use.
 
-## D. Send back
+## D. The student screens (about 5 minutes)
+
+```sh
+scripts/run_desktop.sh
+```
+
+- [ ] The window opens at **Who is practising?**, with the speech model at
+      the top. Text is in the pilot's font (Mukta), Hindi joined up
+      correctly.
+- [ ] **New student**: choose a colour and a picture, type a name, press
+      **Add student**. Home shows the name, "0 / 5", "0 days" and "0 XP".
+- [ ] Click the name at the top left: back at the picker, the new card is
+      there, marked "New".
+- [ ] In a second Terminal window, run `scripts/run_desktop.sh` again: a
+      small window says English Saathi is already open. Press OK.
+- [ ] ⌘, › Students › **Delete…** › **Delete …**: the student disappears
+      from the picker.
+
+## E. Send back
 
 - [ ] `~/English-Saathi/desktop/build/speech-check/x86_64.log` (D1)
 - [ ] `~/Library/Application Support/English Saathi/logs/speech-check.log`

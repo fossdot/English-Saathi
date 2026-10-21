@@ -3,6 +3,7 @@ import java.security.MessageDigest
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.multiplatform)
 }
 
@@ -15,7 +16,7 @@ dependencies {
     implementation(project(":speech"))
     // sherpa-onnx's Java library has no Maven Central package; scripts/fetch_deps.sh downloads the release file.
     implementation(files("libs/sherpa-onnx-jvm-1.13.8.jar"))
-    // Lesson and hint files (content/).
+    // Lesson and hint files (content/) and the saved data.
     implementation(libs.kotlinx.serialization.json)
     // The window. currentOs is this Mac's Compose desktop build; both carry the Intel and Apple silicon graphics libraries.
     implementation(compose.desktop.currentOs)
