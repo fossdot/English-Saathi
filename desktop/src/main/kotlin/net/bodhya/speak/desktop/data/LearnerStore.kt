@@ -43,17 +43,27 @@ class LearnerStore(
         root.listFiles { f -> f.isDirectory && f.name.startsWith(DELETING) }?.forEach { it.deleteRecursively() }
     }
 
-    /** All learners, oldest first (the order of the picker). */
+    /**
+     * All learners, oldest first (the order of the picker). A learner whose
+     * file can't be read, or whose folder isn't named by its id (a folder
+     * copied in Finder, "s1 copy", would show the learner twice and count
+     * their attempts twice), is reported and left out.
+     */
     @Synchronized
     fun learners(): List<Learner> = (root.listFiles { f -> f.isDirectory && !f.name.startsWith(".") } ?: emptyArray())
         .mapNotNull { dir ->
             val file = File(dir, LEARNER)
             if (!file.isFile) return@mapNotNull null
-            runCatching { pretty.decodeFromString<Learner>(file.readText()) }
+            runCatching {
+                val learner = pretty.decodeFromString<Learner>(file.readText())
+                require(learner.id == dir.name && ID.matches(dir.name)) { "the folder isn't named by the learner's id \"${learner.id}\"" }
+                learner to OffsetDateTime.parse(learner.created).toInstant()
+            }
                 .onFailure { problem("$file could not be read: ${it.message ?: it}") }
                 .getOrNull()
         }
-        .sortedWith(compareBy({ OffsetDateTime.parse(it.created).toInstant() }, { it.id }))
+        .sortedWith(compareBy({ it.second }, { it.first.id }))
+        .map { it.first }
 
     fun learner(id: String): Learner? = learners().firstOrNull { it.id == id }
 
@@ -131,16 +141,18 @@ class LearnerStore(
         require(dirOf(id).isDirectory) { "no learner $id" }
         val file = File(dirOf(id), "$ATTEMPTS/${OffsetDateTime.parse(record.time).toLocalDate()}.jsonl")
         val old = if (file.isFile) file.readText() else ""
-        SafeFiles.write(file, old + oneLine.encodeToString(record) + "\n")
+        // A file whose last line lost its line break (edited by hand) would otherwise swallow this row.
+        val separator = if (old.isEmpty() || old.endsWith("\n")) "" else "\n"
+        SafeFiles.write(file, old + separator + oneLine.encodeToString(record) + "\n")
     }
 
-    /** The learner's log, oldest first. Rows that can't be read are reported and left out. */
+    /** The learner's log, oldest first. Rows that can't be read, or whose time isn't a time, are reported and left out. */
     @Synchronized
     fun attempts(id: String): List<AttemptRecord> {
         val files = File(dirOf(id), ATTEMPTS).listFiles { f -> f.isFile && f.name.endsWith(".jsonl") }?.sortedBy { it.name } ?: return emptyList()
         return files.flatMap { file ->
             file.readLines().withIndex().filter { it.value.isNotBlank() }.mapNotNull { (i, text) ->
-                runCatching { oneLine.decodeFromString<AttemptRecord>(text) }
+                runCatching { oneLine.decodeFromString<AttemptRecord>(text).also { OffsetDateTime.parse(it.time) } }
                     .onFailure { problem("$file line ${i + 1} could not be read: ${it.message ?: it}") }
                     .getOrNull()
             }
@@ -150,8 +162,9 @@ class LearnerStore(
     /** Every learner's log, oldest first. */
     @Synchronized
     fun allAttempts(): List<LoggedAttempt> = learners()
-        .flatMap { learner -> attempts(learner.id).map { LoggedAttempt(learner, it) } }
-        .sortedBy { OffsetDateTime.parse(it.record.time).toInstant() }
+        .flatMap { learner -> attempts(learner.id).map { LoggedAttempt(learner, it) to OffsetDateTime.parse(it.time).toInstant() } }
+        .sortedBy { it.second }
+        .map { it.first }
 
     /** Keeps [wav] as the latest recording of [sentenceId] (sentence attempts only, docs/decisions.md). */
     @Synchronized

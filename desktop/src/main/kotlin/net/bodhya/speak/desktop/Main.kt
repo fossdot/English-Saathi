@@ -145,6 +145,11 @@ fun main(args: Array<String>) {
             onCloseRequest = ::exitApplication,
             title = "English Saathi",
             state = windowState,
+            // Every press and release is seen here first, even one a text field then takes, so a held key never repeats a shortcut.
+            onPreviewKeyEvent = { e ->
+                keys.track(e.key, e.type == KeyEventType.KeyDown)
+                false
+            },
             onKeyEvent = { e ->
                 val down = e.type == KeyEventType.KeyDown
                 if (down && e.isMetaPressed && e.key == Key.Comma) {
@@ -153,7 +158,8 @@ fun main(args: Array<String>) {
                 }
                 val a = app ?: return@Window false
                 val screen = a.state.value.screen
-                val shortcut = keys.onKey(e.key, down, e.isMetaPressed || e.isCtrlPressed || e.isAltPressed, typing = screen == Screen.NewStudent)
+                if (!down) return@Window false
+                val shortcut = keys.shortcut(e.key, e.isMetaPressed || e.isCtrlPressed || e.isAltPressed, typing = screen == Screen.NewStudent)
                     ?: return@Window false
                 when (screen) {
                     Screen.Home -> if (shortcut == Shortcut.PRIMARY) a.startPractice() else return@Window false
@@ -312,17 +318,15 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsv
             GoalScreen(state, streak.days, streak.status, remember(state.progress) { a.wordsForTomorrow() }, GoalActions(a::startPractice, a::showStudents, a::home, a::hindiHelp))
         }
         Screen.Results -> {
-            var data by remember { mutableStateOf<ResultsData?>(null) }
-            LaunchedEffect(Unit) { data = withContext(Dispatchers.IO) { a.loadResults() } }
+            // Read again whenever the students change (a delete or rename in Settings while Results is open).
+            var data by remember(state.students) { mutableStateOf<ResultsData?>(null) }
+            LaunchedEffect(state.students) { data = withContext(Dispatchers.IO) { a.loadResults() } }
             val scope = rememberCoroutineScope()
             ResultsScreen(
                 state, data, ready.lesson.sentences.size,
                 ResultsActions(
                     back = a::showStudents,
-                    save = {
-                        val rows = data?.rows.orEmpty()
-                        chooseCsvFile(a.csvFileName())?.let { file -> scope.launch(Dispatchers.IO) { a.saveCsv(file, rows) } }
-                    },
+                    save = { chooseCsvFile(a.csvFileName())?.let { file -> scope.launch(Dispatchers.IO) { a.saveCsv(file) } } },
                     help = a::hindiHelp,
                 ),
             )
@@ -331,7 +335,11 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsv
             ready.lesson, checkState, recognition,
             CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared),
             CheckActions(c::selectSentence, c::listen, c::hindiHelp, c::toggleRecording),
-            onBack = a::showStudents,
+            onBack = {
+                // The speech check records on its own: stop it and drop its result, so only one microphone line is ever open.
+                c.close()
+                a.showStudents()
+            },
         )
     }
 }

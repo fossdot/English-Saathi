@@ -177,7 +177,54 @@ class LearnerStoreTest {
         val lock = AppLock.acquire(dataDir)
         assertNotNull("free again once the other copy has quit", lock)
         assertNull("and this process can't take it twice", AppLock.acquire(dataDir))
+        // That second try must not have released the lock (macOS locks belong to the process).
+        val third = ProcessBuilder(java, "-cp", System.getProperty("java.class.path"), LockHolder::class.java.name, dataDir.path).start()
+        try {
+            assertEquals("not locked", third.inputStream.bufferedReader().readLine())
+        } finally {
+            third.outputStream.close()
+            third.waitFor()
+        }
         lock!!.close()
+        val again = AppLock.acquire(dataDir)
+        assertNotNull("this process can lock it again after closing", again)
+        again!!.close()
+    }
+
+    @Test
+    fun `a row whose time isn't a time is reported and left out, and the rest still load`() {
+        val id = store.add("Anita", blueFish).id
+        store.logAttempt(id, record("2026-10-21T13:45:30+05:30"))
+        // Valid JSON, but the time is written the CSV's way, without its offset.
+        File(dataDir, "learners/$id/attempts/2026-10-21.jsonl").appendText(
+            "{\"time\":\"2026-10-21 13:46:30\",\"lesson\":\"bus_stand\",\"sentence\":\"bus_01\",\"mode\":\"sentence\",\"target\":\"x\",\"heard\":\"\",\"result\":\"not heard\"}\n",
+        )
+        store.logAttempt(id, record("2026-10-21T13:47:30+05:30"))
+        assertEquals(2, store.allAttempts().size)
+        assertEquals(problems.toString(), 1, problems.size)
+    }
+
+    @Test
+    fun `a learner whose file has a bad date or a copied folder is reported and left out`() {
+        val anita = store.add("Anita", blueFish)
+        store.add("Ravi", redSun)
+        File(dataDir, "learners/${anita.id}").copyRecursively(File(dataDir, "learners/${anita.id} copy"))
+        assertEquals("the copy doesn't show Anita twice", listOf("Anita", "Ravi"), store.learners().map { it.name })
+        val file = File(dataDir, "learners/${anita.id}/learner.json")
+        file.writeText(file.readText().replace(anita.created, "21/10/2026"))
+        assertEquals(listOf("Ravi"), store.learners().map { it.name })
+        assertEquals(problems.toString(), 2, problems.distinct().size)
+    }
+
+    @Test
+    fun `a day file that lost its last line break doesn't swallow the next row`() {
+        val id = store.add("Anita", blueFish).id
+        store.logAttempt(id, record("2026-10-21T13:45:30+05:30"))
+        val file = File(dataDir, "learners/$id/attempts/2026-10-21.jsonl")
+        file.writeText(file.readText().trimEnd('\n'))
+        store.logAttempt(id, record("2026-10-21T13:46:30+05:30"))
+        assertEquals(2, store.attempts(id).size)
+        assertEquals(emptyList<String>(), problems)
     }
 }
 

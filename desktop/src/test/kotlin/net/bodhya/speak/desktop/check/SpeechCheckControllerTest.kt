@@ -149,6 +149,16 @@ class SpeechCheckControllerTest {
     }
 
     @Test
+    fun `leaving the speech check drops a result still to come`() {
+        recognition.gate = CompletableDeferred()
+        controller.toggleRecording()
+        controller.close()
+        recognition.gate!!.complete(Unit)
+        assertNull(controller.state.value.result)
+        assertTrue(log.last().startsWith("dropped a result for bus_01"))
+    }
+
+    @Test
     fun `a microphone that can't be opened is reported, not a crash`() {
         microphone = { throw IOException("the microphone \"AirPods\" is not connected") }
         controller.toggleRecording()

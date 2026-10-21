@@ -31,6 +31,18 @@ class ShortcutKeysTest {
     }
 
     @Test
+    fun `Return pressed in a text field and held doesn't fire on the next screen`() {
+        // The first press only reaches the window's preview: the name field takes it and adds the student.
+        keys.track(Key.Enter, down = true)
+        // Held past the key-repeat delay: the next press reaches the window, on the new screen.
+        keys.track(Key.Enter, down = true)
+        assertNull(keys.shortcut(Key.Enter, withModifiers = false, typing = false))
+        keys.track(Key.Enter, down = false)
+        keys.track(Key.Enter, down = true)
+        assertEquals(Shortcut.PRIMARY, keys.shortcut(Key.Enter, withModifiers = false, typing = false))
+    }
+
+    @Test
     fun `not with modifiers, and not while typing`() {
         assertNull(press(Key.L, modifiers = true))
         release(Key.L)

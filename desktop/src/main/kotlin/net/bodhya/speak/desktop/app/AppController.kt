@@ -76,8 +76,12 @@ sealed interface Screen {
     data object SpeechCheck : Screen
 }
 
-/** What the Results screen shows: every row of the attempt log, the summary and the latest attempts. */
-data class ResultsData(val rows: List<LoggedAttempt>, val summary: List<StudentSummary>, val recent: List<LoggedAttempt>)
+/**
+ * What the Results screen shows: every row of the attempt log, the summary
+ * and the latest attempts. [read] false: the log couldn't be read (the
+ * screen shows why).
+ */
+data class ResultsData(val rows: List<LoggedAttempt>, val summary: List<StudentSummary>, val recent: List<LoggedAttempt>, val read: Boolean = true)
 
 /** A learner as the picker shows them: their card, name and streak. */
 data class StudentCard(val learner: Learner, val streak: StreakView)
@@ -433,20 +437,27 @@ class AppController(
     fun results() = go { it.copy(screen = Screen.Results, message = null) }
 
     /** Reads the whole attempt log. Blocking: call it off the main thread. */
-    fun loadResults(): ResultsData {
+    fun loadResults(): ResultsData = try {
         val rows = store.allAttempts()
-        return ResultsData(rows, Results.summary(rows), Results.recent(rows))
+        ResultsData(rows, Results.summary(rows), Results.recent(rows))
+    } catch (e: Exception) {
+        log("results could not be read: $e")
+        show(MessageKind.PROBLEM, Message("The results couldn’t be read: ${e.message ?: e}", "नतीजे पढ़े नहीं जा सके।"))
+        ResultsData(emptyList(), emptyList(), emptyList(), read = false)
     }
 
     /** The name the Save dialog suggests for the CSV. */
     fun csvFileName(): String = Results.fileName(today())
 
     /**
-     * Writes [rows] as the CSV to [file], the place chosen in the Save
-     * dialog, and says whether it worked. Blocking: call it off the main thread.
+     * Writes the whole attempt log as the CSV to [file], the place chosen in
+     * the Save dialog, and says whether it worked. The log is read again
+     * here, so a student deleted or renamed meanwhile in Settings is
+     * exported as they are now. Blocking: call it off the main thread.
      */
-    fun saveCsv(file: File, rows: List<LoggedAttempt>) {
+    fun saveCsv(file: File) {
         val message = try {
+            val rows = store.allAttempts()
             SafeFiles.write(file, Results.csv(rows))
             log("results saved: ${rows.size} rows to $file")
             ShownMessage(MessageKind.OK, Message("Results saved: ${file.name}", "नतीजे सेव हो गए।"))

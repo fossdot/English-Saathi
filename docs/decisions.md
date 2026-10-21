@@ -173,7 +173,10 @@ Within the plan; each is a setting or a small change.
   flushed to the disk and moved over the old one. A file that can't be
   read is reported on the picker and in the log, never silently replaced:
   a damaged progress file is kept as `progress.damaged-<time>.json` before
-  the learner starts afresh.
+  the learner starts afresh. A log row or learner file with a time that
+  isn't a time is reported and left out, and so is a learner folder not
+  named by its id (a copy made in Finder, "s1 copy"), so nobody is
+  counted twice.
 - **A second copy refuses to start**: it shows a small window saying
   English Saathi is already open. The lock is released by macOS when the
   app ends, even after a crash.
@@ -255,8 +258,10 @@ Within the plan; each is a setting or a small change.
   ones), the data folder and log with "Open the data folder" (Finder), and
   the teacher note, alongside the students, model, microphone and speech
   check.
-- The attempt log is read off the main thread when Results opens, so a
-  long log never freezes the window.
+- The attempt log is read off the main thread when Results opens (108,000
+  rows took 0.6 s on the M4), and again when a student is deleted or
+  renamed in Settings meanwhile; Save as CSV… reads it afresh, so a
+  deleted student's rows never reach the CSV.
 
 ## Owner answers
 

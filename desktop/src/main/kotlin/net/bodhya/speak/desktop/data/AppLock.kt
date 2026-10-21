@@ -12,28 +12,40 @@ import java.nio.file.StandardOpenOption
  * the lock when the process ends, however it ends, so a crash never leaves
  * the app locked out.
  */
-class AppLock private constructor(private val channel: FileChannel, private val lock: FileLock) : AutoCloseable {
+class AppLock private constructor(private val channel: FileChannel, private val lock: FileLock, private val path: String) : AutoCloseable {
 
-    override fun close() {
+    override fun close() = synchronized(Companion) {
         lock.release()
         channel.close()
+        held -= path
     }
 
     companion object {
-        /** Locks [dataDir], or returns null when another copy of the app holds it. */
-        fun acquire(dataDir: File): AppLock? {
+        /**
+         * Lock files this process holds. macOS file locks belong to the
+         * process, and closing any channel to the file releases them, so a
+         * second try from this process must not even open the file.
+         */
+        private val held = mutableSetOf<String>()
+
+        /** Locks [dataDir], or returns null when another copy of the app (or this one) holds it. */
+        fun acquire(dataDir: File): AppLock? = synchronized(Companion) {
             dataDir.mkdirs()
-            val channel = FileChannel.open(File(dataDir, "app.lock").toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE)
+            val file = File(dataDir, "app.lock").canonicalFile
+            if (file.path in held) return null
+            val channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE)
             val lock = try {
                 channel.tryLock()
             } catch (e: OverlappingFileLockException) {
-                null // held by this same process
+                // Locked elsewhere in this process; closing the channel would release that lock, so it is left open.
+                return null
             }
             if (lock == null) {
                 channel.close()
                 return null
             }
-            return AppLock(channel, lock)
+            held += file.path
+            return AppLock(channel, lock, file.path)
         }
     }
 }

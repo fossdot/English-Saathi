@@ -191,6 +191,13 @@ class SpeechCheckController(
         output.stop()
     }
 
+    /** The facilitator left the speech check: recording stops and a result still to come is dropped. */
+    fun close() {
+        leave()
+        screen++
+        _state.update { it.copy(result = null, message = null) }
+    }
+
     /**
      * Records one second and looks for sound. At first start this makes the
      * macOS permission prompt appear while the facilitator is there.

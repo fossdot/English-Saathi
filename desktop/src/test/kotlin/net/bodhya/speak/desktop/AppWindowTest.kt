@@ -13,6 +13,7 @@ import net.bodhya.speak.desktop.data.Card
 import net.bodhya.speak.desktop.data.CardColour
 import net.bodhya.speak.desktop.data.CardSymbol
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -92,6 +93,26 @@ class AppWindowTest {
         compose.waitUntil(5_000) { compose.onAllNodesWithText("Results saved: results.csv").fetchSemanticsNodes().isNotEmpty() }
         val lines = target.readText().removePrefix("\uFEFF").lines()
         assertEquals("2026-10-21 13:45:30,Anita,bus_01,sentence,Where is the bus stop?,where is the bus stop,5,5,3,tiny.en,scored,420", lines[1])
+    }
+
+    @Test
+    fun `a student deleted in Settings while Results is open leaves the tables and the CSV`() {
+        val record = AttemptRecord("2026-10-21T13:45:30+05:30", "bus_stand", "bus_01", "sentence", "Where is the bus stop?", "where is the bus stop", 5, 5, 3, "tiny.en", AttemptResult.SCORED, 420)
+        val anita = ready.store.add("Anita", Card(CardColour.BLUE, CardSymbol.FISH))
+        val ravi = ready.store.add("Ravi", Card(CardColour.RED, CardSymbol.SUN))
+        ready.store.logAttempt(anita.id, record)
+        ready.store.logAttempt(ravi.id, record.copy(time = "2026-10-21T13:46:30+05:30"))
+        parts.app.showStudents()
+        val target = File(tmp.root, "results.csv")
+        compose.setContent { Screens(ready, parts, prepared = true, chooseCsvFile = { target }) }
+        compose.onNodeWithText("Results").performClick()
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("Ravi").fetchSemanticsNodes().isNotEmpty() }
+        parts.app.deleteStudent(ravi.id) // from Settings, which can open over any screen
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("Ravi").fetchSemanticsNodes().isEmpty() }
+        compose.onNodeWithText("Save as CSV…").performClick()
+        compose.waitUntil(5_000) { target.isFile }
+        val text = target.readText()
+        assertTrue(text, "Anita" in text && "Ravi" !in text)
     }
 
     @Test

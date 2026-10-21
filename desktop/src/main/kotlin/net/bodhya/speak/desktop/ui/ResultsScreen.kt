@@ -57,6 +57,7 @@ fun ResultsScreen(state: AppState, data: ResultsData?, sentences: Int, actions: 
         state.message?.let { MessageBox(it.kind, it.message) }
         when {
             data == null -> Line("Reading the results…", color = Colors.muted)
+            !data.read -> Unit // the message above says why
             data.rows.isEmpty() -> MessageBox(MessageKind.INFO, Message("No attempts yet. Results appear here after students practise.", "अभी कोई नतीजा नहीं है।"))
             else -> {
                 Table(

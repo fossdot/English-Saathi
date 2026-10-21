@@ -97,8 +97,9 @@ internal class Setup(
 
             val dataProblems = MutableStateFlow(emptyList<String>())
             val store = LearnerStore(dataDir) { problem ->
-                log.write("data: $problem")
-                dataProblems.update { it + problem }
+                // The same file is read again and again (every time the picker or Results opens): report it once.
+                if (problem !in dataProblems.value) log.write("data: $problem")
+                dataProblems.update { if (problem in it) it else it + problem }
             }
             log.write("learners: ${store.learners().size}")
 
