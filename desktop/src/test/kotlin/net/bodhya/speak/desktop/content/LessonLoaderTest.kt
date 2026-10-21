@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.content
 
+import net.bodhya.speak.desktop.TestContent
 import net.bodhya.speak.domain.GameConfig
 import net.bodhya.speak.domain.LearnerProgress
 import net.bodhya.speak.domain.Practice
@@ -16,7 +17,7 @@ class LessonLoaderTest {
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
     private val config = GameConfig()
-    private val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
+    private val hints = TestContent.hints
 
     private fun load(text: String, goal: Int = 1) = LessonLoader.loadLesson("test.json", text, hints, GameConfig(dailyGoal = goal))
 
@@ -29,10 +30,9 @@ class LessonLoaderTest {
     private fun warnings(text: String, goal: Int = 1) = load(text, goal).warnings
 
     @Test
-    fun `the bus stand lesson loads without warnings`() {
-        val loaded = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, config)
-        assertEquals(emptyList<String>(), loaded.warnings)
-        val lesson = loaded.lesson
+    fun `the bus stand lesson in the app's pack has everything decided`() {
+        // It loads without warnings: PackLoaderTest.
+        val lesson = TestContent.lesson
         assertEquals(listOf("bus_01", "bus_02", "bus_03", "bus_04", "bus_05"), lesson.sentences.map { it.id })
         assertEquals(setOf("patna"), lesson.unscoredIn(lesson.sentences[2]))
         assertEquals(setOf("bettiah"), lesson.unscoredIn(lesson.sentences[4]))
@@ -44,7 +44,7 @@ class LessonLoaderTest {
 
     @Test
     fun `owner's examples work on the real lesson`() {
-        val lesson = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, config).lesson
+        val lesson = TestContent.lesson
         val r = Practice.attemptSentence(LearnerProgress(), lesson, lesson.sentences[2], "1 ticket 2 but now please", LocalDate.of(2026, 10, 20), config)
         assertEquals(Score(4, 4, 3), (r as SentenceAttempt.Scored).score)
     }

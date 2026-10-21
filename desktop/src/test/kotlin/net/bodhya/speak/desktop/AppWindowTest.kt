@@ -42,7 +42,7 @@ class AppWindowTest {
 
     @Test
     fun `a new student is added, goes home and is saved`() {
-        compose.setContent { Screens(ready, parts, prepared = true) }
+        compose.setContent { Screens(ready, parts) }
         compose.onNodeWithText("Who is practising?").assertExists()
         compose.onNodeWithText("Speech model: tiny.en", substring = true).assertExists()
         compose.onNodeWithText("No students yet. Press New student to add one.").assertExists()
@@ -91,7 +91,7 @@ class AppWindowTest {
         )
         parts.app.showStudents()
         val target = File(tmp.root, "chosen/results.csv").also { it.parentFile.mkdirs() }
-        compose.setContent { Screens(ready, parts, prepared = true, chooseCsvFile = { name -> assertEquals(parts.app.csvFileName(), name); target }) }
+        compose.setContent { Screens(ready, parts, chooseCsvFile = { name -> assertEquals(parts.app.csvFileName(), name); target }) }
         compose.onNodeWithText("Results").performClick()
         compose.waitUntil(5_000) { compose.onAllNodesWithText("5 of 5").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("Save as CSV…").performClick()
@@ -110,7 +110,7 @@ class AppWindowTest {
         ready.store.logAttempt(ravi.id, record.copy(time = "2026-10-21T13:46:30+05:30"))
         parts.app.showStudents()
         val target = File(tmp.root, "results.csv")
-        compose.setContent { Screens(ready, parts, prepared = true, chooseCsvFile = { target }) }
+        compose.setContent { Screens(ready, parts, chooseCsvFile = { target }) }
         compose.onNodeWithText("Results").performClick()
         compose.waitUntil(5_000) { compose.onAllNodesWithText("Ravi").fetchSemanticsNodes().isNotEmpty() }
         parts.app.deleteStudent(ravi.id) // from Settings, which can open over any screen
@@ -131,7 +131,7 @@ class AppWindowTest {
 
     @Test
     fun `the speech check opens from Settings and goes back to the picker`() {
-        compose.setContent { Screens(ready, parts, prepared = true) }
+        compose.setContent { Screens(ready, parts) }
         parts.app.speechCheck()
         compose.onNodeWithText("Speech check").assertExists()
         compose.onNodeWithContentDescription("Back to students").performClick()

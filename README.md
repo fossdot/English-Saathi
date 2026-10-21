@@ -26,7 +26,7 @@ the full one at the end of v0.1.
 | `app/` | The Android app. `speech/` holds the microphone and the Whisper recognizer; `ui/` holds the screens |
 | `desktop/` | The macOS desktop app (`docs/desktop-plan.md`): Whisper through sherpa-onnx's Java library, macOS voices, the student screens, saved data, results and the CSV, and the facilitator's speech check (`docs/desktop-speech.md`) |
 | `NOTICE` | Third-party code and fonts in the repo (Sonic, for slow speech; the Mukta font) and their licences |
-| `content/` | Lesson files in the agreed format (`docs/decisions.md`, "Word data scope") and the tip templates; all marked for teacher review |
+| `content/packs/` | The lesson pack that comes with the app (Bus stand and the tip templates), in the pack format of `docs/lesson-packs.md`; all marked for teacher review. More packs are added in the app's Settings |
 | `scripts/` | `fetch_deps.sh` downloads the speech library and model; `make_test_wavs.sh` makes test clips (macOS) |
 | `docs/decisions.md` | Everything agreed with the product owner, including where the Kotlin rules deliberately differ from the pilot |
 | `docs/asr-model-comparison.md` | Which speech model the app uses, and why |

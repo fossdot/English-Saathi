@@ -1,6 +1,6 @@
 package net.bodhya.speak.desktop.check
 
-import net.bodhya.speak.desktop.content.LessonLoader
+import net.bodhya.speak.desktop.content.LessonLibrary
 import net.bodhya.speak.desktop.voice.SayRenderer
 import net.bodhya.speak.desktop.voice.Speaker
 import net.bodhya.speak.desktop.voice.Speeds.HINDI_HELP
@@ -10,6 +10,7 @@ import net.bodhya.speak.desktop.voice.VoiceHelp
 import net.bodhya.speak.desktop.voice.VoiceRole
 import net.bodhya.speak.domain.GameConfig
 import java.io.File
+import java.nio.file.Files
 import kotlin.system.exitProcess
 
 /**
@@ -37,8 +38,7 @@ fun main(args: Array<String>) {
 
     val speaker = Speaker(renderer)
     (english ?: voices.englishFallback())?.let { voice ->
-        val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
-        val lesson = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, GameConfig()).lesson
+        val lesson = LessonLibrary.load(File(projectDir, "content/packs"), Files.createTempDirectory("voice-check").toFile(), GameConfig()).lessons.first().lesson
         val start = System.nanoTime()
         val bytes = speaker.prepareLesson(voice, lesson)
         println("prepared the bus stand lesson's speech in ${(System.nanoTime() - start) / 1_000_000} ms, ${bytes / 1024} KB in memory")

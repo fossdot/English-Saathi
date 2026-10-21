@@ -34,6 +34,8 @@ import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.bodhya.speak.desktop.app.AppController
@@ -78,6 +80,7 @@ import net.bodhya.speak.desktop.voice.Speaker
 import net.bodhya.speak.desktop.voice.Speeds
 import net.bodhya.speak.desktop.voice.Voice
 import net.bodhya.speak.desktop.voice.VoiceHelp
+import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.domain.Streaks
 import net.bodhya.speak.speech.EngineState
 import net.bodhya.speak.speech.WavReader
@@ -222,19 +225,10 @@ fun main(args: Array<String>) {
                             window.addWindowFocusListener(focus)
                             onDispose { window.removeWindowFocusListener(focus) }
                         }
-                        var prepared by remember { mutableStateOf(false) }
-                        LaunchedEffect(ready) {
-                            ready.english?.let { voice ->
-                                val start = System.nanoTime()
-                                val bytes = withContext(Dispatchers.IO) { ready.speaker.prepareLesson(voice, ready.lesson) }
-                                ready.log.write("lesson speech prepared in ${(System.nanoTime() - start) / 1_000_000} ms, ${bytes / 1024} KB in memory")
-                            }
-                            prepared = true
-                        }
-                        Screens(ready, parts, prepared, chooseCsvFile = { name -> chooseSaveFile(window, name) })
+                        Screens(ready, parts, chooseCsvFile = { name -> chooseSaveFile(window, name) })
                         if (showSettings) {
                             DialogWindow(onCloseRequest = { showSettings = false }, title = "Settings", state = rememberDialogState(size = DpSize(760.dp, 720.dp))) {
-                                Settings(ready, parts)
+                                Settings(ready, parts, choosePack = { choosePackFile(window) })
                             }
                         }
                     },
@@ -246,7 +240,7 @@ fun main(args: Array<String>) {
 }
 
 /** The controllers behind the main window, made once [Setup] is ready. */
-internal class AppParts(val app: AppController, val check: SpeechCheckController, val listening: Listening) {
+internal class AppParts(val app: AppController, val check: SpeechCheckController, val listening: Listening, val speech: LessonPreparer) {
     /** Leaving the window (another app comes to the front) stops listening and speech. */
     fun leave() {
         app.leave()
@@ -256,7 +250,11 @@ internal class AppParts(val app: AppController, val check: SpeechCheckController
     companion object {
         fun create(ready: Setup, startOnCheck: Boolean = false): AppParts {
             val output = MacSpeechOutput(ready.speaker, ready.english, ready.hindi, ready.log)
-            val check = newController(ready, output)
+            val speech = LessonPreparer(ready.speaker, ready.english, ready.log::write)
+            val first = ready.library.lessons.first().lesson
+            // The speech check uses the first lesson; a learner's own lesson is prepared when they are picked.
+            speech.prepare(first)
+            val check = newController(ready, output, first)
             val listening = Listening(
                 ready.recognition,
                 openMicrophone = { input -> JavaSoundPcmSource(input) },
@@ -268,12 +266,13 @@ internal class AppParts(val app: AppController, val check: SpeechCheckController
                 log = ready.log::write,
             )
             val app = AppController(
-                ready.store, ready.lesson, ready.hints, output, listening,
+                ready.store, ready.library, output, listening,
                 micReady = { ready.recognition.state.value.engine is EngineState.Ready },
                 log = ready.log::write,
+                onLessonChange = speech::prepare,
             )
             if (startOnCheck) app.speechCheck()
-            return AppParts(app, check, listening)
+            return AppParts(app, check, listening, speech)
         }
     }
 }
@@ -284,7 +283,7 @@ internal class AppParts(val app: AppController, val check: SpeechCheckController
  * facilitator cancelled.
  */
 @Composable
-internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsvFile: (String) -> File? = { null }) {
+internal fun Screens(ready: Setup, parts: AppParts, chooseCsvFile: (String) -> File? = { null }) {
     val a = parts.app
     val c = parts.check
     val state by a.state.collectAsState()
@@ -292,6 +291,7 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsv
     val recognition by ready.recognition.state.collectAsState()
     val problems by ready.dataProblems.collectAsState()
     val mic by parts.listening.state.collectAsState()
+    val prepared by parts.speech.ready.collectAsState()
     when (val screen = state.screen) {
         Screen.Students -> StudentsScreen(
             state,
@@ -302,13 +302,13 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsv
             state.students.map { it.learner.card }.toSet(), state.message?.message,
             NewStudentActions(a::addStudent, a::showStudents, a::hindiHelp),
         )
-        Screen.Home -> HomeScreen(state, ready.lesson, a.config, HomeActions(a::startPractice, a::openSentence, a::showStudents, a::hindiHelp))
+        Screen.Home -> HomeScreen(state, a.lesson, a.config, HomeActions(a::startPractice, a::openSentence, a::chooseLesson, a::showStudents, a::hindiHelp))
         is Screen.Practice -> PracticeScreen(
-            state, mic, recognition, ready.lesson, screen.sentence,
+            state, mic, recognition, a.lesson, screen.sentence,
             PracticeActions(a::toggleRecording, a::listen, a::home, a::showStudents, a::hindiHelp),
         )
         is Screen.Feedback -> state.result?.let { result ->
-            FeedbackScreen(state.learner!!, result, ready.lesson, FeedbackActions({ a.listen(slow = false) }, a::fix, a::next, a::showStudents, a::hindiHelp))
+            FeedbackScreen(state.learner!!, result, a.lesson, FeedbackActions({ a.listen(slow = false) }, a::fix, a::next, a::showStudents, a::hindiHelp))
         }
         is Screen.Fix -> state.fix?.let { fix ->
             FixScreen(state, fix, mic, recognition, FixActions(a::fixNext, a::toggleRecording, a::fixListen, a::backToFeedback, a::next, a::showStudents, a::hindiHelp))
@@ -323,7 +323,7 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsv
             LaunchedEffect(state.students) { data = withContext(Dispatchers.IO) { a.loadResults() } }
             val scope = rememberCoroutineScope()
             ResultsScreen(
-                state, data, ready.lesson.sentences.size,
+                state, data, a.sentenceCount(),
                 ResultsActions(
                     back = a::showStudents,
                     save = { chooseCsvFile(a.csvFileName())?.let { file -> scope.launch(Dispatchers.IO) { a.saveCsv(file) } } },
@@ -332,8 +332,8 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsv
             )
         }
         Screen.SpeechCheck -> SpeechCheckScreen(
-            ready.lesson, checkState, recognition,
-            CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared),
+            c.lesson, checkState, recognition,
+            CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared == c.lesson),
             CheckActions(c::selectSentence, c::listen, c::hindiHelp, c::toggleRecording),
             onBack = {
                 // The speech check records on its own: stop it and drop its result, so only one microphone line is ever open.
@@ -344,16 +344,16 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean, chooseCsv
     }
 }
 
-/** The Settings window's content (⌘,). */
+/** The Settings window's content (⌘,). [choosePack] shows the macOS Open dialog for a lesson pack. */
 @Composable
-internal fun Settings(ready: Setup, parts: AppParts) {
+internal fun Settings(ready: Setup, parts: AppParts, choosePack: () -> File? = { null }) {
     val a = parts.app
     val c = parts.check
     val state by a.state.collectAsState()
     val checkState by c.state.collectAsState()
     val recognition by ready.recognition.state.collectAsState()
     SettingsPanel(
-        recognition.model, checkState.input, ready.inputs, ready.builtIn, ready.clips.keys.toList(), state.students.map { it.learner },
+        recognition.model, checkState.input, ready.inputs, ready.builtIn, ready.clips.keys.toList(), state.students, a.packs(),
         SettingsInfo(ready.english?.name, ready.hindi?.name, VoiceHelp.settingsPath(System.getProperty("os.version")), ready.dataDir.path, ready.log.file.path),
         SettingsActions(
             chooseModel = c::chooseModel,
@@ -364,8 +364,22 @@ internal fun Settings(ready: Setup, parts: AppParts) {
             rename = a::renameStudent,
             delete = a::deleteStudent,
             openDataFolder = { runCatching { Desktop.getDesktop().open(ready.dataDir) }.onFailure { ready.log.write("could not open the data folder: $it") } },
+            setOpenAll = a::setOpenAll,
+            choosePack = choosePack,
+            checkPack = a::checkPack,
+            installPack = a::installPack,
         ),
     )
+}
+
+/** The macOS Open dialog for a lesson pack (a .json file), from the Settings window. */
+private fun choosePackFile(parent: java.awt.Dialog): File? {
+    val dialog = FileDialog(parent, "Choose a lesson pack", FileDialog.LOAD)
+    dialog.directory = File(System.getProperty("user.home"), "Downloads").path
+    dialog.setFilenameFilter { _, name -> name.endsWith(".json", ignoreCase = true) }
+    dialog.isVisible = true
+    val file = dialog.file ?: return null
+    return File(dialog.directory, file)
 }
 
 /** The macOS Save dialog for the CSV, suggesting [name] in Documents; a ".csv" is added if the name lost it. */
@@ -376,6 +390,33 @@ private fun chooseSaveFile(parent: java.awt.Frame, name: String): File? {
     dialog.isVisible = true
     val file = dialog.file ?: return null
     return File(dialog.directory, if (file.endsWith(".csv", ignoreCase = true)) file else "$file.csv")
+}
+
+/**
+ * Prepares one lesson's speech at a time, on its own thread, in memory
+ * (docs/decisions.md, "Speech is prepared per lesson"). When another lesson
+ * is asked for meanwhile, only the newest is prepared. [ready] is the lesson
+ * whose speech is ready.
+ */
+internal class LessonPreparer(private val speaker: Speaker, private val voice: Voice?, private val log: (String) -> Unit) {
+    private val thread = Executors.newSingleThreadExecutor { Thread(it, "lesson-speech").apply { isDaemon = true } }
+    private val wanted = java.util.concurrent.atomic.AtomicReference<Lesson?>(null)
+    private val _ready = MutableStateFlow<Lesson?>(null)
+    val ready: StateFlow<Lesson?> = _ready
+
+    fun prepare(lesson: Lesson) {
+        val v = voice ?: return
+        wanted.set(lesson)
+        thread.execute {
+            if (wanted.get() != lesson || _ready.value == lesson) return@execute
+            runCatching {
+                val start = System.nanoTime()
+                val bytes = speaker.prepareLesson(v, lesson)
+                log("speech for ${lesson.id} prepared in ${(System.nanoTime() - start) / 1_000_000} ms, ${bytes / 1024} KB in memory")
+                _ready.value = lesson
+            }.onFailure { log("speech for ${lesson.id} not prepared: $it") }
+        }
+    }
 }
 
 /** A second copy of the app was started: say so and quit, leaving the first one's data alone. */
@@ -394,8 +435,8 @@ private fun AlreadyOpen(exit: () -> Unit) {
     }
 }
 
-private fun newController(ready: Setup, output: SpeechOutput) = SpeechCheckController(
-    lesson = ready.lesson,
+private fun newController(ready: Setup, output: SpeechOutput, lesson: Lesson) = SpeechCheckController(
+    lesson = lesson,
     recognition = ready.recognition,
     output = output,
     openMicrophone = { input -> JavaSoundPcmSource(input) },

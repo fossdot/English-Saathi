@@ -3,7 +3,7 @@ package net.bodhya.speak.desktop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import net.bodhya.speak.desktop.content.LessonLoader
+import net.bodhya.speak.desktop.content.LessonLibrary
 import net.bodhya.speak.desktop.data.LearnerStore
 import net.bodhya.speak.desktop.mic.MicAccess
 import net.bodhya.speak.desktop.speech.ModelSwitcher
@@ -15,8 +15,6 @@ import net.bodhya.speak.desktop.voice.Voice
 import net.bodhya.speak.desktop.voice.VoiceHelp
 import net.bodhya.speak.desktop.voice.VoiceRole
 import net.bodhya.speak.domain.GameConfig
-import net.bodhya.speak.domain.Hints
-import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.speech.AsrSettings
 import java.io.File
 
@@ -28,8 +26,8 @@ internal class Setup(
     val projectDir: File,
     val dataDir: File,
     val log: SessionLog,
-    val lesson: Lesson,
-    val hints: Hints,
+    /** Every lesson: the packs inside the app and the ones added in Settings. */
+    val library: LessonLibrary,
     val recognition: ModelSwitcher,
     val speaker: Speaker,
     val english: Voice?,
@@ -85,9 +83,9 @@ internal class Setup(
 
             NativeLibraries.use(File(projectDir, "desktop/native"))
             val config = GameConfig()
-            val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
-            val loaded = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, config)
-            loaded.warnings.forEach { log.write("lesson warning: $it") }
+            val library = LessonLibrary.load(File(projectDir, "content/packs"), dataDir, config)
+            library.warnings.forEach { log.write("lesson warning: $it") }
+            log.write("lessons: ${library.packs.joinToString { "${it.pack.id} v${it.pack.version}${if (it.builtIn) "" else " (added)"}" }}; ${library.lessons.size} lessons, ${library.sentenceCount} sentences")
 
             val renderer = SayRenderer()
             val voices = renderer.listVoices()
@@ -103,7 +101,8 @@ internal class Setup(
             val clips = (listOf(File(projectDir, "app/src/androidTest/assets/asr-test/librispeech-0.wav")) +
                 (1..5).map { File(projectDir, "app/src/debug/assets/asr-test/bus_0$it.wav") }).filter { it.isFile }.associateBy { it.name }
 
-            val dataProblems = MutableStateFlow(emptyList<String>())
+            val dataProblems = MutableStateFlow(library.problems)
+            library.problems.forEach { log.write("data: $it") }
             val store = LearnerStore(dataDir) { problem ->
                 // The same file is read again and again (every time the picker or Results opens): report it once.
                 if (problem !in dataProblems.value) log.write("data: $problem")
@@ -112,7 +111,7 @@ internal class Setup(
             log.write("learners: ${store.learners().size}")
 
             return Setup(
-                projectDir, dataDir, log, loaded.lesson, hints,
+                projectDir, dataDir, log, library,
                 ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), saved.model).also { log.write("model ${saved.model.id}, $THREADS threads") },
                 Speaker(renderer), english, hindi, notices, inputs, builtIn, input, settings, clips, store, dataProblems,
             )

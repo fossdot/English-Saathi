@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.app
 
+import net.bodhya.speak.desktop.TestContent
 import net.bodhya.speak.desktop.check.SpeechOutput
 import net.bodhya.speak.desktop.content.LessonLoader
 import net.bodhya.speak.desktop.data.Card
@@ -28,8 +29,8 @@ class AppControllerTest {
     val tmp = TemporaryFolder()
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
-    private val lesson = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, GameConfig()).lesson
+    private val hints = TestContent.hints
+    private val lesson = TestContent.lesson
 
     /** 2026-10-21, 13:45 in India. */
     private val clock = Clock.fixed(Instant.parse("2026-10-21T08:15:30Z"), ZoneId.of("Asia/Kolkata"))
@@ -40,8 +41,9 @@ class AppControllerTest {
         override fun hindi(text: String) { spoken += "hi $text" }
         override fun stop() = Unit
     }
-    private val store by lazy { LearnerStore(tmp.newFolder("data"), clock) }
-    private val app by lazy { AppController(store, lesson, hints, output, clock = clock) }
+    private val dataDir by lazy { tmp.newFolder("data") }
+    private val store by lazy { LearnerStore(dataDir, clock) }
+    private val app by lazy { AppController(store, TestContent.library(dataDir), output, clock = clock) }
 
     private val blueFish = Card(CardColour.BLUE, CardSymbol.FISH)
 

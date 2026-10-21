@@ -23,6 +23,7 @@ data class LoggedAttempt(val learner: Learner, val record: AttemptRecord)
  * ```
  * learners/<id>/learner.json            name and card
  * learners/<id>/progress.json           XP, done sentences, best stars, streak, Leitner box
+ * learners/<id>/lessons.json           which lessons are open, and the current one
  * learners/<id>/attempts/<day>.jsonl    the attempt log, one row per line
  * learners/<id>/recordings/<sentence>.wav  the latest recording of each sentence
  * ```
@@ -135,6 +136,27 @@ class LearnerStore(
         SafeFiles.write(File(dirOf(id), PROGRESS), pretty.encodeToString(ProgressJson.of(progress)) + "\n")
     }
 
+    /** Which lessons the learner may practise. A missing file is a learner from before lesson packs: nothing opened yet. */
+    @Synchronized
+    fun lessons(id: String): LearnerLessons {
+        val file = File(dirOf(id), LESSONS)
+        if (!file.isFile) return LearnerLessons()
+        return try {
+            pretty.decodeFromString<LearnerLessons>(file.readText())
+        } catch (e: Exception) {
+            val aside = File(file.parentFile, "lessons.damaged-${clock.millis()}.json")
+            file.renameTo(aside)
+            problem("$file could not be read (${e.message ?: e}); it was kept as ${aside.name}, and the learner's open lessons are worked out again")
+            LearnerLessons()
+        }
+    }
+
+    @Synchronized
+    fun saveLessons(id: String, lessons: LearnerLessons) {
+        require(dirOf(id).isDirectory) { "no learner $id" }
+        SafeFiles.write(File(dirOf(id), LESSONS), pretty.encodeToString(lessons) + "\n")
+    }
+
     /** Adds a row to the learner's log for the day of [AttemptRecord.time]. */
     @Synchronized
     fun logAttempt(id: String, record: AttemptRecord) {
@@ -186,6 +208,7 @@ class LearnerStore(
 
         private const val LEARNER = "learner.json"
         private const val PROGRESS = "progress.json"
+        private const val LESSONS = "lessons.json"
         private const val ATTEMPTS = "attempts"
         private const val DELETING = ".deleting-"
         private val ID = Regex("[a-z0-9]+")

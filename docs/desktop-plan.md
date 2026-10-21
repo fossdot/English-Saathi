@@ -96,8 +96,9 @@ Status: built and tested on the Apple M4 without opening the microphone
 **D4. Domain rules and the lesson file**
 
 Status: done. `:domain` has the two rules and the lesson-level word table;
-`content/bus_stand.json` and `content/hints.json` are the lesson files;
-`LessonLoader` (desktop) reads them with the checks.
+`LessonLoader` (desktop) reads lessons with the checks. The lesson and tip
+files are now the first lesson pack, `content/packs/starter.json`
+(`docs/lesson-packs.md`).
 
 - Build homophones and unscored words as decided, with the word table moved
   to the lesson. Update the golden overlay and re-record the cases, as

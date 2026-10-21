@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.ui
 
+import net.bodhya.speak.desktop.TestContent
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -34,8 +35,8 @@ class PracticeScreensTest {
     val compose = createComposeRule()
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
-    private val lesson = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, GameConfig()).lesson
+    private val hints = TestContent.hints
+    private val lesson = TestContent.lesson
     private val anita = Learner("s1", "Anita", CardColour.BLUE, CardSymbol.FISH, "2026-10-21T13:45:30+05:30")
     private val state = AppState(Screen.Practice(2), learner = anita, today = LocalDate.of(2026, 10, 21))
     private val ready = RecognitionState(SpeechModel.TINY_EN, EngineState.Ready(300))

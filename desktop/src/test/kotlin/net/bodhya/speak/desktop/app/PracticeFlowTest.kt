@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.app
 
+import net.bodhya.speak.desktop.TestContent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,8 +55,8 @@ class PracticeFlowTest {
     val tmp = TemporaryFolder()
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
-    private val lesson = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, GameConfig()).lesson
+    private val hints = TestContent.hints
+    private val lesson = TestContent.lesson
     private val clock = Clock.fixed(Instant.parse("2026-10-21T08:15:30Z"), ZoneId.of("Asia/Kolkata"))
     private val today = LocalDate.of(2026, 10, 21)
 
@@ -84,12 +85,13 @@ class PracticeFlowTest {
     private var microphone: () -> PcmSource = { ArrayPcmSource(spoken()) }
     private var micReady = true
     private val log = mutableListOf<String>()
-    private val store by lazy { LearnerStore(tmp.newFolder("data"), clock) }
+    private val dataDir by lazy { tmp.newFolder("data") }
+    private val store by lazy { LearnerStore(dataDir, clock) }
     private val listening = Listening(
         recognition, { microphone() }, { null }, { MicPermission.DENIED },
         CoroutineScope(Dispatchers.Unconfined), Dispatchers.Unconfined,
     )
-    private val app by lazy { AppController(store, lesson, hints, output, listening, { micReady }, clock = clock, log = { log += it }) }
+    private val app by lazy { AppController(store, TestContent.library(dataDir), output, listening, { micReady }, clock = clock, log = { log += it }) }
     private val id by lazy { store.add("Anita", Card(CardColour.BLUE, CardSymbol.FISH)).id }
 
     /** Room noise, then a second of a loud tone (speech, as far as the endpointer can tell). */

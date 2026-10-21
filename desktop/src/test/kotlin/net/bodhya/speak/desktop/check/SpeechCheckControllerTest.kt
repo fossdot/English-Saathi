@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.check
 
+import net.bodhya.speak.desktop.TestContent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +35,7 @@ import kotlin.random.Random
 class SpeechCheckControllerTest {
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val lesson = LessonLoader.loadLesson(
-        "bus_stand.json", File(projectDir, "content/bus_stand.json").readText(),
-        LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText()), GameConfig(),
-    ).lesson
+    private val lesson = TestContent.lesson
 
     private val log = mutableListOf<String>()
     private val played = mutableListOf<String>()

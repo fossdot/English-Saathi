@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.ui
 
+import net.bodhya.speak.desktop.TestContent
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -30,10 +31,7 @@ class SpeechCheckScreenTest {
     val compose = createComposeRule()
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val lesson = LessonLoader.loadLesson(
-        "bus_stand.json", File(projectDir, "content/bus_stand.json").readText(),
-        LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText()), GameConfig(),
-    ).lesson
+    private val lesson = TestContent.lesson
     private val info = CheckInfo("Rishi", "Lekha", emptyList(), "/tmp/speech-check.log", speechPrepared = true)
     private val ready = RecognitionState(SpeechModel.TINY_EN, EngineState.Ready(300))
 

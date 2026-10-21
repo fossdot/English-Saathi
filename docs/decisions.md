@@ -193,6 +193,54 @@ Within the plan; each is a setting or a small change.
 - **Commits:** one per part, pushed once its tests pass. The `.dmg` is
   never committed.
 
+### Choices made while building lesson packs
+
+The pack format and its checks are in `docs/lesson-packs.md`.
+
+- **The first pack is `content/packs/starter.json`** (id `starter`,
+  version 1): the Bus stand lesson and the pilot's five tips, exactly as in
+  the former `content/bus_stand.json` and `content/hints.json`, which it
+  replaces.
+- **Added packs live in the data folder** as `lessons/<pack id>.json`, a
+  copy of the file the facilitator picked, written safely. For each pack id
+  the highest version is used (on a tie, the app's own copy), so an app
+  update can also bring a newer version of a pack, and an older pack never
+  replaces a newer one. A shadowed copy is never deleted.
+- **The app's packs always come first** in the unlock order (Bus stand
+  stays lesson 1), then added packs by their `order`, then id.
+- **Sentence ids must be unique across all packs**, ignoring case, and safe
+  as file names: progress, the attempt log and the recordings are kept by
+  sentence id. A pack that reuses one is refused; an added file that clashes
+  or can't be read at start is left out and reported on the picker, and the
+  app's own lessons always load.
+- **Each learner's open lessons are saved** (`learners/<id>/lessons.json`:
+  the current lesson, the lessons opened so far, "Open all lessons"). An
+  opened lesson stays open, so a pack update that adds a sentence to the
+  lesson before it never locks it again. Learners from before packs get
+  their lessons worked out from the sentences they have said.
+- **When a lesson opens,** the feedback screen says "New lesson open: …".
+  Home lists every lesson after the current lesson's sentences: open ones
+  with "n of m said" (tap to make it the current lesson), locked ones with a
+  lock and their names. The hard-coded Market, Bank and Hospital rows show
+  only while there is a single lesson.
+- **Next and Skip also move on** to the next open lesson once every
+  sentence of the current one is done today, as Start practice does.
+- **Adding a pack** goes through Settings › Add lessons: the macOS Open
+  dialog (Downloads, `.json` files), the check (nothing changes yet), a
+  preview with each lesson's titles in English and Hindi, its sentence count
+  and whether it is new or updated, lessons a new version drops, and
+  "Students' progress is kept"; then Add these lessons. A learner in the
+  middle of a sentence goes back home, as the lesson may have changed.
+  There is no way to remove a pack yet.
+- **Tips** come from the sentence's own pack (its templates over the app's).
+- **Results** count "Sentences tried" against every installed sentence; the
+  CSV is unchanged (sentence ids are unique, so they name the lesson).
+- **Speech is prepared** for the learner's current lesson when it changes
+  (one lesson at a time, the newest request wins), and for the first lesson
+  at start, for the speech check.
+- **Size:** a 100-lesson pack of lessons like Bus stand is about 313 KB as
+  written, about 78 KB compressed, and loads in about 50 ms (`PackSizeTest`).
+
 ## Desktop screens: owner answers (2026-10-21)
 
 - **Start D5–D8 now** (owner): students use the desktop app for the next

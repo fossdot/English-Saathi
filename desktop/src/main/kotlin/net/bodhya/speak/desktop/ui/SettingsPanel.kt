@@ -29,10 +29,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import net.bodhya.speak.desktop.app.StudentCard
 import net.bodhya.speak.desktop.check.MessageKind
+import net.bodhya.speak.desktop.content.PackCheck
+import net.bodhya.speak.desktop.content.PackInUse
 import net.bodhya.speak.desktop.data.Learner
 import net.bodhya.speak.desktop.speech.SpeechModel
 import net.bodhya.speak.desktop.voice.Message
+import java.io.File
 
 /** What Settings can do. */
 class SettingsActions(
@@ -46,6 +50,14 @@ class SettingsActions(
     val delete: (id: String) -> Unit,
     /** Shows the data folder in Finder. */
     val openDataFolder: () -> Unit,
+    /** "Open all lessons" for one student. */
+    val setOpenAll: (id: String, open: Boolean) -> Unit,
+    /** The macOS Open dialog for a lesson pack; null if cancelled. */
+    val choosePack: () -> File?,
+    /** Checks a pack file; changes nothing. */
+    val checkPack: (File) -> PackCheck,
+    /** Adds a checked pack; returns what to tell the facilitator. */
+    val installPack: (PackCheck.Ready) -> Message,
 )
 
 /** What Settings shows about this Mac. */
@@ -60,7 +72,8 @@ class SettingsInfo(
 
 /**
  * The facilitator's settings (⌘,; no button on the student screens): the
- * students, the speech model, the microphone input and its 1-second check,
+ * students (rename, delete, "Open all lessons"), the lessons and Add
+ * lessons, the speech model, the microphone input and its 1-second check,
  * the voices found, the data folder, and the speech check with its test
  * clips (milestone D8).
  */
@@ -73,7 +86,8 @@ fun SettingsPanel(
     /** The Mac's built-in microphone, labelled so in the list. */
     builtIn: String?,
     clips: List<String>,
-    students: List<Learner>,
+    students: List<StudentCard>,
+    packs: List<PackInUse>,
     info: SettingsInfo,
     actions: SettingsActions,
 ) {
@@ -82,7 +96,16 @@ fun SettingsPanel(
         MessageBox(MessageKind.INFO, TEACHER_NOTE)
         Line("Students", bold = true)
         if (students.isEmpty()) Line("No students yet.", color = Colors.muted)
-        for (learner in students) StudentRow(learner, actions)
+        for (card in students) StudentRow(card.learner, card.openAll, actions)
+        Line("Lessons", bold = true)
+        for (p in packs) {
+            Line(
+                "${p.pack.titleEn} · ${p.pack.titleHi}: version ${p.pack.version}, ${p.pack.lessons.size} " +
+                    (if (p.pack.lessons.size == 1) "lesson" else "lessons") + if (p.builtIn) " (comes with the app)" else " (added)",
+                color = Colors.muted,
+            )
+        }
+        AddLessons(actions)
         Line("Speech model (every result is logged with its model)", bold = true)
         Row(horizontalArrangement = Gap) {
             for (m in SpeechModel.entries) {
@@ -116,9 +139,60 @@ fun SettingsPanel(
     }
 }
 
-/** One student: rename, or delete after a confirmation (docs/decisions.md, "Deleting a student"). */
+/**
+ * Settings › Add lessons: the facilitator picks a pack file; it is checked
+ * (nothing changes yet), what it adds is shown in English and Hindi, and
+ * only then installed. A pack that can't be added says why.
+ */
 @Composable
-private fun StudentRow(learner: Learner, actions: SettingsActions) {
+private fun AddLessons(actions: SettingsActions) {
+    var check by remember { mutableStateOf<PackCheck?>(null) }
+    var done by remember { mutableStateOf<Message?>(null) }
+    PilotButton("Add lessons…", "पाठ जोड़िए", {
+        done = null
+        check = actions.choosePack()?.let(actions.checkPack)
+    })
+    done?.let { MessageBox(MessageKind.OK, it) }
+    when (val c = check) {
+        null -> Unit
+        is PackCheck.Rejected -> MessageBox(MessageKind.PROBLEM, c.message)
+        is PackCheck.Ready -> Column(
+            Modifier.fillMaxWidth().background(Colors.surface, RoundedCornerShape(16.dp)).padding(14.dp).testTag("pack-preview"),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            val p = c.preview
+            Bilingual(
+                "“${p.titleEn}”, version ${p.version}" + (p.replaces?.let { " (replaces version $it)" } ?: ""),
+                "“${p.titleHi}”, संस्करण ${p.version}" + (p.replaces?.let { " (संस्करण $it की जगह)" } ?: ""),
+                bold = true,
+            )
+            for (line in p.lessons) {
+                val tag = if (line.new) "new" to "नया" else "updated" to "बदला"
+                Bilingual(
+                    "${line.titleEn}: ${line.sentences} ${if (line.sentences == 1) "sentence" else "sentences"} (${tag.first})",
+                    "${line.titleHi}: ${line.sentences} वाक्य (${tag.second})",
+                    size = 16.sp,
+                )
+            }
+            for (line in p.removed) {
+                Bilingual("${line.titleEn} is no longer in this pack", "${line.titleHi} अब इस पैक में नहीं है", size = 16.sp, color = Colors.badInk)
+            }
+            // Drafted for the desktop app; needs the teacher review.
+            Bilingual("Students’ progress is kept.", "छात्रों की प्रगति बनी रहेगी।", size = 16.sp, color = Colors.muted)
+            Row(horizontalArrangement = Gap) {
+                PilotButton("Add these lessons", "ये पाठ जोड़िए", {
+                    done = actions.installPack(c)
+                    check = null
+                }, primary = true)
+                PilotButton("Cancel", "रहने दें", { check = null })
+            }
+        }
+    }
+}
+
+/** One student: rename, delete after a confirmation (docs/decisions.md, "Deleting a student"), or open all lessons. */
+@Composable
+private fun StudentRow(learner: Learner, openAll: Boolean, actions: SettingsActions) {
     var mode by remember(learner.id) { mutableStateOf(RowMode.SHOW) }
     var name by remember(learner.id) { mutableStateOf(learner.name) }
     var problem by remember(learner.id) { mutableStateOf<Message?>(null) }
@@ -130,6 +204,7 @@ private fun StudentRow(learner: Learner, actions: SettingsActions) {
             CardBadge(learner.card, 40.dp)
             BasicText(learner.name, style = textStyle(18.sp, Colors.ink, FontWeight.SemiBold), modifier = Modifier.weight(1f))
             if (mode == RowMode.SHOW) {
+                PilotButton("Open all lessons" + if (openAll) " ✓" else "", "सारे पाठ खोलिए", { actions.setOpenAll(learner.id, !openAll) }, primary = openAll)
                 PilotButton("Rename", "नाम बदलें", { name = learner.name; problem = null; mode = RowMode.RENAME })
                 PilotButton("Delete…", "मिटाएँ", { mode = RowMode.CONFIRM_DELETE })
             }

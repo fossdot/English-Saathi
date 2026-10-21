@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.ui
 
+import net.bodhya.speak.desktop.TestContent
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -31,10 +32,7 @@ class StudentScreensTest {
     val compose = createComposeRule()
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val lesson = LessonLoader.loadLesson(
-        "bus_stand.json", File(projectDir, "content/bus_stand.json").readText(),
-        LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText()), GameConfig(),
-    ).lesson
+    private val lesson = TestContent.lesson
     private val today = LocalDate.of(2026, 10, 21)
     private val anita = Learner("s1", "Anita", CardColour.BLUE, CardSymbol.FISH, "2026-10-21T13:45:30+05:30")
     private val ravi = Learner("s2", "Ravi", CardColour.RED, CardSymbol.SUN, "2026-10-21T13:46:30+05:30")
@@ -87,7 +85,7 @@ class StudentScreensTest {
         var started = 0
         var opened = -1
         compose.setContent {
-            HomeScreen(AppState(Screen.Home, learner = anita, progress = progress, today = today), lesson, GameConfig(), HomeActions({ started++ }, { opened = it }, {}, {}))
+            HomeScreen(AppState(Screen.Home, learner = anita, progress = progress, today = today), lesson, GameConfig(), HomeActions({ started++ }, { opened = it }, {}, {}, {}))
         }
         compose.onNodeWithTag("goal").assertExists()
         compose.onNodeWithText("2 / 5").assertExists()
@@ -109,7 +107,7 @@ class StudentScreensTest {
             doneByDay = mapOf(today to listOf("bus_01", "bus_02", "bus_03", "bus_04", "bus_05")),
             streak = StreakState(9, today.minusDays(5)),
         )
-        compose.setContent { HomeScreen(AppState(Screen.Home, learner = anita, progress = progress, today = today), lesson, GameConfig(), HomeActions({}, {}, {}, {})) }
+        compose.setContent { HomeScreen(AppState(Screen.Home, learner = anita, progress = progress, today = today), lesson, GameConfig(), HomeActions({}, {}, {}, {}, {})) }
         compose.onNodeWithText("0 days").assertExists()
         compose.onNodeWithText("Practise more").assertExists()
     }

@@ -29,9 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.bodhya.speak.desktop.app.AppState
 import net.bodhya.speak.desktop.app.SentenceResult
+import net.bodhya.speak.desktop.check.MessageKind
 import net.bodhya.speak.desktop.data.Learner
 import net.bodhya.speak.desktop.practice.Listening
 import net.bodhya.speak.desktop.speech.RecognitionState
+import net.bodhya.speak.desktop.voice.Message
 import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.domain.Praise
 import net.bodhya.speak.domain.FeedbackSelector
@@ -171,6 +173,10 @@ fun FeedbackScreen(learner: Learner, result: SentenceResult, lesson: Lesson, act
                     WordChips(sentence.text, result.alignment.words)
                 }
                 Line("We heard: “${result.heard.trim()}” (हमने सुना)", size = 16.sp, color = Colors.muted)
+                // Saying the last unsaid sentence of a lesson opens the next one.
+                for (opened in result.opened) {
+                    MessageBox(MessageKind.OK, Message("New lesson open: ${opened.titleEn}", "नया पाठ खुला: ${opened.titleHi}"))
+                }
             }
             Column(Modifier.weight(1f).background(Colors.surface, RoundedCornerShape(28.dp)).padding(28.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 result.tip?.let { tip ->

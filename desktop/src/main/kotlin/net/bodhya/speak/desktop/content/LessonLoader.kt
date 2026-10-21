@@ -58,13 +58,14 @@ object LessonLoader {
     }
 
     /** Loads the tip templates: `{ "tag": { "text_hi": "…", "reviewed": false } }`. */
-    fun loadHints(name: String, text: String): Hints = parse(name) {
-        Hints(
-            parseRoot(text).map { (tag, v) ->
-                val o = v.asObject("hint \"$tag\"")
-                HintTemplate(tag, o.string("text_hi"), o.boolean("reviewed") ?: false)
-            },
-        )
+    fun loadHints(name: String, text: String): Hints = parse(name) { Hints(loadHintTemplates(name, text)) }
+
+    /** The tip templates in [text], without requiring the generic one (a lesson pack's own templates add to the app's). */
+    fun loadHintTemplates(name: String, text: String): List<HintTemplate> = parse(name) {
+        parseRoot(text).map { (tag, v) ->
+            val o = v.asObject("hint \"$tag\"")
+            HintTemplate(tag, o.string("text_hi"), o.boolean("reviewed") ?: false)
+        }
     }
 
     private fun word(key: String, o: JsonObject, warnings: MutableList<String>): WordInfo {
