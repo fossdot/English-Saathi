@@ -38,7 +38,6 @@ import net.bodhya.speak.desktop.mic.JavaSoundPcmSource
 import net.bodhya.speak.desktop.mic.MicAccess
 import net.bodhya.speak.desktop.speech.ModelSwitcher
 import net.bodhya.speak.desktop.speech.NativeLibraries
-import net.bodhya.speak.desktop.speech.SpeechModel
 import net.bodhya.speak.desktop.ui.CheckActions
 import net.bodhya.speak.desktop.ui.CheckInfo
 import net.bodhya.speak.desktop.ui.Colors
@@ -67,9 +66,6 @@ import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
-/** The model the switch starts on until the MacBook trip measures small.en (docs/decisions.md, Q3). */
-private val FIRST_MODEL = SpeechModel.TINY_EN
-
 /** Threads for Whisper: D1 measured 4 as the useful number under Rosetta; the MacBook trip checks 2, 4 and 6. */
 private const val THREADS = 4
 
@@ -85,6 +81,9 @@ internal class Setup(
     val hindi: Voice?,
     val notices: List<Message>,
     val inputs: List<String>,
+    /** The input to start on: the saved one, or the built-in microphone when it isn't connected. */
+    val input: String?,
+    val settings: SettingsFile,
     val clips: Map<String, File>,
 ) {
     companion object {
@@ -110,6 +109,13 @@ internal class Setup(
             val inputs = MicAccess.inputs()
             log.write("inputs: ${inputs.joinToString()}")
 
+            val settings = SettingsFile(File(dataDir, "settings.json"))
+            val saved = settings.read { log.write("settings: $it") }
+            val input = MicAccess.restoreInput(saved.input, inputs, MicAccess::builtInInput)
+            log.write("settings: model ${saved.model.id}, microphone ${saved.input ?: "Mac's default"}" +
+                if (input != saved.input) " (not connected: using ${input ?: "Mac's default"})" else "")
+            if (input != saved.input) notices += inputMissing(saved.input!!, input)
+
             NativeLibraries.use(File(projectDir, "desktop/native"))
             val config = GameConfig()
             val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
@@ -132,8 +138,21 @@ internal class Setup(
 
             return Setup(
                 projectDir, dataDir, log, loaded.lesson,
-                ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), FIRST_MODEL).also { log.write("model ${FIRST_MODEL.id}, $THREADS threads") },
-                Speaker(renderer), english, hindi, notices, inputs, clips,
+                ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), saved.model).also { log.write("model ${saved.model.id}, $THREADS threads") },
+                Speaker(renderer), english, hindi, notices, inputs, input, settings, clips,
+            )
+        }
+
+        /** Drafted for the desktop app; needs the teacher review. */
+        fun inputMissing(saved: String, using: String?): Message = if (using != null) {
+            Message(
+                "The chosen microphone \"$saved\" isn't connected, so the Mac's built-in microphone ($using) is used. To use \"$saved\", connect it and open English Saathi again.",
+                "चुना हुआ माइक \"$saved\" जुड़ा नहीं है, इसलिए Mac में लगा माइक इस्तेमाल हो रहा है। \"$saved\" के लिए उसे जोड़कर English Saathi फिर से खोलिए।",
+            )
+        } else {
+            Message(
+                "The chosen microphone \"$saved\" isn't connected, and no built-in microphone was found, so the Mac's default microphone is used. Check the microphone in Settings (⌘,).",
+                "चुना हुआ माइक \"$saved\" जुड़ा नहीं है, इसलिए Mac का अपना माइक इस्तेमाल हो रहा है। Settings (⌘,) में माइक जाँचिए।",
             )
         }
 
@@ -271,6 +290,10 @@ private fun newController(ready: Setup) = SpeechCheckController(
     log = ready.log::write,
     scope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
     io = Dispatchers.IO,
+    input = ready.input,
+    // Only a choice in Settings is saved: a fallback at start keeps the saved microphone for when it is back.
+    saveModel = { model -> ready.settings.update { it.copy(model = model) } },
+    saveInput = { input -> ready.settings.update { it.copy(input = input) } },
     saveRecording = { sentenceId, recording ->
         // The latest recording of each sentence only, in the data folder (kept out of Time Machine).
         val file = File(ready.dataDir, "recordings/speech-check/$sentenceId.wav")

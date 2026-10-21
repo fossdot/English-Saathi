@@ -182,6 +182,39 @@ class SpeechCheckControllerTest {
     }
 
     @Test
+    fun `choices in Settings are saved, and a restored input is used`() {
+        val models = mutableListOf<SpeechModel>()
+        val inputs = mutableListOf<String?>()
+        val opened = mutableListOf<String?>()
+        val c = SpeechCheckController(
+            lesson, recognition, output,
+            openMicrophone = { opened += it; microphone() },
+            permission = { permission }, readClip = { spoken() }, log = { log += it },
+            scope = CoroutineScope(Dispatchers.Unconfined), io = Dispatchers.Unconfined,
+            input = "USB PnP Sound Device", saveModel = { models += it }, saveInput = { inputs += it },
+        )
+        assertEquals("USB PnP Sound Device", c.state.value.input)
+        c.checkMicrophone()
+        assertEquals(listOf<String?>("USB PnP Sound Device"), opened)
+        c.chooseModel(SpeechModel.TINY_EN)
+        c.chooseInput(null)
+        assertEquals(listOf(SpeechModel.TINY_EN), models)
+        assertEquals(listOf<String?>(null), inputs)
+    }
+
+    @Test
+    fun `a choice that can't be saved is logged, not a crash`() {
+        val c = SpeechCheckController(
+            lesson, recognition, output, openMicrophone = { microphone() }, permission = { permission }, readClip = { spoken() },
+            log = { log += it }, scope = CoroutineScope(Dispatchers.Unconfined), io = Dispatchers.Unconfined,
+            saveInput = { throw IOException("disk full") },
+        )
+        c.chooseInput("AirPods")
+        assertEquals("AirPods", c.state.value.input)
+        assertTrue(log.last(), log.last().startsWith("settings not saved") && "disk full" in log.last())
+    }
+
+    @Test
     fun `test clips go through the same recorder`() {
         controller.runClip("bus_01.wav")
         assertEquals("bus_01.wav", controller.state.value.result!!.source)

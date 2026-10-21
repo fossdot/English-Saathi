@@ -111,11 +111,16 @@ class SpeechCheckController(
     private val scope: CoroutineScope,
     /** Keeps [Recording] as the latest of sentence [String]; returns where, or null. Runs on [io]. */
     private val saveRecording: (String, Recording) -> String? = { _, _ -> null },
+    /** The input to start on, restored from the data folder; null is the Mac's default. */
+    input: String? = null,
+    /** Keep the facilitator's choice of model and of microphone for the next start. */
+    private val saveModel: (SpeechModel) -> Unit = {},
+    private val saveInput: (String?) -> Unit = {},
     private val io: CoroutineDispatcher,
     private val config: GameConfig = GameConfig(),
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
-    private val _state = MutableStateFlow(SpeechCheckState())
+    private val _state = MutableStateFlow(SpeechCheckState(input = input))
     val state: StateFlow<SpeechCheckState> = _state.asStateFlow()
 
     /** Changes whenever the screen moves on; a result for an older one is dropped. */
@@ -140,11 +145,17 @@ class SpeechCheckController(
     fun chooseModel(model: SpeechModel) {
         recognition.switchTo(model)
         log("model switched to ${model.id}")
+        save { saveModel(model) }
     }
 
     fun chooseInput(input: String?) {
         _state.update { it.copy(input = input, mic = MicStatus.NotChecked) }
         log("input: ${input ?: "Mac's default"}")
+        save { saveInput(input) }
+    }
+
+    private fun save(write: () -> Unit) {
+        runCatching(write).onFailure { log("settings not saved: $it") }
     }
 
     /** Space and the mic button: start recording, or stop it early. */

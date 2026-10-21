@@ -75,10 +75,18 @@ class SpeechCheckScreenTest {
     }
 
     @Test
+    fun `the model in use is shown at the top`() {
+        compose.setContent { SpeechCheckScreen(lesson, SpeechCheckState(), ready, info, CheckActions({}, {}, {}, {})) }
+        compose.onNodeWithText("Speech model: tiny.en").assertExists()
+        compose.onNodeWithText("मॉडल: तेज़").assertExists()
+    }
+
+    @Test
     fun `while the model loads the screen says so`() {
         compose.setContent {
             SpeechCheckScreen(lesson, SpeechCheckState(), RecognitionState(SpeechModel.SMALL_EN, EngineState.Loading), info, CheckActions({}, {}, {}, {}))
         }
         compose.onNodeWithText("Loading the speech model…").assertExists()
+        compose.onNodeWithText("Speech model: small.en · loading…").assertExists()
     }
 }

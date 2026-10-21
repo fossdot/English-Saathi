@@ -80,6 +80,9 @@ The other model:
       to load).
 - [ ] Repeat the 5 sentences. Note the "result after … s" figures: ____
       Is that wait acceptable for a student? ____
+- [ ] Quit the app (⌘Q) and run `scripts/run_desktop.sh` again. The top
+      of the window says **Speech model: small.en**, and Settings still
+      has the microphone chosen before.
 
 Listening and keys:
 

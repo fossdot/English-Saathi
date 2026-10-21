@@ -39,6 +39,7 @@ import net.bodhya.speak.desktop.check.MicStatus
 import net.bodhya.speak.desktop.check.SpeechCheckState
 import net.bodhya.speak.desktop.check.starsText
 import net.bodhya.speak.desktop.speech.RecognitionState
+import net.bodhya.speak.desktop.speech.SpeechModel
 import net.bodhya.speak.desktop.voice.Message
 import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.domain.Normalizer
@@ -71,6 +72,7 @@ fun SpeechCheckScreen(lesson: Lesson, state: SpeechCheckState, recognition: Reco
     Column(Modifier.fillMaxSize().background(Colors.bg).verticalScroll(rememberScrollState()).padding(horizontal = 40.dp, vertical = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Gap) {
             Bilingual("Speech check", "बोलकर जाँचिए", Modifier.weight(1f), size = 28.sp, bold = true)
+            ModelBadge(recognition)
             PilotButton("Hindi help", "हिंदी में सुनिए", actions.hindiHelp, enabled = info.hindi != null)
         }
         for (notice in info.notices) MessageBox(MessageKind.PROBLEM, notice)
@@ -132,6 +134,21 @@ private fun MicBlock(state: SpeechCheckState, recognition: RecognitionState, act
         Box(Modifier.fillMaxWidth().height(10.dp).background(Colors.line, RoundedCornerShape(5.dp))) {
             Box(Modifier.fillMaxWidth(state.level).height(10.dp).background(Colors.primary, RoundedCornerShape(5.dp)))
         }
+    }
+}
+
+/** The model in use, at the top where a facilitator can't miss it (every result depends on it). */
+@Composable
+private fun ModelBadge(recognition: RecognitionState) {
+    val (bg, fg, status) = when (recognition.engine) {
+        EngineState.Loading -> Triple(Colors.surface, Colors.ink, " · loading…")
+        is EngineState.Ready -> Triple(Colors.primarySoft, Colors.primaryInk, "")
+        is EngineState.Failed -> Triple(Colors.badSoft, Colors.badInk, " · didn't load")
+    }
+    // The Hindi words are Settings' labels for the two models.
+    val hi = if (recognition.model == SpeechModel.TINY_EN) "तेज़" else "ज़्यादा सही"
+    Box(Modifier.background(bg, RoundedCornerShape(16.dp)).padding(horizontal = 16.dp, vertical = 8.dp).testTag("model")) {
+        Bilingual("Speech model: ${recognition.model.id}$status", "मॉडल: $hi", size = 20.sp, color = fg, bold = true)
     }
 }
 

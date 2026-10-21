@@ -107,9 +107,9 @@ Answers to the desktop plan's questions (`docs/desktop-plan.md`).
 
 Within the plan; each is a setting or a small change.
 
-- **The model switch starts on tiny.en** until the MacBook trip measures
-  small.en (the 1.5 s rule above); Whisper runs with 4 threads (the trip's
-  D1 check also times 2 and 6).
+- **The model switch starts on tiny.en** at the first start until the
+  MacBook trip measures small.en (the 1.5 s rule above); Whisper runs with
+  4 threads (the trip's D1 check also times 2 and 6).
 - **The microphone check runs at every start**, not only the first: one
   silent second, so the macOS prompt appears while the facilitator is there
   and a microphone that stopped working is caught before a student speaks.
@@ -120,6 +120,14 @@ Within the plan; each is a setting or a small change.
   recognizer heard, never audio.
 - **Settings** opens with ⌘, (the standard macOS Settings item): model,
   microphone input, the microphone check, test clips.
+- **The chosen model and microphone are kept** in `settings.json` in the
+  data folder and restored at start (the retest after the end-of-speech
+  fix, 2026-10-21, found both back on tiny.en and the Mac's default).
+  When the saved microphone isn't connected, the app uses the Mac's
+  built-in microphone (found with `system_profiler`; the Mac's default if
+  there is none or the lid is closed) and says so at the top of the
+  window; the saved choice stays, for when that microphone is back. The
+  main window shows the model in use at the top.
 - **Buttons never take keyboard focus**, so Space and Enter always reach
   the shortcuts instead of clicking the last button used.
 - **Leaving the window** (another app comes to the front) stops listening

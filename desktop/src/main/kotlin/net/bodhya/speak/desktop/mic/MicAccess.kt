@@ -1,5 +1,10 @@
 package net.bodhya.speak.desktop.mic
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -34,6 +39,27 @@ object MicAccess {
 
     /** The recording inputs Java Sound sees (the first is usually "Default Audio Device"). */
     fun inputs(): List<String> = recordingMixers().map { it.name }
+
+    /**
+     * The input to start on: the saved one if it is connected, otherwise the
+     * Mac's built-in microphone, otherwise (none built in, or the lid closed)
+     * the Mac's default, null.
+     */
+    fun restoreInput(saved: String?, inputs: List<String>, builtIn: () -> String?): String? = when (saved) {
+        null, in inputs -> saved
+        else -> builtIn()?.takeIf { it in inputs }
+    }
+
+    /** The Mac's built-in microphone by name ("MacBook Pro Microphone"), from `system_profiler`; null if there is none. */
+    fun builtInInput(): String? = run("system_profiler", "SPAudioDataType", "-json")?.let(::parseBuiltInInput)
+
+    /** Finds the input device whose transport is built in, in `system_profiler SPAudioDataType -json`. */
+    fun parseBuiltInInput(json: String): String? = runCatching {
+        val groups = (Json.parseToJsonElement(json) as JsonObject)["SPAudioDataType"] as JsonArray
+        groups.flatMap { (it as JsonObject)["_items"] as? JsonArray ?: JsonArray(emptyList()) }.map { it as JsonObject }.firstOrNull { item ->
+            item["coreaudio_device_transport"]?.jsonPrimitive?.contentOrNull == "coreaudio_device_type_builtin" && "coreaudio_device_input" in item
+        }?.get("_name")?.jsonPrimitive?.contentOrNull
+    }.getOrNull()
 
     /**
      * Asks macOS for the microphone permission with a one-line script, which
