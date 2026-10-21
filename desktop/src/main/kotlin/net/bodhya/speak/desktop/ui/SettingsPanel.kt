@@ -70,6 +70,8 @@ fun SettingsPanel(
     model: SpeechModel,
     input: String?,
     inputs: List<String>,
+    /** The Mac's built-in microphone, labelled so in the list. */
+    builtIn: String?,
     clips: List<String>,
     students: List<Learner>,
     info: SettingsInfo,
@@ -89,10 +91,12 @@ fun SettingsPanel(
         }
         Line("Microphone", bold = true)
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            PilotButton("Mac's default" + if (input == null) " ✓" else "", "Mac का अपना माइक", { actions.chooseInput(null) }, primary = input == null)
-            for (name in inputs.filter { it != "Default Audio Device" }) {
-                PilotButton(name + if (name == input) " ✓" else "", "यह माइक", { actions.chooseInput(name) }, primary = name == input)
+            // The built-in microphone first: it is the default, and can't switch to an iPhone or headphones on its own.
+            for (name in inputs.filter { it != "Default Audio Device" }.sortedByDescending { it == builtIn }) {
+                val label = if (name == builtIn) "$name (built-in)" else name
+                PilotButton(label + if (name == input) " ✓" else "", if (name == builtIn) "Mac में लगा माइक" else "यह माइक", { actions.chooseInput(name) }, primary = name == input)
             }
+            PilotButton("Mac's default" + if (input == null) " ✓" else "", "Mac का अपना माइक", { actions.chooseInput(null) }, primary = input == null)
         }
         PilotButton("Check the microphone (1 second)", "माइक जाँचिए", actions.checkMicrophone)
         Line("Voices", bold = true)

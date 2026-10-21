@@ -5,8 +5,12 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
+import net.bodhya.speak.desktop.MicChoice
 import java.io.File
 import java.util.concurrent.TimeUnit
+
+/** Where recording starts: [input] (null is the Mac's default), and the choice that couldn't be followed, if any. */
+data class RestoredInput(val input: String?, val missing: MicChoice? = null)
 
 /** macOS's answer to "may this app use the microphone?", for the app that started Gradle (Terminal). */
 enum class MicPermission {
@@ -41,13 +45,19 @@ object MicAccess {
     fun inputs(): List<String> = recordingMixers().map { it.name }
 
     /**
-     * The input to start on: the saved one if it is connected, otherwise the
-     * Mac's built-in microphone, otherwise (none built in, or the lid closed)
-     * the Mac's default, null.
+     * The input to start on for the facilitator's [choice]: the chosen one if
+     * it is connected, otherwise the Mac's [builtIn] microphone, otherwise
+     * (none built in, or the lid closed) the Mac's default, null. When the
+     * choice can't be followed, [RestoredInput.missing] says which, so the
+     * app can say so.
      */
-    fun restoreInput(saved: String?, inputs: List<String>, builtIn: () -> String?): String? = when (saved) {
-        null, in inputs -> saved
-        else -> builtIn()?.takeIf { it in inputs }
+    fun restoreInput(choice: MicChoice, inputs: List<String>, builtIn: String?): RestoredInput {
+        val builtInHere = builtIn?.takeIf { it in inputs }
+        return when (choice) {
+            MicChoice.MacDefault -> RestoredInput(null)
+            MicChoice.BuiltIn -> if (builtInHere != null) RestoredInput(builtInHere) else RestoredInput(null, choice)
+            is MicChoice.Named -> if (choice.name in inputs) RestoredInput(choice.name) else RestoredInput(builtInHere, choice)
+        }
     }
 
     /** The Mac's built-in microphone by name ("MacBook Pro Microphone"), from `system_profiler`; null if there is none. */

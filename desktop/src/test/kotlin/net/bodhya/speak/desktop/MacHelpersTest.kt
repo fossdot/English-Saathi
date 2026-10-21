@@ -2,6 +2,7 @@ package net.bodhya.speak.desktop
 
 import net.bodhya.speak.desktop.mic.JavaMicCheck
 import net.bodhya.speak.desktop.mic.MicAccess
+import net.bodhya.speak.desktop.mic.RestoredInput
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -32,13 +33,17 @@ class MacHelpersTest {
     @Test
     fun `the saved microphone is used when connected, otherwise the built-in one`() {
         val inputs = listOf("Default Audio Device", "MacBook Pro Microphone", "USB PnP Sound Device")
-        val builtIn = { "MacBook Pro Microphone" }
-        assertEquals(null, MicAccess.restoreInput(null, inputs, builtIn))
-        assertEquals("USB PnP Sound Device", MicAccess.restoreInput("USB PnP Sound Device", inputs, builtIn))
-        assertEquals("MacBook Pro Microphone", MicAccess.restoreInput("AirPods", inputs, builtIn))
-        // No built-in microphone (a Mac mini), or the lid is closed: the Mac's default.
-        assertEquals(null, MicAccess.restoreInput("AirPods", inputs, { null }))
-        assertEquals(null, MicAccess.restoreInput("AirPods", listOf("Default Audio Device", "USB PnP Sound Device"), builtIn))
+        val builtIn = "MacBook Pro Microphone"
+        assertEquals(RestoredInput("MacBook Pro Microphone"), MicAccess.restoreInput(MicChoice.BuiltIn, inputs, builtIn))
+        assertEquals(RestoredInput(null), MicAccess.restoreInput(MicChoice.MacDefault, inputs, builtIn))
+        assertEquals(RestoredInput("USB PnP Sound Device"), MicAccess.restoreInput(MicChoice.Named("USB PnP Sound Device"), inputs, builtIn))
+        val airPods = MicChoice.Named("AirPods")
+        assertEquals(RestoredInput("MacBook Pro Microphone", airPods), MicAccess.restoreInput(airPods, inputs, builtIn))
+        // No built-in microphone (a Mac mini), or the lid is closed: the Mac's default, and the app says so.
+        assertEquals(RestoredInput(null, airPods), MicAccess.restoreInput(airPods, inputs, null))
+        val lidClosed = listOf("Default Audio Device", "USB PnP Sound Device")
+        assertEquals(RestoredInput(null, airPods), MicAccess.restoreInput(airPods, lidClosed, builtIn))
+        assertEquals(RestoredInput(null, MicChoice.BuiltIn), MicAccess.restoreInput(MicChoice.BuiltIn, lidClosed, builtIn))
     }
 
     @Test

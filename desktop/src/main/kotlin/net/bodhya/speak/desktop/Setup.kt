@@ -36,7 +36,9 @@ internal class Setup(
     val hindi: Voice?,
     val notices: List<Message>,
     val inputs: List<String>,
-    /** The input to start on: the saved one, or the built-in microphone when it isn't connected. */
+    /** The Mac's built-in microphone by name, if it has one. */
+    val builtIn: String?,
+    /** The input to start on: the chosen one, or the built-in microphone, or the Mac's default when that isn't there. */
     val input: String?,
     val settings: SettingsFile,
     val clips: Map<String, File>,
@@ -70,10 +72,16 @@ internal class Setup(
 
             val settings = SettingsFile(File(dataDir, "settings.json"))
             val saved = settings.read { log.write("settings: $it") }
-            val input = MicAccess.restoreInput(saved.input, inputs, MicAccess::builtInInput)
-            log.write("settings: model ${saved.model.id}, microphone ${saved.input ?: "Mac's default"}" +
-                if (input != saved.input) " (not connected: using ${input ?: "Mac's default"})" else "")
-            if (input != saved.input) notices += inputMissing(saved.input!!, input)
+            val builtIn = MicAccess.builtInInput()
+            val restored = MicAccess.restoreInput(saved.microphone, inputs, builtIn)
+            val input = restored.input
+            log.write("settings: model ${saved.model.id}, microphone ${describe(saved.microphone)}, built in: ${builtIn ?: "none"}" +
+                (restored.missing?.let { " (not available: using ${input ?: "Mac's default"})" } ?: ""))
+            when (val missing = restored.missing) {
+                null, MicChoice.MacDefault -> Unit
+                MicChoice.BuiltIn -> notices += builtInMissing()
+                is MicChoice.Named -> notices += inputMissing(missing.name, input)
+            }
 
             NativeLibraries.use(File(projectDir, "desktop/native"))
             val config = GameConfig()
@@ -106,9 +114,21 @@ internal class Setup(
             return Setup(
                 projectDir, dataDir, log, loaded.lesson, hints,
                 ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), saved.model).also { log.write("model ${saved.model.id}, $THREADS threads") },
-                Speaker(renderer), english, hindi, notices, inputs, input, settings, clips, store, dataProblems,
+                Speaker(renderer), english, hindi, notices, inputs, builtIn, input, settings, clips, store, dataProblems,
             )
         }
+
+        private fun describe(choice: MicChoice) = when (choice) {
+            MicChoice.BuiltIn -> "built-in"
+            MicChoice.MacDefault -> "Mac's default"
+            is MicChoice.Named -> choice.name
+        }
+
+        /** Drafted for the desktop app; needs the teacher review. */
+        fun builtInMissing(): Message = Message(
+            "The Mac's built-in microphone isn't available (is the lid closed?), so the Mac's default microphone is used. Choose another in Settings (⌘,).",
+            "Mac में लगा माइक नहीं मिला (क्या ढक्कन बंद है?), इसलिए Mac का अपना माइक इस्तेमाल हो रहा है। Settings (⌘,) में दूसरा माइक चुन सकते हैं।",
+        )
 
         /** Drafted for the desktop app; needs the teacher review. */
         fun inputMissing(saved: String, using: String?): Message = if (using != null) {

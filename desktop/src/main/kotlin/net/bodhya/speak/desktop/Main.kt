@@ -353,7 +353,7 @@ internal fun Settings(ready: Setup, parts: AppParts) {
     val checkState by c.state.collectAsState()
     val recognition by ready.recognition.state.collectAsState()
     SettingsPanel(
-        recognition.model, checkState.input, ready.inputs, ready.clips.keys.toList(), state.students.map { it.learner },
+        recognition.model, checkState.input, ready.inputs, ready.builtIn, ready.clips.keys.toList(), state.students.map { it.learner },
         SettingsInfo(ready.english?.name, ready.hindi?.name, VoiceHelp.settingsPath(System.getProperty("os.version")), ready.dataDir.path, ready.log.file.path),
         SettingsActions(
             chooseModel = c::chooseModel,
@@ -407,7 +407,14 @@ private fun newController(ready: Setup, output: SpeechOutput) = SpeechCheckContr
     input = ready.input,
     // Only a choice in Settings is saved: a fallback at start keeps the saved microphone for when it is back.
     saveModel = { model -> ready.settings.update { it.copy(model = model) } },
-    saveInput = { input -> ready.settings.update { it.copy(input = input) } },
+    saveInput = { input ->
+        val choice = when (input) {
+            null -> MicChoice.MacDefault
+            ready.builtIn -> MicChoice.BuiltIn
+            else -> MicChoice.Named(input)
+        }
+        ready.settings.update { it.copy(microphone = choice) }
+    },
     saveRecording = { sentenceId, recording ->
         // The latest recording of each sentence only, in the data folder (kept out of Time Machine).
         val file = File(ready.dataDir, "recordings/speech-check/$sentenceId.wav")

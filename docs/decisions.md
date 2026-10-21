@@ -7,9 +7,10 @@ gaps between the spec, the design mockup (`design/`) and the web pilot
 
 **Status (2026-10-21):** the macOS desktop app comes first and Android is
 paused (see "Direction change" below). The desktop plan is
-`docs/desktop-plan.md` (milestones D1–D9). D1–D4 are done. Students will use
-the desktop app for the next three months, so D5–D8 started on 2026-10-21
-without waiting for the pilots (see "Desktop screens: owner answers").
+`docs/desktop-plan.md` (milestones D1–D9). D1–D8 are built. Students will
+use the desktop app for the next three months, as a normal Mac app with
+lessons that can be added later (see "Distribution, defaults and lessons:
+owner answers").
 
 ## Direction change: macOS desktop app first (2026-10-19)
 
@@ -109,7 +110,8 @@ Within the plan; each is a setting or a small change.
 
 - **The model switch starts on tiny.en** at the first start until the
   MacBook trip measures small.en (the 1.5 s rule above); Whisper runs with
-  4 threads (the trip's D1 check also times 2 and 6).
+  4 threads (the trip's D1 check also times 2 and 6). *Changed 2026-10-21:
+  small.en is the default (owner).*
 - **The microphone check runs at every start**, not only the first: one
   silent second, so the macOS prompt appears while the facilitator is there
   and a microphone that stopped working is caught before a student speaks.
@@ -127,7 +129,13 @@ Within the plan; each is a setting or a small change.
   built-in microphone (found with `system_profiler`; the Mac's default if
   there is none or the lid is closed) and says so at the top of the
   window; the saved choice stays, for when that microphone is back. The
-  main window shows the model in use at the top.
+  main window shows the model in use at the top. *Changed 2026-10-21: with
+  nothing chosen, the app uses the built-in microphone, not the Mac's
+  default (owner). `settings.json` now says `"microphone": "built-in"`,
+  `"mac-default"` or `"named"` (with `"microphone_name"`); files with the
+  old `"input"` keep a named choice, and their `null` (written even when
+  nothing was chosen) now means the built-in microphone. Settings lists the
+  built-in microphone first, marked "(built-in)".*
 - **Buttons never take keyboard focus**, so Space and Enter always reach
   the shortcuts instead of clicking the last button used.
 - **Leaving the window** (another app comes to the front) stops listening
@@ -142,6 +150,48 @@ Within the plan; each is a setting or a small change.
 - **Icons are drawn**, from the pilot's own SVG paths (`ui/Icons.kt`): the
   mic and stop buttons, stars instead of "3 stars", and the chips' check,
   retry and dash marks, which were text characters.
+
+## Distribution, defaults and lessons: owner answers (2026-10-21)
+
+- **Speech model:** small.en is the default; tiny.en stays as the fallback
+  in Settings. Revisit only if the MacBook check shows small.en too slow.
+  This replaces Q3's "tiny.en until the MacBook trip measures small.en".
+- **Microphone:** the Mac's built-in microphone by default, not "Mac's
+  default", so the input can't switch to an iPhone or headphones on its
+  own. If the built-in microphone isn't available (none, or the lid is
+  closed), the app uses the Mac's default and says so. Settings can still
+  choose another, and the choice is saved.
+- **Distribution:** students get English Saathi as a normal Mac app from a
+  download link. No Terminal, Gradle, Java install or internet after the
+  download. Shared through Google Drive for now; GitHub Releases once the
+  repo goes public with the final product. Packaging moves from "after D9"
+  (`docs/later.md`) to now.
+- **Student profiles:** created once; several per Mac. All data stays on
+  that Mac. No tracking or sharing for now.
+- **Target:** Hikmat Foundation's 2019 Intel MacBook Pros, 16 GB RAM.
+- **Lessons are kept separate from the app.** The app ships with the first
+  lesson pack inside and also reads extra lesson packs from the data
+  folder. Settings › "Add lessons" picks a pack file, checks it with the
+  lesson loader, shows what it adds (in English and Hindi) and installs it.
+  A bad pack is rejected with a clear message and never breaks existing
+  lessons or progress. A pack has a version number, so adding an older one
+  never replaces a newer one. App updates replace English Saathi.app only;
+  progress and added lessons in the data folder survive (with a test).
+- **Lessons unlock in order:** lesson 2 opens once every sentence of
+  lesson 1 has been said at least once (any stars). Later lessons show with
+  a lock and their names. A Settings switch, "Open all lessons", is for
+  testing and for students who already know the basics; it is per student
+  (Settings › Students), so one student can skip ahead without opening
+  everything for the class.
+- **Daily goal with several lessons:** the goal (5 different sentences a
+  day) counts sentences from any lesson. Start practice continues the
+  learner's current lesson and moves to the next open lesson once every
+  sentence in it is done today.
+- **Pack format:** text only for now: one `.json` file. The format carries
+  its own version number, so a later format can add pictures in a `.zip`
+  without breaking installed packs.
+- **Commits:** one per part, pushed once its tests pass. The `.dmg` is
+  never committed.
 
 ## Desktop screens: owner answers (2026-10-21)
 

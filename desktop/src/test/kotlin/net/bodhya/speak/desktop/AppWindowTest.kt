@@ -12,6 +12,7 @@ import net.bodhya.speak.desktop.data.AttemptResult
 import net.bodhya.speak.desktop.data.Card
 import net.bodhya.speak.desktop.data.CardColour
 import net.bodhya.speak.desktop.data.CardSymbol
+import net.bodhya.speak.desktop.speech.SpeechModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -31,7 +32,12 @@ class AppWindowTest {
     val tmp = TemporaryFolder()
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val ready by lazy { Setup.create(projectDir, File(tmp.root, "English Saathi")) }
+    private val ready by lazy {
+        val dataDir = File(tmp.root, "English Saathi")
+        // tiny.en: these tests start the app six times, and small.en (the default) would load 375 MB each time.
+        SettingsFile(File(dataDir, "settings.json")).update { it.copy(model = SpeechModel.TINY_EN) }
+        Setup.create(projectDir, dataDir)
+    }
     private val parts by lazy { AppParts.create(ready) }
 
     @Test
