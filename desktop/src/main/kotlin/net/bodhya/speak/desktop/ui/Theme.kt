@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,7 +84,15 @@ fun Bilingual(en: String, hi: String, modifier: Modifier = Modifier, size: TextU
  * the window's shortcuts instead of clicking whatever button was last used.
  */
 @Composable
-fun PilotButton(en: String, hi: String, onClick: () -> Unit, modifier: Modifier = Modifier, primary: Boolean = false, enabled: Boolean = true) {
+fun PilotButton(
+    en: String,
+    hi: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    primary: Boolean = false,
+    enabled: Boolean = true,
+    leading: (@Composable () -> Unit)? = null,
+) {
     val shape = RoundedCornerShape(16.dp)
     val fg = if (primary) Colors.onPrimary else Colors.primaryInk
     Box(
@@ -95,7 +104,10 @@ fun PilotButton(en: String, hi: String, onClick: () -> Unit, modifier: Modifier 
             .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.CenterStart,
     ) {
-        Bilingual(en, hi, size = 18.sp, color = if (enabled) fg else Colors.muted, bold = true)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            leading?.invoke()
+            Bilingual(en, hi, size = 18.sp, color = if (enabled) fg else Colors.muted, bold = true)
+        }
     }
 }
 

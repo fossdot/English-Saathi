@@ -15,6 +15,7 @@ import net.bodhya.speak.desktop.voice.Voice
 import net.bodhya.speak.desktop.voice.VoiceHelp
 import net.bodhya.speak.desktop.voice.VoiceRole
 import net.bodhya.speak.domain.GameConfig
+import net.bodhya.speak.domain.Hints
 import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.speech.AsrSettings
 import java.io.File
@@ -28,6 +29,7 @@ internal class Setup(
     val dataDir: File,
     val log: SessionLog,
     val lesson: Lesson,
+    val hints: Hints,
     val recognition: ModelSwitcher,
     val speaker: Speaker,
     val english: Voice?,
@@ -101,7 +103,7 @@ internal class Setup(
             log.write("learners: ${store.learners().size}")
 
             return Setup(
-                projectDir, dataDir, log, loaded.lesson,
+                projectDir, dataDir, log, loaded.lesson, hints,
                 ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), saved.model).also { log.write("model ${saved.model.id}, $THREADS threads") },
                 Speaker(renderer), english, hindi, notices, inputs, input, settings, clips, store, dataProblems,
             )

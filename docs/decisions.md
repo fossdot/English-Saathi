@@ -195,6 +195,28 @@ Within the plan; each is a setting or a small change.
   lines (the pilot's picker line describes typing a name), marked for
   teacher review with the other new messages.
 
+### Choices made while building D6
+
+- **Every recording of a sentence goes into the attempt log**, "Didn't
+  hear you" included: when nothing was loud enough (the recognizer isn't
+  run; `heard` is empty), when the transcript had no words, and when the
+  microphone sent only zeros. A microphone that couldn't be opened, or a
+  recognizer that failed, is shown but not logged: there was no attempt.
+- **The latest recording is kept only when the recognizer ran**, so a
+  silent try doesn't replace the learner's last real attempt.
+- **Keys as in the pilot:** Space, L and S on the practice screen (Enter
+  does nothing there, as in the pilot); Enter (Fix, or Next sentence) and L
+  ("Hear the correct sentence") on feedback.
+- **The mic can't be pressed until the speech model has loaded**, and says
+  so; if the model fails to load, it says to tell the facilitator.
+- **The mic's ring grows with the learner's voice** while listening,
+  instead of the pilot's pulsing animation, so a learner can see the
+  microphone hears them.
+- **The feedback screen has no close button**, as in the pilot: Fix, Skip
+  or Next lead on.
+- The session log (`logs/speech-check.log`) also gets a line per attempt
+  with what the endpointer saw, as the speech check's results do.
+
 ## Owner answers
 
 - **Profiles:** each learner picks a colour and one of about 8 drawn symbols.

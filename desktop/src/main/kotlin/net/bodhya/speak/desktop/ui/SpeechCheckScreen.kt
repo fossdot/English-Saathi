@@ -163,55 +163,13 @@ private fun ResultBlock(lesson: Lesson, r: CheckResult) {
             Stars(it.stars, 40.dp)
             Bilingual("${it.correct} of ${it.total} words correct", "${it.total} में से ${it.correct} शब्द सही", bold = true)
         }
-        r.words?.let { words -> FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Chips(sentence.text, words) } }
+        r.words?.let { words -> FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { WordChips(sentence.text, words) } }
         r.heard?.let { Bilingual("We heard: “${it.trim()}”", "हमने सुना") }
         Line(
             "${r.model?.id ?: "not run"} · ${r.source} · recording ${"%.1f".format(r.audioMs / 1000.0)} s (${r.endReason.name.lowercase().replace('_', ' ')})" +
                 (r.waitMs?.let { " · result after ${"%.2f".format(it / 1000.0)} s" } ?: ""),
             size = 16.sp, color = Colors.muted,
         )
-    }
-}
-
-/** One chip per word as written ("Patna"), coloured by how it was said; unscored words are neutral. */
-@Composable
-private fun Chips(text: String, words: List<WordResult>) {
-    var next = 0
-    for (token in Normalizer.tokens(text)) {
-        if (token.words.isEmpty()) continue
-        val mine = words.subList(next, minOf(words.size, next + token.words.size))
-        next += token.words.size
-        val scored = mine.any { it.scored }
-        val status = when {
-            mine.any { it.status == WordStatus.WRONG } -> WordStatus.WRONG
-            mine.any { it.status == WordStatus.MISSING } -> WordStatus.MISSING
-            else -> WordStatus.CORRECT
-        }
-        Chip(token.text.trim('.', ',', '?', '!'), if (scored) status else null)
-    }
-}
-
-@Composable
-private fun Chip(label: String, status: WordStatus?) {
-    val shape = RoundedCornerShape(12.dp)
-    val (bg, fg, icon) = when (status) {
-        WordStatus.CORRECT -> Triple(Colors.okSoft, Colors.okInk, Icons.check)
-        WordStatus.WRONG -> Triple(Colors.badSoft, Colors.badInk, Icons.retry)
-        WordStatus.MISSING -> Triple(Color.Transparent, Colors.badInk, Icons.dash)
-        null -> Triple(Colors.bg, Colors.muted, null)
-    }
-    Box(
-        Modifier.background(bg, shape)
-            .then(if (status == WordStatus.WRONG) Modifier.border(2.dp, Colors.bad, shape) else Modifier)
-            .then(if (status == WordStatus.MISSING) Modifier.drawBehind {
-                drawRoundRect(Colors.bad, style = Stroke(width = 2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))), cornerRadius = CornerRadius(12.dp.toPx()))
-            } else Modifier)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            icon?.let { Icon(it, 20.dp, fg) }
-            BasicText(label, style = textStyle(26.sp, fg, FontWeight.SemiBold))
-        }
     }
 }
 

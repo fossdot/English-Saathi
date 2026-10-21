@@ -126,7 +126,10 @@ the student screens are in the MacBook trip's part D.
 - A facilitator action to delete a student, with a confirmation step: it
   removes their progress, attempt-log rows and recordings.
 
-**D6. Practice and feedback** (after the pilots)
+**D6. Practice and feedback**
+
+Status: built and tested on the Apple M4 (headless and off-screen tests);
+in the MacBook trip's part D.
 - Two-column layout, Listen and Slowly, the mic button, Space/L/S/Enter as
   in the pilot.
 - Chips (neutral for unscored words), stars, praise, "n of m words

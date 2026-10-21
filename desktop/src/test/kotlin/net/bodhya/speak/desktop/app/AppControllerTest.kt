@@ -28,10 +28,8 @@ class AppControllerTest {
     val tmp = TemporaryFolder()
 
     private val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
-    private val lesson = LessonLoader.loadLesson(
-        "bus_stand.json", File(projectDir, "content/bus_stand.json").readText(),
-        LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText()), GameConfig(),
-    ).lesson
+    private val hints = LessonLoader.loadHints("hints.json", File(projectDir, "content/hints.json").readText())
+    private val lesson = LessonLoader.loadLesson("bus_stand.json", File(projectDir, "content/bus_stand.json").readText(), hints, GameConfig()).lesson
 
     /** 2026-10-21, 13:45 in India. */
     private val clock = Clock.fixed(Instant.parse("2026-10-21T08:15:30Z"), ZoneId.of("Asia/Kolkata"))
@@ -43,7 +41,7 @@ class AppControllerTest {
         override fun stop() = Unit
     }
     private val store by lazy { LearnerStore(tmp.newFolder("data"), clock) }
-    private val app by lazy { AppController(store, lesson, output, clock = clock) }
+    private val app by lazy { AppController(store, lesson, hints, output, clock = clock) }
 
     private val blueFish = Card(CardColour.BLUE, CardSymbol.FISH)
 
@@ -104,7 +102,7 @@ class AppControllerTest {
         app.newStudent()
         app.hindiHelp()
         assertEquals(
-            listOf("hi " + AppController.helpText(Screen.Students), "hi " + AppController.helpText(Screen.NewStudent)),
+            listOf("hi " + AppController.helpText(AppState(Screen.Students, today = today)), "hi " + AppController.helpText(AppState(Screen.NewStudent, today = today))),
             spoken,
         )
     }

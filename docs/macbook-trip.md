@@ -131,8 +131,15 @@ scripts/run_desktop.sh
       correctly.
 - [ ] **New student**: choose a colour and a picture, type a name, press
       **Add student**. Home shows the name, "0 / 5", "0 days" and "0 XP".
+- [ ] **Start practice**: the first sentence. Press Space, say it, stop
+      talking: the result shows stars, the words as chips, what was heard
+      and XP. If a word is marked, the tip names it as written.
+- [ ] Press Space and say nothing: "Didn't hear you", and no stars.
+- [ ] **Next sentence** (or **Skip for now**) moves on to the next
+      sentence; the cross at the top left goes home, where the sentence
+      now shows its stars and the goal counts it.
 - [ ] Click the name at the top left: back at the picker, the new card is
-      there, marked "New".
+      there with "1 day".
 - [ ] In a second Terminal window, run `scripts/run_desktop.sh` again: a
       small window says English Saathi is already open. Press OK.
 - [ ] ⌘, › Students › **Delete…** › **Delete …**: the student disappears

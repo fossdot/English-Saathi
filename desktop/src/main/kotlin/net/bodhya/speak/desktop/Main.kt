@@ -39,6 +39,7 @@ import net.bodhya.speak.desktop.app.Screen
 import net.bodhya.speak.desktop.check.SpeechCheckController
 import net.bodhya.speak.desktop.check.SpeechOutput
 import net.bodhya.speak.desktop.data.AppLock
+import net.bodhya.speak.desktop.practice.Listening
 import net.bodhya.speak.desktop.mic.JavaSoundPcmSource
 import net.bodhya.speak.desktop.mic.MicAccess
 import net.bodhya.speak.desktop.ui.BigButton
@@ -46,6 +47,8 @@ import net.bodhya.speak.desktop.ui.Bilingual
 import net.bodhya.speak.desktop.ui.CheckActions
 import net.bodhya.speak.desktop.ui.CheckInfo
 import net.bodhya.speak.desktop.ui.Colors
+import net.bodhya.speak.desktop.ui.FeedbackActions
+import net.bodhya.speak.desktop.ui.FeedbackScreen
 import net.bodhya.speak.desktop.ui.HomeActions
 import net.bodhya.speak.desktop.ui.HomeScreen
 import net.bodhya.speak.desktop.ui.Icons
@@ -53,6 +56,8 @@ import net.bodhya.speak.desktop.ui.Line
 import net.bodhya.speak.desktop.ui.NewStudentActions
 import net.bodhya.speak.desktop.ui.NewStudentScreen
 import net.bodhya.speak.desktop.ui.Page
+import net.bodhya.speak.desktop.ui.PracticeActions
+import net.bodhya.speak.desktop.ui.PracticeScreen
 import net.bodhya.speak.desktop.ui.RoundIconButton
 import net.bodhya.speak.desktop.ui.SettingsActions
 import net.bodhya.speak.desktop.ui.SettingsPanel
@@ -65,6 +70,7 @@ import net.bodhya.speak.desktop.ui.StudentsScreen
 import net.bodhya.speak.desktop.voice.Speaker
 import net.bodhya.speak.desktop.voice.Speeds
 import net.bodhya.speak.desktop.voice.Voice
+import net.bodhya.speak.speech.EngineState
 import net.bodhya.speak.speech.WavReader
 import net.bodhya.speak.speech.WavWriter
 import java.awt.Desktop
@@ -141,6 +147,18 @@ fun main(args: Array<String>) {
                     ?: return@Window false
                 when (screen) {
                     Screen.Home -> if (shortcut == Shortcut.PRIMARY) a.startPractice() else return@Window false
+                    // As in the pilot, Enter does nothing on the practice screen.
+                    is Screen.Practice -> when (shortcut) {
+                        Shortcut.SPEAK -> a.toggleRecording()
+                        Shortcut.LISTEN -> a.listen(slow = false)
+                        Shortcut.SLOWLY -> a.listen(slow = true)
+                        Shortcut.PRIMARY -> return@Window false
+                    }
+                    is Screen.Feedback -> when (shortcut) {
+                        Shortcut.PRIMARY -> a.feedbackPrimary()
+                        Shortcut.LISTEN -> a.listen(slow = false)
+                        else -> return@Window false
+                    }
                     Screen.SpeechCheck -> {
                         val c = check ?: return@Window false
                         when (shortcut) {
@@ -204,16 +222,34 @@ fun main(args: Array<String>) {
 }
 
 /** The controllers behind the main window, made once [Setup] is ready. */
-internal class AppParts(val app: AppController, val check: SpeechCheckController) {
+internal class AppParts(val app: AppController, val check: SpeechCheckController, val listening: Listening) {
     /** Leaving the window (another app comes to the front) stops listening and speech. */
-    fun leave() = check.leave()
+    fun leave() {
+        app.leave()
+        check.leave()
+    }
 
     companion object {
         fun create(ready: Setup, startOnCheck: Boolean = false): AppParts {
             val output = MacSpeechOutput(ready.speaker, ready.english, ready.hindi, ready.log)
-            val app = AppController(ready.store, ready.lesson, output, log = ready.log::write)
+            val check = newController(ready, output)
+            val listening = Listening(
+                ready.recognition,
+                openMicrophone = { input -> JavaSoundPcmSource(input) },
+                // The input chosen in Settings, which the speech check keeps.
+                input = { check.state.value.input },
+                permission = MicAccess::permission,
+                scope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
+                io = Dispatchers.IO,
+                log = ready.log::write,
+            )
+            val app = AppController(
+                ready.store, ready.lesson, ready.hints, output, listening,
+                micReady = { ready.recognition.state.value.engine is EngineState.Ready },
+                log = ready.log::write,
+            )
             if (startOnCheck) app.speechCheck()
-            return AppParts(app, newController(ready, output))
+            return AppParts(app, check, listening)
         }
     }
 }
@@ -227,6 +263,7 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean) {
     val checkState by c.state.collectAsState()
     val recognition by ready.recognition.state.collectAsState()
     val problems by ready.dataProblems.collectAsState()
+    val mic by parts.listening.state.collectAsState()
     when (val screen = state.screen) {
         Screen.Students -> StudentsScreen(
             state,
@@ -238,7 +275,15 @@ internal fun Screens(ready: Setup, parts: AppParts, prepared: Boolean) {
             NewStudentActions(a::addStudent, a::showStudents, a::hindiHelp),
         )
         Screen.Home -> HomeScreen(state, ready.lesson, a.config, HomeActions(a::startPractice, a::openSentence, a::showStudents, a::hindiHelp))
-        is Screen.Practice -> PracticeToCome(ready.lesson.sentences[screen.sentence].text, a::home)
+        is Screen.Practice -> PracticeScreen(
+            state, mic, recognition, ready.lesson, screen.sentence,
+            PracticeActions(a::toggleRecording, a::listen, a::home, a::showStudents, a::hindiHelp),
+        )
+        is Screen.Feedback -> state.result?.let { result ->
+            FeedbackScreen(state.learner!!, result, ready.lesson, FeedbackActions({ a.listen(slow = false) }, a::fix, a::next, a::showStudents, a::hindiHelp))
+        }
+        is Screen.Fix -> ToCome("Fix “${state.result?.toFixWritten}”", "शब्द ठीक करने की स्क्रीन अगले चरण (D7) में आएगी।", a::next)
+        Screen.GoalDone -> ToCome("Goal complete, ${state.learner?.name}!", "लक्ष्य की स्क्रीन अगले चरण (D7) में आएगी।", a::home)
         Screen.SpeechCheck -> SpeechCheckScreen(
             ready.lesson, checkState, recognition,
             CheckInfo(ready.english?.name, ready.hindi?.name, ready.notices, ready.log.file.path, prepared),
@@ -286,12 +331,12 @@ private fun AlreadyOpen(exit: () -> Unit) {
     }
 }
 
-/** Until milestone D6 builds the practice screen. */
+/** Until milestone D7 builds the fixing loop and the goal screen. */
 @Composable
-private fun PracticeToCome(sentence: String, home: () -> Unit) {
+private fun ToCome(title: String, note: String, onward: () -> Unit) {
     Page {
-        RoundIconButton(Icons.close, "Close and go home", home, plain = true)
-        Bilingual(sentence, "अभ्यास की स्क्रीन अगले चरण (D6) में आएगी।", size = 28.sp, bold = true)
+        RoundIconButton(Icons.close, "Go on", onward, plain = true)
+        Bilingual(title, note, size = 28.sp, bold = true)
     }
 }
 
