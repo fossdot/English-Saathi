@@ -362,6 +362,11 @@ The owner's answers:
   refuses to export a function that isn't built, so they are taken out.
 - sherpa-onnx's build breaks on a space in its path ("English Saathi"), so
   it builds in `$TMPDIR`.
+- **No paths of the Mac that built it:** the source paths the compiler
+  writes into the library read `sherpa-onnx-v1.13.8/…`, and it looks for
+  ONNX Runtime only next to itself (`@loader_path`), as sherpa-onnx's own
+  installed copy does. The script checks both, then signs it ad hoc again
+  (changing it breaks the signature, which Apple silicon won't load).
 - **The two libraries are kept in git** (`desktop/native/osx-x64/` and
   `desktop/native/osx-aarch64/libsherpa-onnx-jni.dylib`, listed in
   `scripts/deps.sha256`), as a rebuild elsewhere gives different bytes.
