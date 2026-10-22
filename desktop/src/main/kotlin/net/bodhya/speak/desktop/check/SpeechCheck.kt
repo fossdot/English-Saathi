@@ -6,6 +6,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import net.bodhya.speak.desktop.AppFiles
 import net.bodhya.speak.desktop.speech.JvmWhisperRecognizer
 import net.bodhya.speak.desktop.speech.NativeLibraries
 import net.bodhya.speak.desktop.speech.SpeechModel
@@ -27,7 +28,7 @@ import kotlin.system.exitProcess
 /** A test clip and the sentence said in it. */
 private data class Clip(val file: File, val expected: String)
 
-private const val LIBRISPEECH_TEXT =
+internal const val LIBRISPEECH_TEXT =
     "AFTER EARLY NIGHTFALL THE YELLOW LAMPS WOULD LIGHT UP HERE AND THERE THE SQUALID QUARTER OF THE BROTHELS"
 
 /** The pilot's bus-stand sentences, as recorded by scripts/make_test_wavs.sh. */
@@ -84,7 +85,7 @@ fun main(args: Array<String>) {
     val executor = Executors.newSingleThreadExecutor { Thread(it, "speech") }
     val scope = CoroutineScope(SupervisorJob())
     val engine = SpeechEngine(scope, executor.asCoroutineDispatcher(), System::currentTimeMillis) {
-        JvmWhisperRecognizer.load(model, model.files(projectDir), settings)
+        JvmWhisperRecognizer.load(model, AppFiles.repo(projectDir).model(model), settings)
     }
     var failed = false
     runBlocking {

@@ -18,19 +18,26 @@ Out of scope for v0.1. Collected here so they are not lost.
 - **End-of-speech detection with a model.** If the loudness-based detector
   stops too late or too early in noisy homes, sherpa-onnx's Silero VAD (a
   small extra model) could tell speech from noise.
+- **The Android app's speech library has text-to-speech inside.**
+  `sherpa-onnx-static-link-onnxruntime-1.13.8.aar` compiles in eSpeak NG
+  (GPL-3.0), as the desktop library did before it was rebuilt
+  (`docs/decisions.md`, "Licences: owner answers"). Before an Android build
+  is shared, rebuild it without text-to-speech too, or move to sherpa-onnx
+  2.0, which drops eSpeak NG.
 - **Recording at 48 kHz as a fallback.** Android requires phones to record
   at 16 kHz, but if a cheap phone can't, the app could record at 48 kHz and
   let sherpa-onnx resample.
 
 ## macOS desktop app
 
-- **Package as a .app after D9** (`docs/desktop-plan.md`): jpackage with a
-  bundled Corretto runtime, so the MacBooks don't need Gradle, Terminal or
-  internet. The app then needs its own microphone text
-  (`NSMicrophoneUsageDescription` in Info.plist) and the
-  `com.apple.security.device.audio-input` entitlement: the Compose Gradle
-  plugin's defaults include neither. macOS will ask for the microphone
-  again, this time for English Saathi instead of Terminal.
+- **Notarize the app** (`docs/packaging.md`, "Signing"): with an Apple
+  Developer ID, signing with the hardened runtime and the four entitlements
+  listed there, and notarization, macOS would open the app without the
+  one-time Open Anyway, and keep the microphone permission across updates.
+  (Packaging itself was done on 2026-10-21, before D9: the owner wants
+  students on a normal Mac app now.)
+- **Remove an added lesson pack** in Settings. Not needed yet: packs are
+  only ever replaced by newer versions.
 
 ## App size
 

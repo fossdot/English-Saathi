@@ -178,6 +178,8 @@ class AppController(
     private val log: (String) -> Unit = {},
     /** The current lesson changed (its speech can be prepared). */
     private val onLessonChange: (Lesson) -> Unit = {},
+    /** The app macOS asks about the microphone ("English Saathi", or "Terminal" when run from Gradle). */
+    private val permissionApp: String = "Terminal",
 ) {
     private val _state = MutableStateFlow(AppState(today = today()))
     val state: StateFlow<AppState> = _state.asStateFlow()
@@ -477,7 +479,7 @@ class AppController(
             }
             is Heard.Silent -> {
                 logAttempt(learner, ref, "", AttemptResult.NOT_HEARD, recording = heard.recording)
-                show(MessageKind.PROBLEM, SpeechCheckController.silent(heard.permission))
+                show(MessageKind.PROBLEM, SpeechCheckController.silent(heard.permission, permissionApp))
             }
             is Heard.NoMicrophone -> show(MessageKind.PROBLEM, SpeechCheckController.unavailable(heard.detail))
             is Heard.Failed -> show(MessageKind.PROBLEM, SOMETHING_WRONG)
@@ -583,7 +585,7 @@ class AppController(
                 if (r.outcome == FixOutcome.SENTENCE_FIXED) next()
             }
             is Heard.NothingLoud -> notHeard("", recording = heard.recording, message = ShownMessage(MessageKind.INFO, SpeechCheckController.DIDNT_HEAR))
-            is Heard.Silent -> notHeard("", recording = heard.recording, message = ShownMessage(MessageKind.PROBLEM, SpeechCheckController.silent(heard.permission)))
+            is Heard.Silent -> notHeard("", recording = heard.recording, message = ShownMessage(MessageKind.PROBLEM, SpeechCheckController.silent(heard.permission, permissionApp)))
             is Heard.NoMicrophone -> show(MessageKind.PROBLEM, SpeechCheckController.unavailable(heard.detail))
             is Heard.Failed -> show(MessageKind.PROBLEM, SOMETHING_WRONG)
         }

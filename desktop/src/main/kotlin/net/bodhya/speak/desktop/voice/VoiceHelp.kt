@@ -10,10 +10,12 @@ data class Message(val en: String, val hi: String)
  */
 object VoiceHelp {
 
-    /** The System Settings path to the voice list, as Apple names it on [macOsVersion] (e.g. "26.5.1"). */
+    /** The path to the voice list in the Mac's settings, as Apple names it on [macOsVersion] (e.g. "26.5.1"). */
     fun settingsPath(macOsVersion: String): String = when (majorVersion(macOsVersion)) {
         in 26..Int.MAX_VALUE -> "System Settings › Accessibility › Read & Speak › System voice › ⓘ"
         15 -> "System Settings › Accessibility › Spoken Content › System voice › ⓘ"
+        // macOS 11 and 12 still have System Preferences.
+        in 1..12 -> "System Preferences › Accessibility › Spoken Content › System Voice › Customize"
         else -> "System Settings › Accessibility › Spoken Content › System voice › Manage Voices"
     }
 

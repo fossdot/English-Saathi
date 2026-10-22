@@ -244,6 +244,50 @@ The pack format and its checks are in `docs/lesson-packs.md`.
 - **Size:** a 100-lesson pack of lessons like Bus stand is about 313 KB as
   written, about 78 KB compressed, and loads in about 50 ms (`PackSizeTest`).
 
+### Choices made while packaging
+
+How the app is built is in `docs/packaging.md`; the staff guide is
+`docs/setup-guide.pdf`.
+
+- **Signed ad hoc, not notarized** (the owner: no notarization). No Apple
+  Developer ID is needed, and the microphone works. Because the app isn't
+  notarized, a staff member allows it once per Mac and version (System
+  Settings › Privacy & Security › Open Anyway), and macOS asks for the
+  microphone again after each update. Everything inside is signed without
+  the hardened runtime, so no entitlements are needed; Compose's own
+  signing would leave an Intel build unsigned.
+- **macOS 11 or later:** Corretto 17.0.20's Intel programs are built for it.
+- **Bundle ID `net.bodhya.speak`**, never to change: macOS keeps the
+  microphone permission under it.
+- **Everything inside, nothing downloaded at first launch:** the Java
+  runtime, both speech models (small.en is 375 MB of the app's 599 MB), the
+  first lesson pack and the LibriSpeech clip for the speech check. The
+  bus-stand clips stay out: they are made with the macOS voices, whose
+  licence doesn't allow sharing recordings of them.
+- **The `.dmg`** has the app, a link to Applications and the setup guide,
+  LZMA-compressed (the smallest format). There is no licence click-through;
+  `THIRD-PARTY-NOTICES.txt` is inside the app.
+- **A self-test** (`English Saathi --self-test`) checks a copy of the app on
+  any Mac without a window: signature, microphone text, notices, lessons,
+  both models on the LibriSpeech clip, drawing, voices. The build runs it,
+  and whoever looks after the Macs can run it in Terminal; staff never need
+  to.
+- **The version is 1.0.0** (`appVersion` in `desktop/build.gradle.kts`),
+  raised for every copy sent out.
+- **The microphone prompt:** the app checks the microphone for a second at
+  every start, which is what makes macOS ask. On macOS 26.5.1 the check
+  simply waits for the answer and then hears sound (checked with the
+  packaged app on 2026-10-22). In case another macOS version gives silence
+  while the prompt is open, the check then runs again once it is answered,
+  and the notice it showed meanwhile goes away.
+- **A microphone turned on in System Settings** only works after the app is
+  opened again, so the app's message and the guide both say: turn on
+  English Saathi, then Quit & Reopen if macOS offers it, or quit and open
+  it again.
+- **The staff guide's steps are for macOS 13 to 26.** The app runs on 11 and
+  12 too, where System Preferences looks different; the app's own voice
+  hint gives their path.
+
 ## Lesson review: owner answers (2026-10-22)
 
 A design review of lesson packs raised four questions about the rules.

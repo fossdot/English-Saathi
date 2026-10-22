@@ -71,6 +71,7 @@ class VoicesTest {
         assertTrue(VoiceHelp.hindiMissing("16.0").hi.contains("Read & Speak"))
         assertTrue(VoiceHelp.hindiMissing("15.6").en.contains("Spoken Content › System voice › ⓘ"))
         assertTrue(VoiceHelp.hindiMissing("14.7").en.contains("Spoken Content › System voice › Manage Voices"))
+        assertTrue(VoiceHelp.hindiMissing("12.7.6").en.contains("System Preferences › Accessibility › Spoken Content › System Voice › Customize"))
         val english = VoiceHelp.englishMissing("26.0", Voice("Daniel (Enhanced)", "en_GB"))
         assertTrue(english.en.contains("Sentences use Daniel (Enhanced) instead."))
         assertTrue(english.hi.contains("English (India) में Rishi"))

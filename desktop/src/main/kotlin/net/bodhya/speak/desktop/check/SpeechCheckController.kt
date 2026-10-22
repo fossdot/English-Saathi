@@ -3,6 +3,7 @@ package net.bodhya.speak.desktop.check
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -119,6 +120,11 @@ class SpeechCheckController(
     private val io: CoroutineDispatcher,
     private val config: GameConfig = GameConfig(),
     private val clock: () -> Long = System::currentTimeMillis,
+    /** The app macOS asks about the microphone, for the blocked-microphone message. */
+    private val permissionApp: String = "Terminal",
+    /** How often, and how long, to look for the answer to macOS's microphone prompt after the first check. */
+    private val answerPollMs: Long = 1_000,
+    private val answerWaitMs: Long = 180_000,
 ) {
     private val _state = MutableStateFlow(SpeechCheckState(input = input))
     val state: StateFlow<SpeechCheckState> = _state.asStateFlow()
@@ -200,7 +206,9 @@ class SpeechCheckController(
 
     /**
      * Records one second and looks for sound. At first start this makes the
-     * macOS permission prompt appear while the facilitator is there.
+     * macOS permission prompt appear while the facilitator is there. Until the
+     * prompt is answered the microphone gives only silence, so after a silent
+     * check with the prompt unanswered, the check runs again once it is.
      */
     fun checkMicrophone() {
         if (busy) return
@@ -213,11 +221,24 @@ class SpeechCheckController(
                 it.copy(
                     mic = status,
                     message = when (status) {
-                        is MicStatus.Silent -> ShownMessage(MessageKind.PROBLEM, silent(status.permission))
+                        is MicStatus.Silent -> ShownMessage(MessageKind.PROBLEM, silent(status.permission, permissionApp))
                         is MicStatus.Unavailable -> ShownMessage(MessageKind.PROBLEM, unavailable(status.detail))
                         else -> it.message
                     },
                 )
+            }
+            if (status is MicStatus.Silent && status.permission == MicPermission.NOT_ASKED) checkWhenAnswered()
+        }
+    }
+
+    /** Waits up to [answerWaitMs] for macOS's microphone prompt to be answered, then checks the microphone again. */
+    private suspend fun checkWhenAnswered() {
+        val until = clock() + answerWaitMs
+        while (clock() < until) {
+            delay(answerPollMs)
+            if (withContext(io) { permission() } != MicPermission.NOT_ASKED) {
+                log("microphone: the macOS prompt was answered, checking again")
+                return checkMicrophone()
             }
         }
     }
@@ -290,7 +311,7 @@ class SpeechCheckController(
     }
 
     private fun messageFor(recording: Recording, result: CheckResult): ShownMessage? = when {
-        recording.noSound -> ShownMessage(MessageKind.PROBLEM, silent(permission()))
+        recording.noSound -> ShownMessage(MessageKind.PROBLEM, silent(permission(), permissionApp))
         result.words == null -> ShownMessage(MessageKind.INFO, DIDNT_HEAR)
         else -> null
     }
@@ -314,14 +335,20 @@ class SpeechCheckController(
 
         // The messages below are drafted for the desktop app and need the teacher review.
 
-        fun silent(permission: MicPermission): Message = when (permission) {
+        /**
+         * A second of exact zeros. [app] is the app macOS asks about the
+         * microphone: "English Saathi", or "Terminal" when run from Gradle.
+         * macOS only lets an app use a microphone turned on in System Settings
+         * after it is opened again.
+         */
+        fun silent(permission: MicPermission, app: String = "Terminal"): Message = when (permission) {
             MicPermission.DENIED, MicPermission.RESTRICTED -> Message(
-                "The microphone is blocked. Open System Settings › Privacy & Security › Microphone, turn on Terminal, then press the mic again.",
-                "माइक बंद है। System Settings › Privacy & Security › Microphone में Terminal चालू कीजिए, फिर माइक दबाइए।",
+                "The microphone is blocked. Open System Settings › Privacy & Security › Microphone and turn on $app. Then click Quit & Reopen if macOS offers it, or quit $app (⌘Q) and open it again.",
+                "माइक बंद है। System Settings › Privacy & Security › Microphone में $app चालू कीजिए। फिर macOS Quit & Reopen दिखाए तो उसे दबाइए, नहीं तो $app बंद (⌘Q) करके फिर खोलिए।",
             )
             else -> Message(
-                "The microphone sends no sound. If macOS asked about the microphone, click Allow and try again. Check that the lid is open and no other app is using the microphone.",
-                "माइक से आवाज़ नहीं आ रही। अगर macOS ने माइक के बारे में पूछा तो Allow दबाकर फिर कोशिश कीजिए। देखिए कि लैपटॉप का ढक्कन खुला है।",
+                "The microphone sends no sound. If macOS is asking about the microphone, click Allow. If it was just turned on in System Settings, quit $app (⌘Q) and open it again. Check that the lid is open and no other app is using the microphone.",
+                "माइक से आवाज़ नहीं आ रही। अगर macOS माइक के बारे में पूछ रहा है तो Allow दबाइए। अगर System Settings में अभी चालू किया है तो $app बंद (⌘Q) करके फिर खोलिए। देखिए कि लैपटॉप का ढक्कन खुला है।",
             )
         }
 

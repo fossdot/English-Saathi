@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 /** Where recording starts: [input] (null is the Mac's default), and the choice that couldn't be followed, if any. */
 data class RestoredInput(val input: String?, val missing: MicChoice? = null)
 
-/** macOS's answer to "may this app use the microphone?", for the app that started Gradle (Terminal). */
+/** macOS's answer to "may this app use the microphone?": for English Saathi.app, or for the app that started Gradle (Terminal). */
 enum class MicPermission {
     /** Not asked yet: the first recording shows the macOS prompt. */
     NOT_ASKED,
@@ -89,9 +89,15 @@ object MicAccess {
         }
     }
 
-    /** Reads the signature of this JVM's `java` with `codesign`, which every Mac has. */
-    fun checkJava(javaHome: String = System.getProperty("java.home")): JavaMicCheck {
-        val java = File(javaHome, "bin/java").path
+    /**
+     * Reads the signature of the program this JVM runs in with `codesign`,
+     * which every Mac has: `java` when run from Gradle, the English Saathi
+     * launcher in the app. Its signature decides whether macOS lets it record.
+     */
+    fun checkJava(
+        executable: String = ProcessHandle.current().info().command().orElse(File(System.getProperty("java.home"), "bin/java").path),
+    ): JavaMicCheck {
+        val java = executable
         val details = run("codesign", "-dv", java).orEmpty()
         val entitlements = run("codesign", "-d", "--entitlements", "-", "--xml", java).orEmpty()
         return JavaMicCheck(

@@ -23,6 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.PI
 import kotlin.math.sin
 import kotlin.random.Random
@@ -114,7 +115,8 @@ class SpeechCheckControllerTest {
         controller.toggleRecording()
         val m = controller.state.value.message!!
         assertEquals(MessageKind.PROBLEM, m.kind)
-        assertTrue(m.message.en, m.message.en.contains("Privacy & Security › Microphone, turn on Terminal"))
+        assertTrue(m.message.en, m.message.en.contains("Privacy & Security › Microphone and turn on Terminal"))
+        assertTrue("macOS lets it record only after it is opened again: ${m.message.en}", m.message.en.contains("quit Terminal (⌘Q) and open it again"))
         assertEquals("the recognizer is not run on silence", 0, recognition.calls)
     }
 
@@ -178,6 +180,27 @@ class SpeechCheckControllerTest {
         microphone = { throw IOException("no microphone") }
         controller.checkMicrophone()
         assertEquals(MicStatus.Unavailable("no microphone"), controller.state.value.mic)
+    }
+
+    @Test
+    fun `the check runs again once the macOS prompt is answered`() {
+        // Until the facilitator answers the prompt, macOS gives the app only silence.
+        val answered = AtomicBoolean(false)
+        val c = SpeechCheckController(
+            lesson, recognition, output,
+            openMicrophone = { if (answered.get()) ArrayPcmSource(spoken()) else ArrayPcmSource(ShortArray(0)) },
+            permission = { if (answered.get()) MicPermission.ALLOWED else MicPermission.NOT_ASKED },
+            readClip = { spoken() }, log = { synchronized(log) { log += it } },
+            scope = CoroutineScope(Dispatchers.Unconfined), io = Dispatchers.Unconfined,
+            answerPollMs = 10, answerWaitMs = 10_000,
+        )
+        c.checkMicrophone()
+        assertEquals(MicStatus.Silent(MicPermission.NOT_ASKED), c.state.value.mic)
+        answered.set(true)
+        val until = System.currentTimeMillis() + 5_000
+        while (c.state.value.mic !is MicStatus.Working && System.currentTimeMillis() < until) Thread.sleep(10)
+        assertTrue(c.state.value.mic.toString(), c.state.value.mic is MicStatus.Working)
+        assertTrue(synchronized(log) { log.any { "the macOS prompt was answered" in it } })
     }
 
     @Test

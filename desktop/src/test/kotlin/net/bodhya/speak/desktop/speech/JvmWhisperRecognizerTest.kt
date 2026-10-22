@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.speech
 
+import net.bodhya.speak.desktop.AppFiles
 import net.bodhya.speak.domain.Normalizer
 import net.bodhya.speak.speech.AsrSettings
 import net.bodhya.speak.speech.WavReader
@@ -25,7 +26,7 @@ class JvmWhisperRecognizerTest {
 
     @Test
     fun aMissingModelFileIsAnErrorNotACrash() {
-        val files = SpeechModel.TINY_EN.files(projectDir).copy(decoder = File(projectDir, "no-such-decoder.onnx"))
+        val files = AppFiles.repo(projectDir).model(SpeechModel.TINY_EN).copy(decoder = File(projectDir, "no-such-decoder.onnx"))
         assertThrows(FileNotFoundException::class.java) {
             JvmWhisperRecognizer.load(SpeechModel.TINY_EN, files, AsrSettings())
         }
@@ -40,7 +41,7 @@ class JvmWhisperRecognizerTest {
     private fun assertRecognizes(model: SpeechModel) {
         val samples = File(projectDir, "app/src/androidTest/assets/asr-test/librispeech-0.wav").inputStream()
             .use { WavReader.toFloats(WavReader.readPcm16Mono(it)) }
-        JvmWhisperRecognizer.load(model, model.files(projectDir), AsrSettings(numThreads = 2)).use { asr ->
+        JvmWhisperRecognizer.load(model, AppFiles.repo(projectDir).model(model), AsrSettings(numThreads = 2)).use { asr ->
             assertEquals(Normalizer.normalize(LIBRISPEECH_TEXT), Normalizer.normalizeHeard(asr.transcribe(samples)))
         }
     }

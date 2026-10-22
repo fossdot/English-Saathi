@@ -10,7 +10,9 @@ and walks them through fixing them.
 desktop app (`desktop/`, `docs/desktop-plan.md`) is ahead: D1–D8 are built
 (speech, voices, microphone, saved data, student picker, home, practice,
 feedback, the fixing loop, results and the CSV), in the web pilot's layout
-until the desktop designs arrive. Its MacBook trip (`docs/macbook-trip.md`)
+until the desktop designs arrive. It is packaged as a normal Mac app for
+Intel MacBooks (`scripts/package_mac.sh`, `docs/packaging.md`; the staff
+guide is `docs/setup-guide.pdf`). Its MacBook trip (`docs/macbook-trip.md`)
 is still to come.
 
 On Android, milestones a (domain logic) and b (recording and on-device
@@ -27,7 +29,8 @@ the full one at the end of v0.1.
 | `desktop/` | The macOS desktop app (`docs/desktop-plan.md`): Whisper through sherpa-onnx's Java library, macOS voices, the student screens, saved data, results and the CSV, and the facilitator's speech check (`docs/desktop-speech.md`) |
 | `NOTICE` | Third-party code and fonts in the repo (Sonic, for slow speech; the Mukta font) and their licences |
 | `content/packs/` | The lesson pack that comes with the app (Bus stand and the tip templates), in the pack format of `docs/lesson-packs.md`; all marked for teacher review. More packs are added in the app's Settings |
-| `scripts/` | `fetch_deps.sh` downloads the speech library and model; `make_test_wavs.sh` makes test clips (macOS) |
+| `desktop/packaging/` | The Mac app's icon and `THIRD-PARTY-NOTICES.txt`: everything inside the app and its licences |
+| `scripts/` | `fetch_deps.sh` downloads the speech library and models; `make_test_wavs.sh` makes test clips (macOS); `package_mac.sh` builds the Mac app and its `.dmg`; `make_setup_guide.sh` prints the staff guide; `build_sherpa_onnx.sh` builds the desktop speech library without text-to-speech |
 | `docs/decisions.md` | Everything agreed with the product owner, including where the Kotlin rules deliberately differ from the pilot |
 | `docs/asr-model-comparison.md` | Which speech model the app uses, and why |
 | `docs/speech-on-device.md` | Speed and memory on the emulator, and what to test on a real phone |
@@ -56,7 +59,9 @@ scripts/make_test_wavs.sh    # optional, macOS only: lesson sentences for the de
 
 `fetch_deps.sh` gets these files, which are not kept in git:
 - the sherpa-onnx 1.13.8 library (the Android archive, and for the desktop
-  app the Java library and its macOS native libraries);
+  app the Java library and ONNX Runtime for macOS). The desktop app's
+  sherpa-onnx native library is kept in git instead: it is built without
+  text-to-speech by `scripts/build_sherpa_onnx.sh`;
 - the Whisper tiny.en files, and small.en (int8) for the desktop app;
 - a LibriSpeech test clip.
 
@@ -98,3 +103,15 @@ scripts/run_desktop.sh                  # the desktop app, on Corretto 17 (--che
 
 - **Microphone tests:** these are skipped on devices whose microphone can't be
   opened, such as the Android 8.0 emulator image.
+
+## Building the Mac app
+
+```sh
+scripts/package_mac.sh
+```
+
+It builds `desktop/build/packaging/English-Saathi-<version>.dmg` for Intel
+Macs (an Apple silicon Mac builds it under Rosetta), signs it ad hoc, runs
+the app's self-test, and downloads Corretto's source code next to it. Put
+both files in the Google Drive folder. Details, signing and licences:
+`docs/packaging.md`.

@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import net.bodhya.speak.speech.AsrSettings
 import net.bodhya.speak.speech.EngineState
 import net.bodhya.speak.speech.SpeechEngine
-import java.io.File
 import java.util.concurrent.Executors
 
 /** Which model is in use, and whether it has loaded. */
@@ -43,7 +42,8 @@ interface Recognition {
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ModelSwitcher(
-    private val projectDir: File,
+    /** The files of each model. */
+    private val filesOf: (SpeechModel) -> ModelFiles,
     private val settings: AsrSettings,
     first: SpeechModel,
 ) : Recognition {
@@ -75,7 +75,7 @@ class ModelSwitcher(
         val scope = CoroutineScope(SupervisorJob())
         var recognizer: JvmWhisperRecognizer? = null
         val engine = SpeechEngine(scope, dispatcher, System::currentTimeMillis) {
-            JvmWhisperRecognizer.load(model, model.files(projectDir), settings).also { recognizer = it }
+            JvmWhisperRecognizer.load(model, filesOf(model), settings).also { recognizer = it }
         }
         // Queued behind any recognition still running on that thread, so the model is never freed mid-use.
         val free = { scope.launch(dispatcher) { recognizer?.close() }.invokeOnCompletion { scope.cancel(); executor.shutdown() }; Unit }

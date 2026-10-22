@@ -1,164 +1,126 @@
-# MacBook trip: D1 speech check and D3 microphone test
+# MacBook trip: the packaged app on a Hikmat MacBook
 
-One visit to a 2019 16-inch Intel MacBook Pro covers both milestones that
-need the real machine (`docs/desktop-plan.md`). Allow about an hour, most
-of it waiting for downloads and the D1 timings. Tick each box and note what
-you saw; the notes and two log files are what to send back.
+One visit to one of Hikmat Foundation's 2019 16-inch Intel MacBook Pros.
+It checks the app exactly as staff will get it (`docs/packaging.md`): the
+`.dmg`, the setup guide, Open Anyway, the microphone, the voices, then the
+speed of small.en (the default speech model) and the student screens. No
+Terminal is needed except in part F, which is optional. Allow about an hour.
+Tick each box and note what you saw; the notes, the log and the CSV are what
+to send back.
 
-## A. Set up (once per MacBook, about 20 minutes)
+Take: `English-Saathi-<version>.dmg` (or its Google Drive link) and the
+setup guide (`docs/setup-guide.pdf`, also on the `.dmg`).
+
+## A. The machine (5 minutes)
 
 - [ ] Plug the MacBook into power and close other apps.
-- [ ] Check the machine: in Terminal, `uname -m` prints `x86_64` and
-      `sysctl -n machdep.cpu.brand_string` names the Intel i7 or i9.
-      macOS version (Apple menu › About This Mac): ________
-- [ ] Install **Amazon Corretto 17** for macOS x64 (the `.pkg`) from
-      https://aws.amazon.com/corretto/. Not Temurin: its Java can't use the
-      microphone.
-- [ ] If the speech benchmark ran on this MacBook, Xcode's tools and Python
-      are already there. Otherwise: `xcode-select --install`, then Homebrew
-      (https://brew.sh) and `brew install python@3.12`.
-- [ ] Get the repo: `gh repo clone fossdot/English-Saathi ~/English-Saathi`,
-      or `cd ~/English-Saathi && git pull`. Let the scripts download the
-      large files on the MacBook itself; files copied over AirDrop are
-      marked as downloaded, and macOS may refuse to load the speech library.
-- [ ] Voices: System Settings › Accessibility › Read & Speak › System voice
-      › ⓘ. Note which English (India) and Hindi voices are listed as
-      installed: ________. Don't download any yet; the app should work with
-      what a fresh Mac has.
+- [ ] Apple menu › About This Mac: macOS version ________, processor Intel
+      i7 or i9 ________, memory 16 GB. Is the staff account an
+      administrator (System Settings › Users & Groups)? ________
+- [ ] Voices: System Settings › Accessibility › Read & Speak (Spoken Content
+      on older macOS) › System voice › ⓘ or Manage Voices. Note which English
+      (India) and Hindi voices are already installed: ________. Don't
+      download any yet.
 
-## B. D1: speech check (about 10 minutes, unattended)
+## B. Install, following the setup guide (10 minutes)
 
-```sh
-cd ~/English-Saathi
-caffeinate -i scripts/desktop_speech_check.sh
-```
+Do exactly what the guide says, as a staff member would, and note anything
+in the guide that didn't match the screen: ________
 
-- [ ] It ends with "Done. Send back: desktop/build/speech-check/x86_64.log".
-      It needs internet the first time (about 1 GB). If it stops part way,
-      run it again: downloads are kept.
+- [ ] Download the `.dmg` from the Google Drive link (in Safari or Chrome),
+      open it, drag English Saathi onto Applications, eject the disk.
+- [ ] Open the app from Applications. macOS refuses it the first time. Exact
+      words of the message and its buttons: ________. (It must **not** say
+      the app is "damaged".)
+- [ ] System Settings › Privacy & Security › Open Anyway, then Open Anyway
+      in the message that follows, then an administrator's Touch ID or Use
+      Password… (macOS 13 or 14: Open Anyway, then Open): the app opens.
+      Steps or words that differed from the guide: ________
+- [ ] macOS asks for the microphone, and the prompt names **English Saathi**
+      (not Terminal), with the text "English Saathi listens while a student
+      says a sentence…". Click **Allow** (**OK** on macOS 13).
+- [ ] The window opens at **Who is practising?**, text sharp, Hindi joined up
+      correctly. The model at the top says **small.en**. No red notice about
+      the microphone; one may show while macOS is asking, and it must go
+      within a few seconds of Allow. What you saw: ________. A red notice
+      about missing voices may appear: note it ________ (newer macOS has
+      basic Rishi and Lekha voices built in).
+- [ ] Quit (⌘Q) and open the app again from Applications: it opens at once,
+      with no Open Anyway and no microphone prompt.
 
-## C. D3: microphone and the window (about 25 minutes)
+## C. Voices (5 minutes, needs internet)
 
-Do this in the room where sessions happen, at a normal time of day.
-`--check` opens the facilitator's speech check instead of the student
-picker.
+- [ ] Follow step 4 of the guide: download **Rishi (Enhanced)** (English
+      (India)) and **Lekha (Enhanced)** (Hindi). Quit and reopen the app: no
+      voice notice, and Settings (⌘,) › Voices names Rishi (Enhanced) and
+      Lekha (Enhanced) (the app takes the best voice installed, so a Premium
+      voice already on the Mac would come first). Time the downloads took:
+      ________
 
-```sh
-cd ~/English-Saathi
-scripts/run_desktop.sh --check
-```
+## D. Speech: is small.en fast enough? (15 minutes)
 
-Starting up:
+In the room where sessions happen, at a normal time of day.
 
-- [ ] A macOS prompt asks: "“Terminal” would like to access the
-      Microphone." Click **Allow**. (No prompt and the microphone stays
-      silent: note it; check that Terminal is on in System Settings ›
-      Privacy & Security › Microphone.)
-- [ ] The window opens and draws cleanly: text sharp, Hindi joined up
-      correctly, no flicker or black areas. Note anything odd: ________
-- [ ] The grey box at the bottom ("For the facilitator") shows:
-      microphone "working", voices English and Hindi (not "missing"), and,
-      within a minute, "lesson speech ready".
-- [ ] No red notice at the top. (A red notice about Java means it isn't
-      running on Corretto: note what it says.)
-
-Speaking, with the model the app starts on (tiny.en):
-
-- [ ] For each of the 5 sentences (click it on the left): press **Space**,
-      say the sentence normally, then stop talking.
-  - [ ] Recording stops about a second after you finish (not at 8 s, not
-        in the middle of the sentence). Times it went wrong: ____
-  - [ ] The result appears; note the "result after … s" figures: ____
+- [ ] Settings (⌘,) › **Open the speech check**. For each of the 5 sentences
+      (click it on the left): press **Space**, say it normally, stop talking.
+  - [ ] Recording stops about a second after you finish (not at 8 s, not in
+        the middle). Times it went wrong: ____
+  - [ ] Note the "result after … s" figures: ____ Is that wait acceptable
+        for a student? ____ (If not, the owner's rule applies: tiny.en.)
 - [ ] Press Space and say nothing: after 8 s it says "Didn't hear you".
-- [ ] Press Space, start speaking, and press Space again: it stops at once.
-- [ ] Have someone talk nearby (as students waiting their turn would)
-      while you say a sentence. Does recording still stop after you
-      finish? ____
+- [ ] Have someone talk nearby while you say a sentence. Does recording
+      still stop after you finish? ____
+- [ ] Settings › Microphone shows the MacBook's own microphone first, marked
+      "(built-in)", and ticked.
+- [ ] Settings › **tiny.en**, then the 5 sentences again: "result after"
+      figures ____. Then back to **small.en**.
+- [ ] Settings › Test clips › librispeech-0: a result appears.
+- [ ] Activity Monitor › Energy: in "Requires High Perf GPU", java or English
+      Saathi says **No**. Value seen: ____
 
-The other model:
+## E. The student screens (10 minutes)
 
-- [ ] Press **⌘,** (Settings), choose **small.en**, close Settings, and
-      wait until the mic button works again (the model takes a few seconds
-      to load).
-- [ ] Repeat the 5 sentences. Note the "result after … s" figures: ____
-      Is that wait acceptable for a student? ____
-- [ ] Quit the app (⌘Q) and run `scripts/run_desktop.sh --check` again.
-      The top of the window says **Speech model: small.en**, and Settings
-      still has the microphone chosen before.
+- [ ] Back to the picker (the arrow at the top left). **New student**:
+      choose a colour and a picture, type a name, **Add student**. Home shows
+      the name, "0 / 5", "0 days" and "0 XP".
+- [ ] **Start practice**: press Space, say the sentence, stop talking: stars,
+      the words as chips, what was heard, XP.
+- [ ] Say a sentence with one word wrong on purpose, then **Fix**: steps 1 to
+      5; saying the word wrong twice goes back one step.
+- [ ] Say all five sentences: the goal screen appears once.
+- [ ] Results › **Save as CSV…**: open the file in Numbers or Excel; the
+      times are this Mac's.
+- [ ] Settings › Add lessons…: choose `content/packs/starter.json` from a
+      copy of the repo if one is at hand: it is refused as "already
+      installed", and nothing changes. (Skip if no pack file is at hand.)
+- [ ] Settings › Students › **Delete…** › **Delete …**: the student
+      disappears.
 
-Listening and keys:
-
-- [ ] **L** plays the sentence; **S** plays it clearly slower, at the same
-      pitch. Both start at once (no wait).
-- [ ] **Hindi help** reads the Hindi instruction in a Hindi voice.
-- [ ] **Enter** starts recording like Space.
-- [ ] Start a recording and click on another app's window: recording
-      stops.
-
-When the microphone is blocked:
-
-- [ ] Quit the app (⌘Q). In System Settings › Privacy & Security ›
-      Microphone, turn **Terminal** off (macOS may ask to quit Terminal:
-      do it, and open Terminal again).
-- [ ] Run `scripts/run_desktop.sh --check` again. The app shows a red
-      message that the microphone is blocked, naming Terminal and the
-      setting.
-- [ ] Turn Terminal back on in System Settings, quit and restart the app,
-      and check that recording works again.
-
-Test clips and battery:
-
-- [ ] ⌘, › Test clips: run bus_01 to bus_05. Each gives a result (these
-      are the recorded test sentences, without the microphone).
-- [ ] Open Activity Monitor › Energy. In the "Requires High Perf GPU"
-      column, java says **No** (the app asks for the Intel graphics to save
-      battery). Value seen: ____
-
-Optional, if you have one:
-
-- [ ] A wired or USB headset, chosen under ⌘, › Microphone: recording works.
-- [ ] AirPods or another Bluetooth headset: recording works, and note
-      whether speech sounds worse while the microphone is in use.
-
-## D. The student screens (about 5 minutes)
+## F. Optional, for whoever looks after the Macs (Terminal)
 
 ```sh
-scripts/run_desktop.sh
+"/Applications/English Saathi.app/Contents/MacOS/English Saathi" --self-test
 ```
 
-- [ ] The window opens at **Who is practising?**, with the speech model at
-      the top. Text is in the pilot's font (Mukta), Hindi joined up
-      correctly.
-- [ ] **New student**: choose a colour and a picture, type a name, press
-      **Add student**. Home shows the name, "0 / 5", "0 days" and "0 XP".
-- [ ] **Start practice**: the first sentence. Press Space, say it, stop
-      talking: the result shows stars, the words as chips, what was heard
-      and XP. If a word is marked, the tip names it as written.
-- [ ] Press Space and say nothing: "Didn't hear you", and no stars.
-- [ ] Say a sentence with one word wrong on purpose, then **Fix**: step 1
-      shows the word big, step 2 its parts, step 3 asks for the word. Say
-      it wrong twice: it goes back one step. Go on to step 5 and say the
-      whole sentence: it moves on to the next sentence.
-- [ ] **Next sentence** (or **Skip for now**) moves on to the next
-      sentence; the cross at the top left goes home, where the sentence
-      now shows its stars and the goal counts it.
-- [ ] Click the name at the top left: back at the picker, the new card is
-      there with "1 day".
-- [ ] Back at the picker, **Results**: the student's attempts are in both
-      tables. **Save as CSV…** saves it to Documents; open it in Numbers or
-      Excel: the times are this Mac's, and "Didn't hear you" rows have
-      empty counts.
-- [ ] In a second Terminal window, run `scripts/run_desktop.sh` again: a
-      small window says English Saathi is already open. Press OK.
-- [ ] ⌘, › Students › **Delete…** › **Delete …**: the student disappears
-      from the picker.
+- [ ] It ends with "all checks passed". Paste its output: ________
+- [ ] Which app macOS asked about (after part B's Allow, within a few
+      minutes): `/usr/bin/log show --last 10m --info --style compact
+      --predicate 'subsystem == "com.apple.TCC" AND eventMessage CONTAINS
+      "AUTHREQ_PROMPTING"'` shows `subject=Sub:{net.bodhya.speak}`: ____
+- [ ] A refused microphone: run `tccutil reset Microphone net.bodhya.speak`,
+      open the app and click **Don't Allow**. Practise a sentence: the app
+      says the microphone is blocked. Follow its steps (turn on English
+      Saathi, then Quit & Reopen, or quit and open it again): recording
+      works again. What happened: ________
+- [ ] The earlier D1 timing script still works from a copy of the repo:
+      `caffeinate -i scripts/desktop_speech_check.sh` (needs Corretto 17 and
+      internet the first time; `docs/desktop-speech.md`).
 
-## E. Send back
+## G. Send back
 
-- [ ] `~/English-Saathi/desktop/build/speech-check/x86_64.log` (D1)
 - [ ] `~/Library/Application Support/English Saathi/logs/speech-check.log`
-      (D3: the machine, Java, permission, voices, graphics and every result
-      with its model). It holds what the recognizer heard, not recordings.
-- [ ] The CSV saved in part D.
+      (Settings › Open the data folder › logs): the machine, the voices and
+      every result with its model. It holds what was heard, not recordings.
+- [ ] The CSV saved in part E.
 - [ ] This checklist with your notes, and a screenshot of the window
       (⇧⌘4, then Space, then click the window).

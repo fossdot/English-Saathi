@@ -8,16 +8,15 @@ data class ModelFiles(val encoder: File, val decoder: File, val tokens: File) {
 }
 
 /**
- * The two Whisper models the desktop app can switch between until student
- * recordings decide the default (docs/decisions.md, "Desktop app: owner
- * answers"). Paths are relative to the project folder, where
- * scripts/fetch_deps.sh puts them.
+ * The two Whisper models the desktop app can switch between (docs/decisions.md:
+ * small.en by default, tiny.en as the fallback). Where their folders are is
+ * [net.bodhya.speak.desktop.AppFiles]'s business: the repo, where
+ * scripts/fetch_deps.sh puts them, or the app bundle.
  */
-enum class SpeechModel(val id: String, private val dir: String, private val encoder: String, private val decoder: String, private val tokens: String) {
+enum class SpeechModel(val id: String, private val encoder: String, private val decoder: String, private val tokens: String) {
     /** The Android app's 44.3 MB build, with the fully quantized decoder (docs/asr-model-comparison.md). */
     TINY_EN(
         "tiny.en",
-        "app/src/main/assets/asr/whisper-tiny.en",
         "tiny.en-encoder.int8.onnx",
         "tiny.en-decoder.int8-embedding.onnx",
         "tiny.en-tokens.txt",
@@ -26,17 +25,14 @@ enum class SpeechModel(val id: String, private val dir: String, private val enco
     /** The official int8 build, 375.5 MB (docs/intel-macbook-benchmarks.md). */
     SMALL_EN(
         "small.en",
-        "desktop/models/whisper-small.en",
         "small.en-encoder.int8.onnx",
         "small.en-decoder.int8.onnx",
         "small.en-tokens.txt",
     ),
     ;
 
-    fun files(projectDir: File): ModelFiles {
-        val d = File(projectDir, dir)
-        return ModelFiles(File(d, encoder), File(d, decoder), File(d, tokens))
-    }
+    /** The model's files in its folder [dir]. */
+    fun files(dir: File): ModelFiles = ModelFiles(File(dir, encoder), File(dir, decoder), File(dir, tokens))
 
     companion object {
         fun byId(id: String): SpeechModel =

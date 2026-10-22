@@ -157,6 +157,14 @@ in the MacBook trip's part D. Opening the CSV in Excel is D9's check.
   folder. The "To be checked by an English teacher" note appears on Results
   and Settings only.
 
+**Packaging** (2026-10-21, before D9: students use a normal Mac app)
+
+Status: `scripts/package_mac.sh` builds `English-Saathi-<version>.dmg` for
+Intel with Corretto 17's runtime, both speech models, the first lesson pack
+and the speech library inside (`docs/packaging.md`); staff install it with
+`docs/setup-guide.pdf`. The MacBook trip (`docs/macbook-trip.md`) checks it
+on a Hikmat MacBook.
+
 **D9. Trial (MacBook run)** (after the pilots)
 - A facilitated session, several students in turn, Wi-Fi off. Check speed
   per model, memory, battery and GPU, voices, and that the CSV opens in

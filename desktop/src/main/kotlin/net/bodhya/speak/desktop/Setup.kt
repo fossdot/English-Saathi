@@ -23,7 +23,8 @@ private const val THREADS = 4
 
 /** Everything the window needs, made once at start, off the main thread. */
 internal class Setup(
-    val projectDir: File,
+    /** The app's own files: the repo, or the app bundle. */
+    val files: AppFiles,
     val dataDir: File,
     val log: SessionLog,
     /** Every lesson: the packs inside the app and the ones added in Settings. */
@@ -44,12 +45,18 @@ internal class Setup(
     /** Saved files that couldn't be read, found at start or later (nothing is deleted; details are in the log). */
     val dataProblems: StateFlow<List<String>>,
 ) {
+    /** The app macOS asks about the microphone: the app itself, or Terminal when run from Gradle. */
+    val permissionApp: String get() = if (files.packaged) "English Saathi" else "Terminal"
+
     companion object {
-        fun create(projectDir: File, dataDir: File = DataFolder.default): Setup {
+        /** The app run from Gradle, with the repo at [projectDir]. */
+        fun create(projectDir: File, dataDir: File = DataFolder.default): Setup = create(AppFiles.repo(projectDir), dataDir)
+
+        fun create(files: AppFiles, dataDir: File = DataFolder.default): Setup {
             val excluded = DataFolder.prepare(dataDir)
             // Still called speech-check.log: the MacBook trip's checklist asks for this file.
             val log = SessionLog(File(dataDir, "logs/speech-check.log"))
-            log.write("== English Saathi starts")
+            log.write("== English Saathi starts (${if (files.packaged) "the app" else "from Gradle"})")
             log.write("machine: ${command("sysctl", "-n", "machdep.cpu.brand_string")}; macOS ${System.getProperty("os.version")}; " +
                 "os.arch ${System.getProperty("os.arch")} (${if (command("sysctl", "-n", "sysctl.proc_translated") == "1") "under Rosetta" else "native"})")
             log.write("data folder $dataDir: ${if (excluded) "excluded from Time Machine" else "NOT excluded from Time Machine"}")
@@ -59,12 +66,15 @@ internal class Setup(
             log.write("java: ${java.vendor} ${System.getProperty("java.runtime.version")} at ${java.javaPath}; hardened runtime ${java.hardened}, " +
                 "audio-input entitlement ${java.hasAudioEntitlement} -> ${if (java.canRecord) "can record" else "CANNOT record"}")
             if (!java.canRecord) {
-                notices += Message(
+                notices += if (files.packaged) Message(
+                    "This copy of English Saathi can't use the microphone: its signature doesn't allow it, so it only ever records silence. Install a fresh copy from the download link.",
+                    "English Saathi की यह कॉपी माइक इस्तेमाल नहीं कर सकती। डाउनलोड लिंक से नई कॉपी लगाइए।",
+                ) else Message(
                     "This Java (${java.vendor}) can't use the microphone: it only ever records silence. Install Amazon Corretto 17 and start English Saathi with scripts/run_desktop.sh.",
                     "यह Java माइक इस्तेमाल नहीं कर सकता। Amazon Corretto 17 इंस्टॉल करके scripts/run_desktop.sh से खोलिए।",
                 )
             }
-            log.write("microphone permission (for the app that started Gradle): ${MicAccess.permission()}")
+            log.write("microphone permission (for ${if (files.packaged) "English Saathi" else "the app that started Gradle"}): ${MicAccess.permission()}")
             val inputs = MicAccess.inputs()
             log.write("inputs: ${inputs.joinToString()}")
 
@@ -81,9 +91,9 @@ internal class Setup(
                 is MicChoice.Named -> notices += inputMissing(missing.name, input)
             }
 
-            NativeLibraries.use(File(projectDir, "desktop/native"))
+            NativeLibraries.use(files.native)
             val config = GameConfig()
-            val library = LessonLibrary.load(File(projectDir, "content/packs"), dataDir, config)
+            val library = LessonLibrary.load(files.packs, dataDir, config)
             library.warnings.forEach { log.write("lesson warning: $it") }
             log.write("lessons: ${library.packs.joinToString { "${it.pack.id} v${it.pack.version}${if (it.builtIn) "" else " (added)"}" }}; ${library.lessons.size} lessons, ${library.sentenceCount} sentences")
 
@@ -98,8 +108,7 @@ internal class Setup(
             log.write("voices: English ${english?.name ?: "none"}, Hindi ${hindi?.name ?: "none"} (en_IN: " +
                 "${voices.all.filter { it.locale == "en_IN" }.joinToString { it.name }}; hi_IN: ${voices.all.filter { it.locale == "hi_IN" }.joinToString { it.name }})")
 
-            val clips = (listOf(File(projectDir, "app/src/androidTest/assets/asr-test/librispeech-0.wav")) +
-                (1..5).map { File(projectDir, "app/src/debug/assets/asr-test/bus_0$it.wav") }).filter { it.isFile }.associateBy { it.name }
+            val clips = files.clips.associateBy { it.name }
 
             val dataProblems = MutableStateFlow(library.problems)
             library.problems.forEach { log.write("data: $it") }
@@ -111,8 +120,8 @@ internal class Setup(
             log.write("learners: ${store.learners().size}")
 
             return Setup(
-                projectDir, dataDir, log, library,
-                ModelSwitcher(projectDir, AsrSettings(numThreads = THREADS), saved.model).also { log.write("model ${saved.model.id}, $THREADS threads") },
+                files, dataDir, log, library,
+                ModelSwitcher(files::model, AsrSettings(numThreads = THREADS), saved.model).also { log.write("model ${saved.model.id}, $THREADS threads") },
                 Speaker(renderer), english, hindi, notices, inputs, builtIn, input, settings, clips, store, dataProblems,
             )
         }

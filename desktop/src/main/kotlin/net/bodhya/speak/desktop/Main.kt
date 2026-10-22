@@ -93,6 +93,7 @@ import java.awt.event.WindowEvent
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.system.exitProcess
 
 /**
  * Plays English and Hindi speech one at a time on its own thread. [stop]
@@ -126,7 +127,9 @@ private class MacSpeechOutput(private val speaker: Speaker, private val englishV
 }
 
 fun main(args: Array<String>) {
-    val projectDir = File(args.firstOrNull() ?: ".").absoluteFile
+    val files = AppFiles.find(args)
+    // English Saathi --self-test: headless checks of this copy of the app (docs/packaging.md).
+    if ("--self-test" in args) exitProcess(SelfTest.run(files, System.out))
     // Taken before anything else: a second copy would overwrite the first one's progress.
     val lock = AppLock.acquire(DataFolder.default)
     // scripts/run_desktop.sh --check opens the facilitator's speech check (the MacBook trip).
@@ -137,7 +140,7 @@ fun main(args: Array<String>) {
             return@application
         }
         var setup by remember { mutableStateOf<Result<Setup>?>(null) }
-        LaunchedEffect(Unit) { setup = withContext(Dispatchers.IO) { runCatching { Setup.create(projectDir) } } }
+        LaunchedEffect(Unit) { setup = withContext(Dispatchers.IO) { runCatching { Setup.create(files) } } }
         val windowState = rememberWindowState(size = DpSize(1280.dp, 880.dp))
         var showSettings by remember { mutableStateOf(false) }
         val keys = remember { ShortcutKeys() }
@@ -270,6 +273,7 @@ internal class AppParts(val app: AppController, val check: SpeechCheckController
                 micReady = { ready.recognition.state.value.engine is EngineState.Ready },
                 log = ready.log::write,
                 onLessonChange = speech::prepare,
+                permissionApp = ready.permissionApp,
             )
             if (startOnCheck) app.speechCheck()
             return AppParts(app, check, listening, speech)
@@ -445,6 +449,7 @@ private fun newController(ready: Setup, output: SpeechOutput, lesson: Lesson) = 
     log = ready.log::write,
     scope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
     io = Dispatchers.IO,
+    permissionApp = ready.permissionApp,
     input = ready.input,
     // Only a choice in Settings is saved: a fallback at start keeps the saved microphone for when it is back.
     saveModel = { model -> ready.settings.update { it.copy(model = model) } },
