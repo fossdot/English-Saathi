@@ -9,9 +9,12 @@ yet** (see the end of this page).
 
 ## What runs
 
-- **Library:** `sherpa-onnx-jvm-1.13.8.jar` and the native libraries from
-  the same GitHub release (onnxruntime 1.28.2), downloaded and checksummed
-  by `scripts/fetch_deps.sh`. The app loads the native libraries for its
+- **Library:** `sherpa-onnx-jvm-1.13.8.jar` and onnxruntime 1.28.2 from
+  sherpa-onnx's GitHub release, downloaded and checksummed by
+  `scripts/fetch_deps.sh`, and sherpa-onnx's native library built from the
+  same version's source without text-to-speech
+  (`scripts/build_sherpa_onnx.sh`, kept in git; `docs/decisions.md`,
+  "Licences: owner answers"). The app loads the native libraries for its
   processor from `desktop/native/osx-x64/` or `desktop/native/osx-aarch64/`
   instead of letting sherpa-onnx unpack them into `$TMPDIR` on every start.
 - **Models:** tiny.en is the Android app's 44.3 MB build (same files);

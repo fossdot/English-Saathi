@@ -6,8 +6,10 @@
 #     tools/asr-compare/quantize_whisper_decoder.py (needs python3; the
 #     script installs onnx and numpy into tools/asr-compare/.venv)
 #   - a LibriSpeech sample (CC BY 4.0) for the on-device speech test
-#   - for the desktop app: the sherpa-onnx Java library and its macOS
-#     native libraries (Intel and Apple silicon), and Whisper small.en (int8)
+#   - for the desktop app: the sherpa-onnx Java library, ONNX Runtime for
+#     macOS (Intel and Apple silicon) and Whisper small.en (int8). The
+#     sherpa-onnx native library itself is kept in git: it is built without
+#     text-to-speech by scripts/build_sherpa_onnx.sh.
 # Safe to re-run: files that are already present and correct are kept.
 # Everything is downloaded into a temporary folder first, so an interrupted
 # run never leaves partial files inside the app.
@@ -86,28 +88,30 @@ if ! ok "$DECODER" "$(expected "$DECODER")"; then
   mv "$work/decoder.onnx" "$DECODER"
 fi
 
-# Desktop app (docs/desktop-plan.md). The native libraries are unpacked from
-# their release jars into desktop/native/<os-arch>/, where the app loads them
-# directly instead of letting sherpa-onnx unpack them into $TMPDIR on every start.
+# Desktop app (docs/desktop-plan.md). The native libraries live in
+# desktop/native/<os-arch>/, where the app loads them directly instead of
+# letting sherpa-onnx unpack them into $TMPDIR on every start. ONNX Runtime
+# is unpacked from sherpa-onnx's release jar; the jar's own sherpa-onnx
+# library is not used, as it has text-to-speech (eSpeak NG, GPL-3.0) inside.
 fetch "$SHERPA_RELEASE/sherpa-onnx-jvm-1.13.8.jar" desktop/libs/sherpa-onnx-jvm-1.13.8.jar
 for arch in osx-x64 osx-aarch64; do
   dir=desktop/native/$arch
-  if ok "$dir/libonnxruntime.dylib" "$(expected "$dir/libonnxruntime.dylib")" &&
-     ok "$dir/libsherpa-onnx-jni.dylib" "$(expected "$dir/libsherpa-onnx-jni.dylib")"; then
-    continue
-  fi
+  lib=$dir/libonnxruntime.dylib
+  if ok "$lib" "$(expected "$lib")"; then continue; fi
   jar=sherpa-onnx-native-lib-$arch-1.13.8.jar
   sha_var=NATIVE_JAR_SHA_${arch//-/_}
   fetch "$SHERPA_RELEASE/$jar" "$work/$jar" "${!sha_var}"
-  unzip -q -o -j "$work/$jar" "sherpa-onnx/native/$arch/*.dylib" -d "$work/$arch"
-  for lib in libonnxruntime.dylib libsherpa-onnx-jni.dylib; do
-    if ! ok "$work/$arch/$lib" "$(expected "$dir/$lib")"; then
-      echo "$jar holds an unexpected $lib" >&2
-      exit 1
-    fi
-  done
+  unzip -q -o -j "$work/$jar" "sherpa-onnx/native/$arch/libonnxruntime.dylib" -d "$work/$arch"
+  if ! ok "$work/$arch/libonnxruntime.dylib" "$(expected "$lib")"; then
+    echo "$jar holds an unexpected libonnxruntime.dylib" >&2
+    exit 1
+  fi
   mkdir -p "$dir"
-  mv "$work/$arch"/*.dylib "$dir/"
+  mv "$work/$arch/libonnxruntime.dylib" "$lib"
+done
+for arch in osx-x64 osx-aarch64; do
+  lib=desktop/native/$arch/libsherpa-onnx-jni.dylib
+  ok "$lib" "$(expected "$lib")" || { echo "$lib is missing or not the tested file (it is kept in git; scripts/build_sherpa_onnx.sh)" >&2; exit 1; }
 done
 SMALL_DIR=desktop/models/whisper-small.en
 fetch "$HF_SMALL/small.en-encoder.int8.onnx" "$SMALL_DIR/small.en-encoder.int8.onnx"

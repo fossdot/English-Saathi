@@ -26,7 +26,9 @@ app/src/main/assets/asr/
 app/src/androidTest/assets/asr-test/
 # Made by scripts/make_test_wavs.sh with the macOS voices, whose licence doesn't allow sharing them
 app/src/debug/assets/asr-test/
-# Desktop app, also downloaded by scripts/fetch_deps.sh
+# Desktop app, also downloaded by scripts/fetch_deps.sh, except the sherpa-onnx
+# native library, which scripts/build_sherpa_onnx.sh builds and git keeps
 desktop/libs/
-desktop/native/
+desktop/native/*/*
+!desktop/native/*/libsherpa-onnx-jni.dylib
 desktop/models/

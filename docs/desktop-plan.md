@@ -181,7 +181,7 @@ Nothing changes for the domain module.
 | UI library | Compose foundation 1.10.3 + our own theme from the pilot's CSS | Material 3 for 1.10.3 is a pre-release (plugin default `1.9.0-beta03`) |
 | kotlinx-coroutines and coroutines-swing | 1.11.0 | Compose 1.10.3 doesn't bring the Swing dispatcher |
 | kotlinx-serialization-json | 1.11.0 | lesson files and saved data |
-| sherpa-onnx | 1.13.8: `sherpa-onnx-jvm`, `sherpa-onnx-native-lib-osx-x64` (+ `-osx-aarch64` for development on Apple silicon) | GitHub release with checksums, not JitPack; onnxruntime 1.28.2, macOS 10.15+, Java 8 class files |
+| sherpa-onnx | 1.13.8: `sherpa-onnx-jvm` and onnxruntime 1.28.2 from the GitHub release; the native library built from the 1.13.8 source without text-to-speech, for Intel (+ Apple silicon for development) | release files with checksums, not JitPack; the native library kept in git (`scripts/build_sherpa_onnx.sh`); macOS 10.15+, Java 8 class files |
 | Speech models | tiny.en (the Android app's 44.3 MB files), small.en int8 (375.5 MB) | fetched and checksummed, not in git |
 | Font | Mukta (SIL Open Font License), bundled | the pilot's font, which the pilot loads online |
 | Tests | JUnit 4.13.2; Compose `ui-test-junit4` 1.10.3 | |

@@ -241,6 +241,55 @@ The pack format and its checks are in `docs/lesson-packs.md`.
 - **Size:** a 100-lesson pack of lessons like Bus stand is about 313 KB as
   written, about 78 KB compressed, and loads in about 50 ms (`PackSizeTest`).
 
+## Licences: owner answers (2026-10-22)
+
+- **Speech library:** sherpa-onnx's prebuilt Java native library (1.13.8,
+  `libsherpa-onnx-jni.dylib`) compiles in eSpeak NG (GPL-3.0) for
+  text-to-speech, which the app doesn't use. Shipping it would bring GPLv3
+  obligations for the whole app. The owner chose to rebuild the same 1.13.8
+  library from its source with text-to-speech off, as sherpa-onnx's
+  maintainer advises, for Intel and Apple silicon.
+- **Java runtime source:** the bundled runtime (Amazon Corretto, GPLv2 with
+  the Classpath Exception) needs its source available. Corretto's source
+  archive goes in the same Google Drive folder as the `.dmg`, and the
+  notices say so.
+
+### Choices made while rebuilding the speech library
+
+- `scripts/build_sherpa_onnx.sh` builds sherpa-onnx v1.13.8 (commit
+  11afbd0) as sherpa-onnx's own macOS JNI build does, with text-to-speech,
+  speaker diarization, PortAudio, the websocket server, the C API and the
+  command-line programs off. It checks that no eSpeak, piper or ucd symbol
+  is left, that each library is for its processor, and that it loads
+  `@rpath/libonnxruntime.dylib`.
+- **The only change to sherpa-onnx's files:** its list of functions to
+  export names 16 text-to-speech and diarization ones, and macOS's linker
+  refuses to export a function that isn't built, so they are taken out.
+- sherpa-onnx's build breaks on a space in its path ("English Saathi"), so
+  it builds in `$TMPDIR`.
+- **The two libraries are kept in git** (`desktop/native/osx-x64/` and
+  `desktop/native/osx-aarch64/libsherpa-onnx-jni.dylib`, listed in
+  `scripts/deps.sha256`), as a rebuild elsewhere gives different bytes.
+  ONNX Runtime 1.28.2 stays the file from sherpa-onnx's release jar, fetched
+  by `scripts/fetch_deps.sh`; it is byte for byte the file the build links
+  against.
+- **The same results:**
+  - Both models recognize the LibriSpeech clip word for word
+    (`JvmWhisperRecognizerTest`, the self-test).
+  - On the speech check's six clips, both models, the Intel library's
+    transcripts are identical to the prebuilt one's (run on Intel Java
+    under Rosetta).
+  - On Apple silicon, they are identical except small.en on bus_03: "1
+    ticket to Patna, please." instead of "One ticket…". Both score 5 of 5.
+    The difference is rounding from another compiler, and it is the same on
+    every run.
+- **Smaller:** the Intel library went from 4.5 to 3.2 MB, the Apple
+  silicon one from 4.2 to 3.0 MB.
+- The Android app's archive (`sherpa-onnx-static-link-onnxruntime-1.13.8.aar`)
+  has the same text-to-speech code inside. Android is paused; before an
+  Android build is shared, it needs the same rebuild, or sherpa-onnx 2.0,
+  which drops eSpeak NG.
+
 ## Desktop screens: owner answers (2026-10-21)
 
 - **Start D5–D8 now** (owner): students use the desktop app for the next

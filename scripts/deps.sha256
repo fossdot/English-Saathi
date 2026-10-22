@@ -5,9 +5,9 @@ b22c3fc1b6a45666d28892bb2f7694beeb77a8362d7ebd77c1a5431ec9435471  app/libs/sherp
 6bc58a4efdf20daac252b6b1502632601a71efe0308f6757dc1eda34891a7e4f  app/src/androidTest/assets/asr-test/librispeech-0.wav
 77b7b047fade4eadada96b568eb92615049aaf1dc317c7244e46c1ea38b9a63b  desktop/libs/sherpa-onnx-jvm-1.13.8.jar
 2bf27180c09e6fd3f407c9ab25205ebf1ff95f2d53bfa35e35409b5849e0ac70  desktop/native/osx-x64/libonnxruntime.dylib
-b7b37a7dcf837d95f562b9949ecc0603a7b44ce59a538f6cd4b7b01034e40a3d  desktop/native/osx-x64/libsherpa-onnx-jni.dylib
+9b99bebbefe48ec26b6175d2947dc858989c4397811a714f521335dc7be45cf5  desktop/native/osx-x64/libsherpa-onnx-jni.dylib
 b0613d0ae53199a83b05fa48e169211498e9d40d54beaa372068ebe5ec5b0929  desktop/native/osx-aarch64/libonnxruntime.dylib
-e8025656a2680b838dd7ccd7d7ee7e88e5da42a35ad010d8717c22dd7b851ca1  desktop/native/osx-aarch64/libsherpa-onnx-jni.dylib
+0212148872a5c9533947ef320723b2b0b9c66cf554409e8c8df1d75bb29dbfec  desktop/native/osx-aarch64/libsherpa-onnx-jni.dylib
 8bdac288f369aa94ee2194059238c465ed82ea9d47ee8fa4a8c0a891873e462f  desktop/models/whisper-small.en/small.en-encoder.int8.onnx
 710ccf890e10f3faa15f51ec346081a2723c9f3adb6e4da81c6573a5a6f877fb  desktop/models/whisper-small.en/small.en-decoder.int8.onnx
 306cd27f03c1a714eca7108e03d66b7dc042abe8c258b44c199a7ed9838dd930  desktop/models/whisper-small.en/small.en-tokens.txt
