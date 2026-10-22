@@ -1,7 +1,6 @@
 package net.bodhya.speak.desktop.content
 
 import net.bodhya.speak.desktop.TestContent
-import net.bodhya.speak.domain.GameConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,7 +28,7 @@ class PackSizeTest {
         val compressed = lessons.sumOf { gzipped(it) }
 
         val start = System.nanoTime()
-        val loaded = PackLoader.load("hundred.json", text, emptyList(), GameConfig())
+        val loaded = PackLoader.load("hundred.json", text, emptyList())
         val ms = (System.nanoTime() - start) / 1_000_000
         println("100-lesson pack: ${bytes / 1024} KB as written, about ${compressed / 1024} KB compressed, loaded in $ms ms")
 

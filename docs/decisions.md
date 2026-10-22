@@ -186,7 +186,8 @@ Within the plan; each is a setting or a small change.
 - **Daily goal with several lessons:** the goal (5 different sentences a
   day) counts sentences from any lesson. Start practice continues the
   learner's current lesson and moves to the next open lesson once every
-  sentence in it is done today.
+  sentence in it is done today. (How lessons move on was changed on
+  2026-10-22: "Lesson review: owner answers".)
 - **Pack format:** text only for now: one `.json` file. The format carries
   its own version number, so a later format can add pictures in a `.zip`
   without breaking installed packs.
@@ -208,11 +209,12 @@ The pack format and its checks are in `docs/lesson-packs.md`.
   replaces a newer one. A shadowed copy is never deleted.
 - **The app's packs always come first** in the unlock order (Bus stand
   stays lesson 1), then added packs by their `order`, then id.
-- **Sentence ids must be unique across all packs**, ignoring case, and safe
-  as file names: progress, the attempt log and the recordings are kept by
-  sentence id. A pack that reuses one is refused; an added file that clashes
-  or can't be read at start is left out and reported on the picker, and the
-  app's own lessons always load.
+- **Ids are unique within a pack**, ignoring case, and safe as file names:
+  progress, the attempt log and the recordings are kept by sentence id. The
+  app puts the pack's id in front, so packs can't clash ("Lesson review:
+  owner answers"; at first a pack reusing another pack's id was refused). An
+  added file that can't be read at start is left out and reported on the
+  picker, and the app's own lessons always load.
 - **Each learner's open lessons are saved** (`learners/<id>/lessons.json`:
   the current lesson, the lessons opened so far, "Open all lessons"). An
   opened lesson stays open, so a pack update that adds a sentence to the
@@ -223,8 +225,9 @@ The pack format and its checks are in `docs/lesson-packs.md`.
   with "n of m said" (tap to make it the current lesson), locked ones with a
   lock and their names. The hard-coded Market, Bank and Hospital rows show
   only while there is a single lesson.
-- **Next and Skip also move on** to the next open lesson once every
-  sentence of the current one is done today, as Start practice does.
+- **Next and Skip also moved on** to the next open lesson once every
+  sentence of the current one was done today, as Start practice did.
+  Replaced by "Lesson review: owner answers".
 - **Adding a pack** goes through Settings › Add lessons: the macOS Open
   dialog (Downloads, `.json` files), the check (nothing changes yet), a
   preview with each lesson's titles in English and Hindi, its sentence count
@@ -233,13 +236,105 @@ The pack format and its checks are in `docs/lesson-packs.md`.
   middle of a sentence goes back home, as the lesson may have changed.
   There is no way to remove a pack yet.
 - **Tips** come from the sentence's own pack (its templates over the app's).
-- **Results** count "Sentences tried" against every installed sentence; the
-  CSV is unchanged (sentence ids are unique, so they name the lesson).
+- **Results** count "Sentences tried" against every installed sentence. The
+  CSV's sentence column now carries the pack's id (`starter.bus_01`).
 - **Speech is prepared** for the learner's current lesson when it changes
   (one lesson at a time, the newest request wins), and for the first lesson
   at start, for the speech check.
 - **Size:** a 100-lesson pack of lessons like Bus stand is about 313 KB as
   written, about 78 KB compressed, and loads in about 50 ms (`PackSizeTest`).
+
+## Lesson review: owner answers (2026-10-22)
+
+A design review of lesson packs raised four questions about the rules.
+The owner's answers:
+
+- **Moving on:** Start practice and Next offer, after sentences with words
+  due for revision, the current lesson's sentences never said yet. Once
+  every sentence of the current lesson has been said (which opens the next
+  lesson), the next lesson becomes current, even if the student stopped at
+  the goal screen. This replaces "moves to the next open lesson once every
+  sentence in it is done today". Bus stand has 5 sentences and the goal is
+  5, so a student who stopped at the goal would have started Bus stand again
+  every day, and sentences 6 and later of a longer lesson would never have
+  been offered.
+- **Revision from other lessons:** Start practice and Next can show a
+  sentence from an earlier open lesson when it has a word due for revision,
+  then go back to the current lesson. Before, a word only in Bus stand never
+  came back after the student moved on, although the goal screen said it
+  would.
+- **Ids carry the pack's id:** the app keeps every lesson and sentence id as
+  `<pack>.<id>` (`starter.bus_01`), so packs can never clash. The CSV's
+  sentence column changes from the pilot's `bus_01` to `starter.bus_01`
+  (and the attempt log's lesson from `bus_stand` to `starter.bus_stand`).
+- **Typos are refused:** a field the app doesn't know in a word, sentence or
+  lesson refuses the pack, naming the field and the one probably meant
+  (`word "patna": unknown field "scored" (did you mean "score"?)`). Before,
+  it was ignored with a warning, so Patna would quietly have been scored.
+  Unknown fields at the top of a pack stay warnings, so a later format can
+  add one.
+
+### Choices made while building the review's answers
+
+- **The sentence order** for Start practice, Next and Skip:
+  1. A sentence not done today with a word due for revision (scored in that
+     sentence): the current lesson's first, then the other open lessons' in
+     the unlock order.
+  2. The current lesson's first sentence never said.
+  3. Otherwise the pilot's order in the current lesson. It continues after
+     the current lesson's sentence last shown, so a revision sentence
+     doesn't lose the place.
+- **Moving on** happens when the attempt that says the current lesson's
+  last unsaid sentence is scored. The next open lesson in the unlock order
+  with a sentence never said becomes current; if there is none, the lesson
+  stays current. The feedback screen still shows the sentence just said,
+  with "New lesson open: …", and Next continues in the new lesson. A lesson
+  the student chooses on Home stays current, even once all of it has been
+  said.
+- **When the saved current lesson can't be used** (none yet, dropped by a
+  pack update, or closed when "Open all lessons" is turned off), the current
+  lesson is the first open lesson with a sentence never said, or else the
+  furthest open one. It used to be the first open lesson, which sent a
+  student back to Bus stand.
+- **A revision sentence says so** on the practice screen: "Revision: this
+  sentence from Bus stand has a word to practise again." (drafted; needs the
+  teacher review). Its speech isn't prepared with the current lesson's, so
+  its first Listen takes a moment longer.
+- **The goal screen's "Practise again tomorrow"** lists only words that can
+  come back: words scored in a sentence of an open lesson.
+- **Data saved before this change** has bare ids, which can only be the
+  first pack's (Bus stand was the only lesson in use). Progress, open lessons
+  and the attempt log read them as `starter.<id>`, so old rows also export as
+  `starter.bus_01`, and the next save writes them in full. Recordings saved
+  under the old names stay as they are; a sentence's next recording uses the
+  new name.
+- **Tips are checked like words and sentences:** an unknown field in a tip
+  (`text_hi`, `reviewed`) refuses the pack too.
+- **More checks from the review:**
+  - A pack file must be UTF-8. A byte-order mark is allowed and dropped;
+    UTF-16 or another encoding is refused, as its Hindi would turn to
+    nonsense.
+  - Lists and objects may nest at most 32 deep. A lesson needs 6, and a
+    deeper file could overflow the JSON reader and stop the app at start.
+  - The 20 MB limit also applies to files found in the data folder at start.
+  - The preview lists what the checks flagged: up to 8 items, and all of
+    them in the log.
+  - The per-lesson warning "the daily goal is more than the sentences" is
+    gone, as the goal counts any lesson. The app warns only if all lessons
+    together can't reach the goal.
+- **Installing never overwrites another file.** A new version replaces the
+  added file of the version in use; otherwise it gets a free name
+  (`<id>.json`, `<id>-2.json`, …). So a file this version can't read (a
+  later format, say) is kept.
+- **Released packs keep loading.** Every released pack is kept in
+  `desktop/src/test/resources/released-packs/`. `ReleasedPacksTest` loads
+  each one with the current app, so a stricter check can never make an app
+  update drop lessons students have opened. The test also fails if a pack
+  inside the app changes without a new version.
+- **Changing lessons while a student practises** (Settings opens over the
+  window): adding a pack, or closing the lesson on screen by turning "Open
+  all lessons" off, takes the student home. Turning it on leaves them where
+  they are.
 
 ## Licences: owner answers (2026-10-22)
 

@@ -304,11 +304,11 @@ internal fun Screens(ready: Setup, parts: AppParts, chooseCsvFile: (String) -> F
         )
         Screen.Home -> HomeScreen(state, a.lesson, a.config, HomeActions(a::startPractice, a::openSentence, a::chooseLesson, a::showStudents, a::hindiHelp))
         is Screen.Practice -> PracticeScreen(
-            state, mic, recognition, a.lesson, screen.sentence,
+            state, mic, recognition, screen.ref,
             PracticeActions(a::toggleRecording, a::listen, a::home, a::showStudents, a::hindiHelp),
         )
         is Screen.Feedback -> state.result?.let { result ->
-            FeedbackScreen(state.learner!!, result, a.lesson, FeedbackActions({ a.listen(slow = false) }, a::fix, a::next, a::showStudents, a::hindiHelp))
+            FeedbackScreen(state.learner!!, result, FeedbackActions({ a.listen(slow = false) }, a::fix, a::next, a::showStudents, a::hindiHelp))
         }
         is Screen.Fix -> state.fix?.let { fix ->
             FixScreen(state, fix, mic, recognition, FixActions(a::fixNext, a::toggleRecording, a::fixListen, a::backToFeedback, a::next, a::showStudents, a::hindiHelp))

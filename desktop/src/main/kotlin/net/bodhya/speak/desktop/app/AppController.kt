@@ -8,7 +8,6 @@ import net.bodhya.speak.desktop.check.MessageKind
 import net.bodhya.speak.desktop.check.ShownMessage
 import net.bodhya.speak.desktop.check.SpeechCheckController
 import net.bodhya.speak.desktop.check.SpeechOutput
-import net.bodhya.speak.desktop.content.LessonEntry
 import net.bodhya.speak.desktop.content.LessonLibrary
 import net.bodhya.speak.desktop.content.PackCheck
 import net.bodhya.speak.desktop.content.PackInUse
@@ -34,7 +33,9 @@ import net.bodhya.speak.domain.FixOutcome
 import net.bodhya.speak.domain.FixState
 import net.bodhya.speak.domain.FixingLoop
 import net.bodhya.speak.domain.GameConfig
+import net.bodhya.speak.domain.Hints
 import net.bodhya.speak.domain.LearnerProgress
+import net.bodhya.speak.domain.Leitner
 import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.domain.Normalizer
 import net.bodhya.speak.domain.Practice
@@ -61,14 +62,14 @@ sealed interface Screen {
 
     data object Home : Screen
 
-    /** Practising sentence [sentence] of the lesson: listen, then speak. */
-    data class Practice(val sentence: Int) : Screen
+    /** Practising [ref]'s sentence: listen, then speak. */
+    data class Practice(val ref: SentenceRef) : Screen
 
-    /** How sentence [sentence] was said ([AppState.result]). */
-    data class Feedback(val sentence: Int) : Screen
+    /** How [ref]'s sentence was said ([AppState.result]). */
+    data class Feedback(val ref: SentenceRef) : Screen
 
-    /** The five-step fixing loop for the word to fix of sentence [sentence] ([AppState.fix]). */
-    data class Fix(val sentence: Int) : Screen
+    /** The five-step fixing loop for the word to fix of [ref]'s sentence ([AppState.fix]). */
+    data class Fix(val ref: SentenceRef) : Screen
 
     /** The daily goal was just reached: shown once per learner per day. */
     data object GoalDone : Screen
@@ -90,9 +91,22 @@ data class ResultsData(val rows: List<LoggedAttempt>, val summary: List<StudentS
 /** A learner as the picker shows them: their card, name and streak (and, for Settings, whether all lessons are open for them). */
 data class StudentCard(val learner: Learner, val streak: StreakView, val openAll: Boolean = false)
 
+/**
+ * Sentence [index] of [lesson]: what the practice, feedback and fixing
+ * screens show. Usually of the current lesson; a sentence brought back for
+ * revision can be of another open lesson.
+ */
+data class SentenceRef(val lesson: Lesson, val index: Int) {
+    init {
+        require(index in lesson.sentences.indices) { "lesson ${lesson.id} has no sentence $index" }
+    }
+
+    val sentence: Sentence get() = lesson.sentences[index]
+}
+
 /** A scored sentence attempt, for the feedback screen. */
 data class SentenceResult(
-    val sentence: Int,
+    val ref: SentenceRef,
     val alignment: Alignment,
     val score: Score,
     val xp: Int,
@@ -131,7 +145,7 @@ data class AppState(
     val message: ShownMessage? = null,
     val result: SentenceResult? = null,
     val fix: FixView? = null,
-    /** The learner's current lesson: where Start practice continues, and the one being practised. */
+    /** The learner's current lesson: where Start practice continues (a sentence brought back for revision can be of another). */
     val lesson: Lesson? = null,
     /** Every lesson in the unlock order, open or locked, for Home. */
     val lessons: List<LessonRow> = emptyList(),
@@ -142,11 +156,14 @@ data class AppState(
  * The flow between the student picker, home, practice, feedback, the
  * fixing loop and the goal screen (milestones D5–D7), without the window,
  * following the pilot with the agreed changes (docs/decisions.md), over
- * every lesson of the [LessonLibrary]: lessons open in order, and Start
- * practice moves on to the next open lesson once the current one is all
- * done today. Every change to a learner's progress is saved at once, so
- * quitting or a power cut loses nothing, and every recording of a sentence
- * or a fixing step is added to the attempt log, "Didn't hear you" included.
+ * every lesson of the [LessonLibrary]: lessons open in order; Start
+ * practice and Next bring back sentences with words due for revision (also
+ * from other open lessons), then the current lesson's sentences never said;
+ * and once every sentence of the current lesson has been said, the next
+ * lesson becomes current. Every change to a learner's progress is saved at
+ * once, so quitting or a power cut loses nothing, and every recording of a
+ * sentence or a fixing step is added to the attempt log, "Didn't hear you"
+ * included.
  */
 class AppController(
     private val store: LearnerStore,
@@ -169,13 +186,15 @@ class AppController(
     var library: LessonLibrary = library
         private set
 
-    /** The lesson being practised (the first lesson on screens without a learner). */
+    /** The learner's current lesson (the first lesson on screens without a learner). */
     val lesson: Lesson get() = _state.value.lesson ?: library.lessons.first().lesson
 
-    private val entry: LessonEntry get() = library.lesson(lesson.id) ?: library.lessons.first()
-
-    /** The sentence last shown, for choosing the next one (0 when none has been shown, as in the pilot). */
-    private var current = 0
+    /**
+     * The current lesson's sentence last shown, for choosing the next one
+     * there; null when none has been shown (the pilot's 0). A sentence
+     * brought back from another lesson leaves it alone.
+     */
+    private var cursor: SentenceRef? = null
 
     /** Changes with every screen; a recording made on an earlier screen is dropped. */
     private var screenToken = 0
@@ -241,8 +260,8 @@ class AppController(
         val progress = Practice.openApp(stored, today, config)
         if (progress != stored) store.saveProgress(id, progress)
         val lessons = openLessons(id, store.lessons(id), progress)
-        val current = currentLesson(lessons)
-        this.current = 0
+        val current = currentLesson(lessons, progress)
+        cursor = null
         go { AppState(Screen.Home, cards(today), learner, progress, today, lesson = current, lessons = rows(progress, lessons, current), learnerLessons = lessons) }
         onLessonChange(current)
     }
@@ -258,38 +277,44 @@ class AppController(
         switchLesson(learner, lesson)
     }
 
-    /**
-     * "Start practice" / "Practise more" on home (Enter): in the current
-     * lesson, or, once every sentence of it is done today, in the next open
-     * lesson that has a sentence not done today (owner, 2026-10-21).
-     */
+    /** "Start practice" / "Practise more" on home (Enter), and on the goal screen: the sentence [choose] picks. */
     fun startPractice() {
         val s = _state.value
-        val learner = s.learner ?: return
+        if (s.learner == null) return
+        open(choose(s.progress, Practice.startPractice(s.progress, lesson.sentences, cursorIn(lesson), today(), config)))
+    }
+
+    /**
+     * The sentence to practise next (docs/decisions.md, "Lesson review: owner
+     * answers"): one not done today with a word due for revision (scored
+     * there), in the current lesson first, then in the other open lessons in
+     * their order; then the current lesson's first sentence never said;
+     * otherwise [fallback], the pilot's choice in the current lesson.
+     */
+    private fun choose(progress: LearnerProgress, fallback: Int): SentenceRef {
         val today = today()
-        val target = if (allDoneToday(lesson, s.progress, today)) nextOpenWithWork(lesson, s.progress, today) ?: lesson else lesson
-        if (target.id != lesson.id) switchLesson(learner, target)
-        openSentence(Practice.startPractice(s.progress, target.sentences, current, today, config))
+        val current = lesson
+        val due = Leitner.due(progress.leitner, today, config).toSet()
+        if (due.isNotEmpty()) {
+            val done = progress.doneOn(today).toSet()
+            val opened = _state.value.learnerLessons
+            val others = library.lessons.map { it.lesson }.filter { it.id != current.id && opened.isOpen(it.id) }
+            for (l in listOf(current) + others) {
+                val i = l.sentences.indexOfFirst { s -> s.id !in done && s.targetWords.any { it in due && it !in l.unscoredIn(s) } }
+                if (i >= 0) return SentenceRef(l, i)
+            }
+        }
+        val unsaid = current.sentences.indexOfFirst { it.id !in progress.bestStars }
+        return SentenceRef(current, if (unsaid >= 0) unsaid else fallback)
     }
 
-    private fun allDoneToday(lesson: Lesson, progress: LearnerProgress, today: LocalDate): Boolean {
-        val done = progress.doneOn(today).toSet()
-        return lesson.sentences.all { it.id in done }
-    }
-
-    /** The next open lesson after [from] (wrapping round) with a sentence not done today. */
-    private fun nextOpenWithWork(from: Lesson, progress: LearnerProgress, today: LocalDate): Lesson? {
-        val order = library.lessons.map { it.lesson }
-        val start = order.indexOfFirst { it.id == from.id }
-        val opened = _state.value.learnerLessons
-        return (1 until order.size).map { order[(start + it).mod(order.size)] }
-            .firstOrNull { opened.isOpen(it.id) && !allDoneToday(it, progress, today) }
-    }
+    /** Where the pilot's sentence order continues in [lesson]: after the sentence of it last shown (0 at first). */
+    private fun cursorIn(lesson: Lesson): Int = cursor?.takeIf { it.lesson.id == lesson.id && it.index in lesson.sentences.indices }?.index ?: 0
 
     private fun switchLesson(learner: Learner, lesson: Lesson) {
         val lessons = _state.value.learnerLessons.copy(current = lesson.id)
         store.saveLessons(learner.id, lessons)
-        current = 0
+        cursor = null
         _state.update { it.copy(lesson = lesson, learnerLessons = lessons, lessons = rows(it.progress, lessons, lesson)) }
         onLessonChange(lesson)
     }
@@ -301,40 +326,58 @@ class AppController(
         return now
     }
 
-    /** The lesson to continue: the stored current one if it still exists and is open, otherwise the first open one. */
-    private fun currentLesson(lessons: LearnerLessons): Lesson {
+    /**
+     * The lesson to continue: the saved current one while it exists and is
+     * open; otherwise (at first, after a pack update dropped it, or after
+     * "Open all lessons" was turned off) the first open lesson with a
+     * sentence never said, or else the furthest open one.
+     */
+    private fun currentLesson(lessons: LearnerLessons, progress: LearnerProgress): Lesson {
         val all = library.lessons.map { it.lesson }
-        return all.firstOrNull { it.id == lessons.current && lessons.isOpen(it.id) } ?: all.firstOrNull { lessons.isOpen(it.id) } ?: all.first()
+        val open = all.filter { lessons.isOpen(it.id) }
+        return open.firstOrNull { it.id == lessons.current } ?: open.firstOrNull { !allSaid(it, progress) } ?: open.lastOrNull() ?: all.first()
     }
+
+    /** The lesson after [done] to move on to: the first open one with a sentence never said; null to stay. */
+    private fun nextLesson(done: Lesson, lessons: LearnerLessons, progress: LearnerProgress): Lesson? {
+        val all = library.lessons.map { it.lesson }
+        return all.drop(all.indexOfFirst { it.id == done.id } + 1).firstOrNull { lessons.isOpen(it.id) && !allSaid(it, progress) }
+    }
+
+    private fun allSaid(lesson: Lesson, progress: LearnerProgress) = lesson.sentences.all { it.id in progress.bestStars }
+
+    /** The tips for [lesson]'s words: its pack's. */
+    private fun hintsFor(lesson: Lesson): Hints = (library.lesson(lesson.id) ?: library.lessons.first()).hints
 
     private fun rows(progress: LearnerProgress, lessons: LearnerLessons, current: Lesson): List<LessonRow> =
         library.lessons.map { e ->
             LessonRow(e.lesson, lessons.isOpen(e.lesson.id), e.lesson.id == current.id, e.lesson.sentences.count { it.id in progress.bestStars })
         }
 
-    /** A sentence row on home, or the next sentence. */
-    fun openSentence(index: Int) {
-        require(index in lesson.sentences.indices)
-        current = index
-        go { it.copy(screen = Screen.Practice(index), today = today(), message = null, result = null, fix = null) }
+    /** A sentence row on home: a sentence of the current lesson. */
+    fun openSentence(index: Int) = open(SentenceRef(lesson, index))
+
+    private fun open(ref: SentenceRef) {
+        if (ref.lesson.id == lesson.id) cursor = ref
+        go { it.copy(screen = Screen.Practice(ref), today = today(), message = null, result = null, fix = null) }
     }
 
     /** Listen (L) and Slowly (S) on the practice screen; "Hear the correct sentence" (L) on feedback. */
     fun listen(slow: Boolean) {
-        val sentence = when (val screen = _state.value.screen) {
-            is Screen.Practice -> lesson.sentences[screen.sentence]
-            is Screen.Feedback -> lesson.sentences[screen.sentence]
+        val ref = when (val screen = _state.value.screen) {
+            is Screen.Practice -> screen.ref
+            is Screen.Feedback -> screen.ref
             else -> return
         }
-        output.english(sentence.text, if (slow) Speeds.SLOW else Speeds.NORMAL)
+        output.english(ref.sentence.text, if (slow) Speeds.SLOW else Speeds.NORMAL)
     }
 
     /** The mic button and Space on the practice screen and fixing steps 3–5: start recording, or stop early. */
     fun toggleRecording() {
         val s = _state.value
-        val index = when (val screen = s.screen) {
-            is Screen.Practice -> screen.sentence
-            is Screen.Fix -> screen.sentence.takeIf { s.fix != null && FixingLoop.isRecordingStep(s.fix.state.step) } ?: return
+        val ref = when (val screen = s.screen) {
+            is Screen.Practice -> screen.ref
+            is Screen.Fix -> screen.ref.takeIf { s.fix != null && FixingLoop.isRecordingStep(s.fix.state.step) } ?: return
             else -> return
         }
         val l = listening ?: return
@@ -343,60 +386,73 @@ class AppController(
         output.stop()
         _state.update { it.copy(message = null) }
         val token = screenToken
-        val sentence = lesson.sentences[index]
         val fixing = s.fix?.state.takeIf { s.screen is Screen.Fix }
         l.start { heard ->
             when {
-                token != screenToken -> log("dropped a result for ${sentence.id}: the screen moved on")
-                fixing != null -> onFixHeard(sentence, fixing, heard)
-                else -> onSentenceHeard(index, sentence, heard)
+                token != screenToken -> log("dropped a result for ${ref.sentence.id}: the screen moved on")
+                fixing != null -> onFixHeard(ref, fixing, heard)
+                else -> onSentenceHeard(ref, heard)
             }
         }
     }
 
-    private fun onSentenceHeard(index: Int, sentence: Sentence, heard: Heard) {
+    private fun onSentenceHeard(ref: SentenceRef, heard: Heard) {
         val s = _state.value
         val learner = s.learner ?: return
         val today = today()
+        val lesson = ref.lesson
+        val sentence = ref.sentence
         when (heard) {
             is Heard.Words -> {
                 saveRecording(learner, sentence, heard.recording)
                 when (val attempt = Practice.attemptSentence(s.progress, lesson, sentence, heard.text, today, config)) {
                     SentenceAttempt.NothingHeard -> {
-                        logAttempt(learner, sentence, heard.text, AttemptResult.NOT_HEARD, model = heard.model.id, waitMs = heard.waitMs, recording = heard.recording)
+                        logAttempt(learner, ref, heard.text, AttemptResult.NOT_HEARD, model = heard.model.id, waitMs = heard.waitMs, recording = heard.recording)
                         show(MessageKind.INFO, SpeechCheckController.DIDNT_HEAR)
                     }
                     is SentenceAttempt.Scored -> {
                         store.saveProgress(learner.id, attempt.progress)
                         logAttempt(
-                            learner, sentence, heard.text, AttemptResult.SCORED, attempt.score.correct, attempt.score.total, attempt.score.stars,
+                            learner, ref, heard.text, AttemptResult.SCORED, attempt.score.correct, attempt.score.total, attempt.score.stars,
                             heard.model.id, heard.waitMs, heard.recording,
                         )
-                        // Saying the last unsaid sentence of a lesson opens the next one.
+                        // Saying the last unsaid sentence of a lesson opens the next one; of the current lesson, it also moves the learner on.
                         val before = s.learnerLessons
-                        val lessons = openLessons(learner.id, before, attempt.progress)
+                        var lessons = openLessons(learner.id, before, attempt.progress)
                         val opened = library.lessons.map { it.lesson }.filter { it.id in lessons.opened && it.id !in before.opened && !before.openAll }
+                        var current = this.lesson
+                        if (lesson.id == current.id && !allSaid(current, s.progress) && allSaid(current, attempt.progress)) {
+                            nextLesson(current, lessons, attempt.progress)?.let { next ->
+                                lessons = lessons.copy(current = next.id)
+                                store.saveLessons(learner.id, lessons)
+                                log("student ${learner.id}: every sentence of ${current.id} said, on to ${next.id}")
+                                current = next
+                                cursor = null
+                            }
+                        }
                         val toFix = FeedbackSelector.wordToFix(attempt.alignment)
                         val result = SentenceResult(
-                            index, attempt.alignment, attempt.score, attempt.xp, heard.text, toFix,
-                            toFix?.let { writtenWord(sentence, it.index) }, toFix?.let { FeedbackSelector.tip(it.word, lesson, entry.hints) },
+                            ref, attempt.alignment, attempt.score, attempt.xp, heard.text, toFix,
+                            toFix?.let { writtenWord(sentence, it.index) }, toFix?.let { FeedbackSelector.tip(it.word, lesson, hintsFor(lesson)) },
                             opened,
                         )
+                        val moved = current.id != this.lesson.id
                         go {
                             it.copy(
-                                screen = Screen.Feedback(index), progress = attempt.progress, today = today, result = result, message = null,
-                                learnerLessons = lessons, lessons = rows(attempt.progress, lessons, lesson),
+                                screen = Screen.Feedback(ref), progress = attempt.progress, today = today, result = result, message = null,
+                                lesson = current, learnerLessons = lessons, lessons = rows(attempt.progress, lessons, current),
                             )
                         }
+                        if (moved) onLessonChange(current)
                     }
                 }
             }
             is Heard.NothingLoud -> {
-                logAttempt(learner, sentence, "", AttemptResult.NOT_HEARD, recording = heard.recording)
+                logAttempt(learner, ref, "", AttemptResult.NOT_HEARD, recording = heard.recording)
                 show(MessageKind.INFO, SpeechCheckController.DIDNT_HEAR)
             }
             is Heard.Silent -> {
-                logAttempt(learner, sentence, "", AttemptResult.NOT_HEARD, recording = heard.recording)
+                logAttempt(learner, ref, "", AttemptResult.NOT_HEARD, recording = heard.recording)
                 show(MessageKind.PROBLEM, SpeechCheckController.silent(heard.permission))
             }
             is Heard.NoMicrophone -> show(MessageKind.PROBLEM, SpeechCheckController.unavailable(heard.detail))
@@ -404,23 +460,19 @@ class AppController(
         }
     }
 
-    /** Next sentence, or Skip: the goal screen the first time today's goal is reached, otherwise the next sentence. */
+    /**
+     * Next sentence, or Skip: the goal screen the first time today's goal is
+     * reached, otherwise the sentence [choose] picks.
+     */
     fun next() {
         val s = _state.value
         val learner = s.learner ?: return
-        val after = Practice.afterSentence(s.progress, lesson.sentences, current, today(), config)
+        val after = Practice.afterSentence(s.progress, lesson.sentences, cursorIn(lesson), today(), config)
         if (after.progress != s.progress) store.saveProgress(learner.id, after.progress)
         _state.update { it.copy(progress = after.progress) }
         when (val next = after.next) {
             AfterSentence.GoalComplete -> go { it.copy(screen = Screen.GoalDone, today = today(), message = null, result = null, fix = null) }
-            is AfterSentence.Next -> {
-                // The whole lesson done today: on to the next open lesson with work, as Start practice does.
-                val today = today()
-                val elsewhere = if (allDoneToday(lesson, after.progress, today)) nextOpenWithWork(lesson, after.progress, today) else null
-                if (elsewhere == null) return openSentence(next.index)
-                switchLesson(learner, elsewhere)
-                openSentence(Practice.startPractice(after.progress, elsewhere.sentences, 0, today, config))
-            }
+            is AfterSentence.Next -> open(choose(after.progress, next.index))
         }
     }
 
@@ -430,13 +482,13 @@ class AppController(
         val screen = s.screen as? Screen.Feedback ?: return
         val result = s.result ?: return
         val toFix = result.toFix ?: return
-        val sentence = lesson.sentences[screen.sentence]
-        val tip = result.tip ?: FeedbackSelector.tip(toFix.word, lesson, entry.hints)
+        val ref = screen.ref
+        val tip = result.tip ?: FeedbackSelector.tip(toFix.word, ref.lesson, hintsFor(ref.lesson))
         val view = FixView(
-            FixingLoop.start(sentence, toFix.index), result.toFixWritten ?: toFix.word,
-            lesson.syllablesOf(toFix.word), tip.soundHi, tip.template.textHi,
+            FixingLoop.start(ref.sentence, toFix.index), result.toFixWritten ?: toFix.word,
+            ref.lesson.syllablesOf(toFix.word), tip.soundHi, tip.template.textHi,
         )
-        go { it.copy(screen = Screen.Fix(screen.sentence), fix = view, message = null) }
+        go { it.copy(screen = Screen.Fix(ref), fix = view, message = null) }
     }
 
     /** "Next" on fixing steps 1 and 2, and Enter there (steps 3–5 use the mic). */
@@ -450,7 +502,7 @@ class AppController(
     /** The back arrow on the fixing screen: the feedback again. */
     fun backToFeedback() {
         val screen = _state.value.screen as? Screen.Fix ?: return
-        go { it.copy(screen = Screen.Feedback(screen.sentence), fix = null, message = null) }
+        go { it.copy(screen = Screen.Feedback(screen.ref), fix = null, message = null) }
     }
 
     /**
@@ -466,17 +518,19 @@ class AppController(
         else output.english(FixingLoop.target(f)!!, if (slow) Speeds.SLOW else Speeds.NORMAL)
     }
 
-    private fun onFixHeard(sentence: Sentence, fixing: FixState, heard: Heard) {
+    private fun onFixHeard(ref: SentenceRef, fixing: FixState, heard: Heard) {
         val s = _state.value
         val learner = s.learner ?: return
         val view = s.fix ?: return
+        val lesson = ref.lesson
+        val sentence = ref.sentence
         val target = FixingLoop.target(fixing)!!
         // The word itself is logged as written ("Where"); the phrase and sentence are the lesson's text.
         val shownTarget = if (fixing.step == 3) view.written else target
         val mode = AttemptRecord.fixStep(fixing.step)
         val today = today()
         fun notHeard(text: String, model: String? = null, waitMs: Long? = null, recording: Recording?, message: ShownMessage) {
-            logAttempt(learner, sentence, text, AttemptResult.NOT_HEARD, model = model, waitMs = waitMs, recording = recording, mode = mode, target = shownTarget)
+            logAttempt(learner, ref, text, AttemptResult.NOT_HEARD, model = model, waitMs = waitMs, recording = recording, mode = mode, target = shownTarget)
             _state.update { it.copy(message = message) }
         }
         when (heard) {
@@ -491,7 +545,7 @@ class AppController(
                 val counted = r.alignment!!.withUnscored(lesson.unscoredIn(sentence))
                 val passed = r.outcome == FixOutcome.PASSED || r.outcome == FixOutcome.SENTENCE_FIXED
                 logAttempt(
-                    learner, sentence, heard.text, if (passed) AttemptResult.PASSED else AttemptResult.FAILED, counted.correctCount, counted.total,
+                    learner, ref, heard.text, if (passed) AttemptResult.PASSED else AttemptResult.FAILED, counted.correctCount, counted.total,
                     model = heard.model.id, waitMs = heard.waitMs, recording = heard.recording, mode = mode, target = shownTarget,
                 )
                 val message = when (r.outcome) {
@@ -511,10 +565,17 @@ class AppController(
         }
     }
 
-    /** Words for the goal screen's "Practise again tomorrow", as written in the lesson, in the order they entered the box. */
+    /**
+     * Words for the goal screen's "Practise again tomorrow", as written in the
+     * lessons, in the order they entered the box: only words that can come
+     * back, scored in a sentence of an open lesson (not ones only in a lesson
+     * a pack update dropped, for example).
+     */
     fun wordsForTomorrow(): List<String> {
         val s = _state.value
-        return Practice.wordsForTomorrow(s.progress, s.today, config).map { writtenInLesson(it) }
+        val open = library.lessons.map { it.lesson }.filter { s.learnerLessons.isOpen(it.id) }
+        val revisable = open.flatMap { l -> l.sentences.flatMap { st -> st.targetWords.filter { it !in l.unscoredIn(st) } } }.toSet()
+        return Practice.wordsForTomorrow(s.progress, s.today, config).filter { it in revisable }.map { writtenInLesson(it) }
     }
 
     /**
@@ -574,7 +635,7 @@ class AppController(
     /**
      * Adds a pack [checkPack] found ready, and uses the new lessons at once.
      * Returns what to tell the facilitator. A learner in the middle of a
-     * sentence goes back to their home screen, as the lesson may have changed.
+     * sentence goes back to their home screen, as its lesson may have changed.
      */
     fun installPack(ready: PackCheck.Ready): Message {
         val message = try {
@@ -589,21 +650,8 @@ class AppController(
             log("lesson pack ${ready.preview.id} not added: $e")
             return Message("The lesson pack couldn’t be added: ${e.message ?: e}. Nothing was changed.", "पैक नहीं जुड़ सका। कुछ नहीं बदला।")
         }
-        refreshLessons()
+        lessonsChanged(_state.value.learnerLessons, libraryChanged = true)
         return message
-    }
-
-    /** After the lessons changed: the learner's open lessons and current lesson again, and back home from a sentence. */
-    private fun refreshLessons() {
-        val s = _state.value
-        val learner = s.learner
-        if (learner == null) return _state.update { it.copy(lesson = null, lessons = emptyList()) }
-        val lessons = openLessons(learner.id, s.learnerLessons, s.progress)
-        val current = currentLesson(lessons)
-        val busy = s.screen is Screen.Practice || s.screen is Screen.Feedback || s.screen is Screen.Fix
-        if (busy) go { it.copy(screen = Screen.Home, message = null, result = null, fix = null) }
-        _state.update { it.copy(lesson = current, learnerLessons = lessons, lessons = rows(it.progress, lessons, current)) }
-        onLessonChange(current)
     }
 
     /** Settings › Students › "Open all lessons" for one learner. */
@@ -611,12 +659,32 @@ class AppController(
         val lessons = store.lessons(id).copy(openAll = open)
         store.saveLessons(id, lessons)
         log("student $id: all lessons ${if (open) "open" else "back to the unlock order"}")
-        val s = _state.value
-        if (s.learner?.id == id) {
-            val current = currentLesson(lessons)
-            _state.update { it.copy(learnerLessons = lessons, lesson = current, lessons = rows(it.progress, lessons, current)) }
-        }
+        if (_state.value.learner?.id == id) lessonsChanged(lessons, libraryChanged = false)
         _state.update { it.copy(students = cards(today())) }
+    }
+
+    /**
+     * The lessons ([libraryChanged]) or which are open for the learner
+     * changed: their open lessons and current lesson again. From a sentence
+     * whose lesson may have changed, or is no longer open, back home.
+     */
+    private fun lessonsChanged(stored: LearnerLessons, libraryChanged: Boolean) {
+        val s = _state.value
+        val learner = s.learner ?: return _state.update { it.copy(lesson = null, lessons = emptyList()) }
+        val lessons = openLessons(learner.id, stored, s.progress)
+        val current = currentLesson(lessons, s.progress)
+        val onScreen = when (val screen = s.screen) {
+            is Screen.Practice -> screen.ref
+            is Screen.Feedback -> screen.ref
+            is Screen.Fix -> screen.ref
+            else -> null
+        }
+        if (onScreen != null && (libraryChanged || !lessons.isOpen(onScreen.lesson.id))) {
+            go { it.copy(screen = Screen.Home, message = null, result = null, fix = null) }
+        }
+        if (libraryChanged || current.id != s.lesson?.id) cursor = null
+        _state.update { it.copy(lesson = current, learnerLessons = lessons, lessons = rows(it.progress, lessons, current)) }
+        if (current != s.lesson) onLessonChange(current)
     }
 
     /**
@@ -679,7 +747,7 @@ class AppController(
 
     private fun logAttempt(
         learner: Learner,
-        sentence: Sentence,
+        ref: SentenceRef,
         heard: String,
         result: AttemptResult,
         correct: Int? = null,
@@ -689,13 +757,12 @@ class AppController(
         waitMs: Long? = null,
         recording: Recording? = null,
         mode: String = AttemptRecord.SENTENCE,
-        target: String = sentence.text,
+        target: String = ref.sentence.text,
     ) {
-        val lessonId = library.lessonOf(sentence.id)?.lesson?.id ?: lesson.id
-        val record = AttemptRecord(LearnerStore.now(clock), lessonId, sentence.id, mode, target, heard, correct, total, stars, model, result, waitMs)
+        val record = AttemptRecord(LearnerStore.now(clock), ref.lesson.id, ref.sentence.id, mode, target, heard, correct, total, stars, model, result, waitMs)
         store.logAttempt(learner.id, record)
         // The session log also gets what the endpointer saw, for tuning the silence rules on real audio.
-        log("attempt | learner=${learner.id} | ${record.mode} | sentence=${sentence.id} | ${result.text} | heard=$heard | " +
+        log("attempt | learner=${learner.id} | ${record.mode} | sentence=${record.sentence} | ${result.text} | heard=$heard | " +
             "score=${correct ?: "-"}/${total ?: "-"} | model=${model ?: "-"} | wait_ms=${waitMs ?: "-"} | ${recording?.stats ?: "-"}")
     }
 

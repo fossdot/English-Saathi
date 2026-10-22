@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.data
 
+import kotlinx.serialization.json.Json
 import net.bodhya.speak.domain.LearnerProgress
 import net.bodhya.speak.domain.LeitnerEntry
 import net.bodhya.speak.domain.StreakState
@@ -35,7 +36,25 @@ class LearnerStoreTest {
     private val redSun = Card(CardColour.RED, CardSymbol.SUN)
 
     private fun record(time: String, heard: String = "where is the bus stop", result: AttemptResult = AttemptResult.SCORED) =
-        AttemptRecord(time, "bus_stand", "bus_01", AttemptRecord.SENTENCE, "Where is the bus stop?", heard, 5, 5, 3, "tiny.en", result, 420)
+        AttemptRecord(time, "starter.bus_stand", "starter.bus_01", AttemptRecord.SENTENCE, "Where is the bus stop?", heard, 5, 5, 3, "tiny.en", result, 420)
+
+    @Test
+    fun `ids saved before they carried the pack's id are read as the first pack's`() {
+        val id = store.add("Anita", blueFish).id
+        val dir = File(dataDir, "learners/$id")
+        File(dir, "progress.json").writeText(
+            """{ "doneByDay": { "2026-10-21": ["bus_02", "bus_01"] }, "bestStars": { "bus_01": 1, "bus_02": 3, "starter.bus_01": 2 } }""",
+        )
+        File(dir, "lessons.json").writeText("""{ "current": "bus_stand", "opened": ["bus_stand", "starter.bus_stand", "bihar1.market"] }""")
+        File(dir, "attempts").mkdirs()
+        File(dir, "attempts/2026-10-21.jsonl").writeText(Json.encodeToString(record("2026-10-21T13:45:30+05:30").copy(lesson = "bus_stand", sentence = "bus_01")) + "\n")
+        val progress = store.progress(id)
+        assertEquals(listOf("starter.bus_02", "starter.bus_01"), progress.doneOn(LocalDate.of(2026, 10, 21)))
+        assertEquals("the best of both spellings", mapOf("starter.bus_01" to 2, "starter.bus_02" to 3), progress.bestStars)
+        assertEquals(LearnerLessons("starter.bus_stand", listOf("starter.bus_stand", "bihar1.market")), store.lessons(id))
+        assertEquals("starter.bus_stand" to "starter.bus_01", store.attempts(id).single().let { it.lesson to it.sentence })
+        assertEquals(emptyList<String>(), problems)
+    }
 
     @Test
     fun `learners keep their card and name, oldest first, across a restart`() {
@@ -76,8 +95,8 @@ class LearnerStoreTest {
         val progress = LearnerProgress(
             xpTotal = 75,
             xpByDay = mapOf(day to 75),
-            doneByDay = mapOf(day to listOf("bus_03", "bus_01")),
-            bestStars = mapOf("bus_01" to 3, "bus_03" to 1),
+            doneByDay = mapOf(day to listOf("starter.bus_03", "starter.bus_01")),
+            bestStars = mapOf("starter.bus_01" to 3, "starter.bus_03" to 1),
             streak = StreakState(4, day, null),
             // Not alphabetical: "the" entered the box first.
             leitner = linkedMapOf("the" to LeitnerEntry(2, day.plusDays(3)), "bus" to LeitnerEntry(1, day.plusDays(1)), "ticket" to LeitnerEntry(1, day.plusDays(1))),

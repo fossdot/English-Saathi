@@ -20,8 +20,10 @@ import net.bodhya.speak.desktop.speech.SpeechModel
 import net.bodhya.speak.domain.Aligner
 import net.bodhya.speak.domain.FeedbackSelector
 import net.bodhya.speak.domain.GameConfig
+import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.domain.Normalizer
 import net.bodhya.speak.domain.Scorer
+import net.bodhya.speak.domain.Sentence
 import net.bodhya.speak.speech.EngineState
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -38,7 +40,7 @@ class PracticeScreensTest {
     private val hints = TestContent.hints
     private val lesson = TestContent.lesson
     private val anita = Learner("s1", "Anita", CardColour.BLUE, CardSymbol.FISH, "2026-10-21T13:45:30+05:30")
-    private val state = AppState(Screen.Practice(2), learner = anita, today = LocalDate.of(2026, 10, 21))
+    private val state = AppState(Screen.Practice(TestContent.at(2)), learner = anita, today = LocalDate.of(2026, 10, 21), lesson = lesson)
     private val ready = RecognitionState(SpeechModel.TINY_EN, EngineState.Ready(300))
 
     private fun result(index: Int, heard: String): SentenceResult {
@@ -47,7 +49,7 @@ class PracticeScreensTest {
         val score = Scorer.score(a, GameConfig())
         val toFix = FeedbackSelector.wordToFix(a)
         return SentenceResult(
-            index, a, score, Scorer.sentenceAttemptXp(score.stars, GameConfig()), heard, toFix,
+            TestContent.at(index), a, score, Scorer.sentenceAttemptXp(score.stars, GameConfig()), heard, toFix,
             toFix?.let { AppController.writtenWord(s, it.index) }, toFix?.let { FeedbackSelector.tip(it.word, lesson, hints) },
         )
     }
@@ -56,7 +58,7 @@ class PracticeScreensTest {
     fun `practice shows the sentence, Listen, Slowly and the mic`() {
         var pressed = 0
         val heard = mutableListOf<Boolean>()
-        compose.setContent { PracticeScreen(state, Listening.State(), ready, lesson, 2, PracticeActions({ pressed++ }, { heard += it }, {}, {}, {})) }
+        compose.setContent { PracticeScreen(state, Listening.State(), ready, TestContent.at(2), PracticeActions({ pressed++ }, { heard += it }, {}, {}, {})) }
         compose.onNodeWithText("One ticket to Patna, please.").assertExists()
         compose.onNodeWithText("Bus stand, sentence 3 (वाक्य 3)").assertExists()
         compose.onNodeWithContentDescription("Sentence 3 of 5").assertExists()
@@ -69,10 +71,23 @@ class PracticeScreensTest {
     }
 
     @Test
+    fun `a sentence brought back from another lesson says it is revision`() {
+        val market = Lesson("bihar1.market", "Market", "बाज़ार", listOf(Sentence("bihar1.mkt_01", "How much are the bananas?", "", emptyList())))
+        compose.setContent { PracticeScreen(state.copy(lesson = market), Listening.State(), ready, TestContent.at(2), PracticeActions({}, {}, {}, {}, {})) }
+        compose.onNodeWithText("Revision: this sentence from Bus stand has a word to practise again.", substring = true).assertExists()
+    }
+
+    @Test
+    fun `a sentence of the current lesson isn't called revision`() {
+        compose.setContent { PracticeScreen(state, Listening.State(), ready, TestContent.at(2), PracticeActions({}, {}, {}, {}, {})) }
+        compose.onNodeWithText("Revision", substring = true).assertDoesNotExist()
+    }
+
+    @Test
     fun `the mic can't be pressed while the model loads, and shows when it listens`() {
         var pressed = 0
         compose.setContent {
-            PracticeScreen(state, Listening.State(), RecognitionState(SpeechModel.SMALL_EN, EngineState.Loading), lesson, 2, PracticeActions({ pressed++ }, {}, {}, {}, {}))
+            PracticeScreen(state, Listening.State(), RecognitionState(SpeechModel.SMALL_EN, EngineState.Loading), TestContent.at(2), PracticeActions({ pressed++ }, {}, {}, {}, {}))
         }
         compose.onNodeWithText("Loading the speech model…").assertExists()
         compose.onNodeWithTag("mic").performClick()
@@ -81,7 +96,7 @@ class PracticeScreensTest {
 
     @Test
     fun `listening shows the stop button`() {
-        compose.setContent { PracticeScreen(state, Listening.State(listening = true, level = 0.5f), ready, lesson, 2, PracticeActions({}, {}, {}, {}, {})) }
+        compose.setContent { PracticeScreen(state, Listening.State(listening = true, level = 0.5f), ready, TestContent.at(2), PracticeActions({}, {}, {}, {}, {})) }
         compose.onNodeWithContentDescription("Stop listening").assertExists()
         compose.onNodeWithText("Listening…").assertExists()
     }
@@ -90,7 +105,7 @@ class PracticeScreensTest {
     fun `feedback shows stars, praise, the count, chips, what was heard, the tip and Fix`() {
         var fixed = 0
         var skipped = 0
-        compose.setContent { FeedbackScreen(anita, result(0, "were is the bus stop"), lesson, FeedbackActions({}, { fixed++ }, { skipped++ }, {}, {})) }
+        compose.setContent { FeedbackScreen(anita, result(0, "were is the bus stop"), FeedbackActions({}, { fixed++ }, { skipped++ }, {}, {})) }
         compose.onNodeWithContentDescription("2 of 3 stars").assertExists()
         compose.onNodeWithText("Very good!").assertExists()
         compose.onNodeWithText("4 of 5 words correct").assertExists()
@@ -107,7 +122,7 @@ class PracticeScreensTest {
     @Test
     fun `all words right offers the next sentence and no tip`() {
         var next = 0
-        compose.setContent { FeedbackScreen(anita, result(2, "1 ticket 2 but now please"), lesson, FeedbackActions({}, {}, { next++ }, {}, {})) }
+        compose.setContent { FeedbackScreen(anita, result(2, "1 ticket 2 but now please"), FeedbackActions({}, {}, { next++ }, {}, {})) }
         compose.onNodeWithText("Excellent!").assertExists()
         compose.onNodeWithText("Patna").assertExists() // unscored: a neutral chip, as written
         compose.onNodeWithTag("tip").assertDoesNotExist()

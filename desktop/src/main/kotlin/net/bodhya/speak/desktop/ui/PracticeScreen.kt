@@ -28,13 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.bodhya.speak.desktop.app.AppState
+import net.bodhya.speak.desktop.app.SentenceRef
 import net.bodhya.speak.desktop.app.SentenceResult
 import net.bodhya.speak.desktop.check.MessageKind
 import net.bodhya.speak.desktop.data.Learner
 import net.bodhya.speak.desktop.practice.Listening
 import net.bodhya.speak.desktop.speech.RecognitionState
 import net.bodhya.speak.desktop.voice.Message
-import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.domain.Praise
 import net.bodhya.speak.domain.FeedbackSelector
 import net.bodhya.speak.speech.EngineState
@@ -51,12 +51,15 @@ class PracticeActions(
 /**
  * The pilot's practice screen: the sentence with Listen and Slowly on the
  * left, the mic on the right (milestone D6). Space speaks, L listens, S
- * listens slowly.
+ * listens slowly. A sentence brought back from another lesson for revision
+ * says so.
  */
 @Composable
-fun PracticeScreen(state: AppState, mic: Listening.State, recognition: RecognitionState, lesson: Lesson, index: Int, actions: PracticeActions) {
+fun PracticeScreen(state: AppState, mic: Listening.State, recognition: RecognitionState, ref: SentenceRef, actions: PracticeActions) {
     val learner = state.learner ?: return
-    val sentence = lesson.sentences[index]
+    val lesson = ref.lesson
+    val index = ref.index
+    val sentence = ref.sentence
     Page {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             RoundIconButton(Icons.close, "Close and go home", actions.home, plain = true)
@@ -72,6 +75,10 @@ fun PracticeScreen(state: AppState, mic: Listening.State, recognition: Recogniti
         Row(horizontalArrangement = Arrangement.spacedBy(40.dp)) {
             Column(Modifier.weight(1.15f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Line("${lesson.titleEn}, sentence ${index + 1} (वाक्य ${index + 1})", color = Colors.muted)
+                if (lesson.id != state.lesson?.id) {
+                    // Drafted for the desktop app; needs the teacher review.
+                    MessageBox(MessageKind.INFO, Message("Revision: this sentence from ${lesson.titleEn} has a word to practise again.", "दोहराना: ${lesson.titleHi} के इस वाक्य में एक शब्द फिर से अभ्यास करना है।"))
+                }
                 Column {
                     BasicText(sentence.text, style = textStyle(46.sp, weight = FontWeight.Bold, lineHeight = 1.15f))
                     BasicText(sentence.hi, style = textStyle(24.sp, Colors.muted))
@@ -149,12 +156,12 @@ class FeedbackActions(
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun FeedbackScreen(learner: Learner, result: SentenceResult, lesson: Lesson, actions: FeedbackActions) {
-    val sentence = lesson.sentences[result.sentence]
+fun FeedbackScreen(learner: Learner, result: SentenceResult, actions: FeedbackActions) {
+    val sentence = result.ref.sentence
     val score = result.score
     Page {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Line("${lesson.titleEn}, sentence ${result.sentence + 1}", color = Colors.muted)
+            Line("${result.ref.lesson.titleEn}, sentence ${result.ref.index + 1}", color = Colors.muted)
             Box(Modifier.weight(1f))
             WhoPill(learner, actions.students)
             HelpButton(actions.help)

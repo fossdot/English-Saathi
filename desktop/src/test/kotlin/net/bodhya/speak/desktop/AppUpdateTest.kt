@@ -108,7 +108,7 @@ class AppUpdateTest {
         val lessons = store.lessons(anita)
         val data = fingerprint(dataDir)
         assertEquals(5, attempts.size)
-        assertEquals(listOf("bus_stand", "market"), lessons.opened)
+        assertEquals(listOf("starter.bus_stand", "bihar1.market"), lessons.opened)
 
         // The update: the old app is deleted and the new one, with version 2 of its own pack, takes its place.
         v1.walkTopDown().forEach { it.setWritable(true) }
@@ -121,10 +121,10 @@ class AppUpdateTest {
         assertEquals(listOf("Anita"), after.learners().map { it.name })
         assertEquals(progress, after.progress(anita))
         assertEquals(attempts, after.attempts(anita))
-        assertTrue(after.recordingFile(anita, "bus_01").isFile)
+        assertTrue(after.recordingFile(anita, "starter.bus_01").isFile)
         assertEquals(SavedSettings(SpeechModel.TINY_EN, MicChoice.Named("USB PnP Sound Device")), SettingsFile(File(dataDir, "settings.json")).read())
         updated.pick(anita)
-        assertEquals("the new app's own pack, and the added one", listOf("bus_stand" to 6, "market" to 2), updated.library.lessons.map { it.lesson.id to it.lesson.sentences.size })
+        assertEquals("the new app's own pack, and the added one", listOf("starter.bus_stand" to 6, "bihar1.market" to 2), updated.library.lessons.map { it.lesson.id to it.lesson.sentences.size })
         assertEquals("Market stays open although Bus stand gained a sentence", listOf(true, true), updated.state.value.lessons.map { it.open })
         assertEquals(2, updated.library.packs.single { it.pack.id == "starter" }.pack.version)
     }

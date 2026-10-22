@@ -89,12 +89,12 @@ class SpeechCheckControllerTest {
     fun `a recording is recognized, scored against the sentence and logged with its model`() {
         controller.toggleRecording()
         val r = controller.state.value.result!!
-        assertEquals("bus_01", r.sentenceId)
+        assertEquals("starter.bus_01", r.sentenceId)
         assertEquals(Score(5, 5, 3), r.score)
         assertEquals(SpeechModel.SMALL_EN, r.model)
-        assertTrue(log.last(), log.last().startsWith("result | model=small.en | sentence=bus_01 | source=microphone"))
-        assertTrue("logs what the endpointer saw: ${log.last()}", "speech from" in log.last() && log.last().endsWith("| saved /data/bus_01.wav"))
-        assertEquals(listOf("bus_01"), saved)
+        assertTrue(log.last(), log.last().startsWith("result | model=small.en | sentence=starter.bus_01 | source=microphone"))
+        assertTrue("logs what the endpointer saw: ${log.last()}", "speech from" in log.last() && log.last().endsWith("| saved /data/starter.bus_01.wav"))
+        assertEquals(listOf("starter.bus_01"), saved)
         assertEquals("speech stops before the microphone opens", listOf("stop"), played)
         assertEquals(false, controller.state.value.listening)
     }
@@ -143,7 +143,7 @@ class SpeechCheckControllerTest {
         controller.selectSentence(3)
         recognition.gate!!.complete(Unit)
         assertNull(controller.state.value.result)
-        assertTrue(log.last().startsWith("dropped a result for bus_01"))
+        assertTrue(log.last().startsWith("dropped a result for starter.bus_01"))
     }
 
     @Test
@@ -153,7 +153,7 @@ class SpeechCheckControllerTest {
         controller.close()
         recognition.gate!!.complete(Unit)
         assertNull(controller.state.value.result)
-        assertTrue(log.last().startsWith("dropped a result for bus_01"))
+        assertTrue(log.last().startsWith("dropped a result for starter.bus_01"))
     }
 
     @Test

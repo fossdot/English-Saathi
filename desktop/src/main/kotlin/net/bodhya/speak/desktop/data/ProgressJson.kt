@@ -22,11 +22,12 @@ internal data class ProgressJson(
     val leitner: List<LeitnerJson> = emptyList(),
     val goalCelebratedOn: String? = null,
 ) {
+    /** Sentence ids saved before they carried their pack's id are read in full ([SavedIds]). */
     fun toProgress() = LearnerProgress(
         xpTotal = xpTotal,
         xpByDay = xpByDay.mapKeys { LocalDate.parse(it.key) },
-        doneByDay = doneByDay.mapKeys { LocalDate.parse(it.key) },
-        bestStars = bestStars,
+        doneByDay = doneByDay.entries.associate { (day, ids) -> LocalDate.parse(day) to ids.map(SavedIds::qualify).distinct() },
+        bestStars = bestStars.entries.groupBy({ SavedIds.qualify(it.key) }, { it.value }).mapValues { it.value.max() },
         streak = StreakState(streak.days, streak.lastPracticeDay?.let(LocalDate::parse), streak.pausedSince?.let(LocalDate::parse)),
         leitner = leitner.associate { it.word to LeitnerEntry(it.box, LocalDate.parse(it.due)) },
         goalCelebratedOn = goalCelebratedOn?.let(LocalDate::parse),

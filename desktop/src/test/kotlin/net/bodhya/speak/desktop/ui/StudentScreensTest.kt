@@ -78,8 +78,8 @@ class StudentScreensTest {
     fun `home shows the goal, best stars, a paused streak, XP and the locked places`() {
         val progress = LearnerProgress(
             xpTotal = 75,
-            doneByDay = mapOf(today to listOf("bus_01", "bus_03")),
-            bestStars = mapOf("bus_01" to 3, "bus_03" to 1),
+            doneByDay = mapOf(today to listOf("starter.bus_01", "starter.bus_03")),
+            bestStars = mapOf("starter.bus_01" to 3, "starter.bus_03" to 1),
             streak = StreakState(4, today.minusDays(2), today.minusDays(1)),
         )
         var started = 0
@@ -104,7 +104,7 @@ class StudentScreensTest {
     @Test
     fun `a broken streak shows 0 days and a reached goal offers more practice`() {
         val progress = LearnerProgress(
-            doneByDay = mapOf(today to listOf("bus_01", "bus_02", "bus_03", "bus_04", "bus_05")),
+            doneByDay = mapOf(today to (1..5).map { "starter.bus_0$it" }),
             streak = StreakState(9, today.minusDays(5)),
         )
         compose.setContent { HomeScreen(AppState(Screen.Home, learner = anita, progress = progress, today = today), lesson, GameConfig(), HomeActions({}, {}, {}, {}, {})) }

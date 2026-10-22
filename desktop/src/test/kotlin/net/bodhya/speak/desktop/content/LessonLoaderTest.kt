@@ -19,7 +19,7 @@ class LessonLoaderTest {
     private val config = GameConfig()
     private val hints = TestContent.hints
 
-    private fun load(text: String, goal: Int = 1) = LessonLoader.loadLesson("test.json", text, hints, GameConfig(dailyGoal = goal))
+    private fun load(text: String) = LessonLoader.loadLesson("test.json", text, hints)
 
     /** A small lesson: one sentence, "Where is the bus stop?", with [words] as its word table and [extra] sentence fields. */
     private fun lesson(words: String = WORDS, extra: String = "") = """
@@ -27,13 +27,13 @@ class LessonLoaderTest {
           "sentences": [ { "id": "s1", "text": "Where is the bus stop?", "hi": "", "chunks": ["Where is", "the bus stop"] $extra } ] }
     """
 
-    private fun warnings(text: String, goal: Int = 1) = load(text, goal).warnings
+    private fun warnings(text: String) = load(text).warnings
 
     @Test
     fun `the bus stand lesson in the app's pack has everything decided`() {
         // It loads without warnings: PackLoaderTest.
         val lesson = TestContent.lesson
-        assertEquals(listOf("bus_01", "bus_02", "bus_03", "bus_04", "bus_05"), lesson.sentences.map { it.id })
+        assertEquals(listOf("starter.bus_01", "starter.bus_02", "starter.bus_03", "starter.bus_04", "starter.bus_05"), lesson.sentences.map { it.id })
         assertEquals(setOf("patna"), lesson.unscoredIn(lesson.sentences[2]))
         assertEquals(setOf("bettiah"), lesson.unscoredIn(lesson.sentences[4]))
         assertEquals(emptyMap<String, Set<String>>(), lesson.accept)
@@ -85,19 +85,34 @@ class LessonLoaderTest {
     }
 
     @Test
-    fun `a daily goal larger than the sentences is flagged`() {
-        assertEquals(listOf("test.json: the daily goal (5) is more than the 1 sentences, so it can't be reached"), warnings(lesson(), goal = 5))
-    }
-
-    @Test
     fun `a hint tag without a template is flagged`() {
         val w = warnings(lesson(WORDS.replace("\"bus\": { \"syllables\": [\"bus\"] }", "\"bus\": { \"syllables\": [\"bus\"], \"hint_tag\": \"z_j\" }")))
         assertEquals(listOf("test.json: word \"bus\": hint tag \"z_j\" has no template, so it gets the generic tip"), w)
     }
 
     @Test
-    fun `unknown fields are flagged`() {
-        assertEquals(listOf("test.json: sentence s1: unknown field \"acept\" is ignored"), warnings(lesson(extra = ", \"acept\": []")))
+    fun `a field it doesn't know in a word, sentence, lesson or tip is an error, with the field probably meant`() {
+        val word = assertThrows(ContentException::class.java) {
+            load(lesson(WORDS.replace("\"bus\": { \"syllables\": [\"bus\"] }", "\"bus\": { \"syllables\": [\"bus\"], \"scored\": false }")))
+        }
+        assertEquals("test.json: word \"bus\": unknown field \"scored\" (did you mean \"score\"?)", word.message)
+        val sentence = assertThrows(ContentException::class.java) { load(lesson(extra = ", \"acept\": []")) }
+        assertEquals("test.json: sentence s1: unknown field \"acept\"", sentence.message)
+        val lesson = assertThrows(ContentException::class.java) { load(lesson().replace("\"title_en\": \"T\"", "\"title_en\": \"T\", \"titel_hi\": \"टी\"")) }
+        assertEquals("test.json: lesson: unknown field \"titel_hi\" (did you mean \"title_hi\"?)", lesson.message)
+        val hint = assertThrows(ContentException::class.java) { LessonLoader.loadHintTemplates("h.json", """{ "th": { "text_hi": "…", "reviewd": true } }""") }
+        assertEquals("h.json: hint \"th\": unknown field \"reviewd\" (did you mean \"reviewed\"?)", hint.message)
+    }
+
+    @Test
+    fun `a suggestion only when a field is close`() {
+        val words = setOf("syllables", "hint_hi", "hint_tag", "accept", "score", "reviewed")
+        assertEquals("score", LessonLoader.closest("Score", words))
+        assertEquals("accept", LessonLoader.closest("acept", words))
+        assertEquals("hint_hi", LessonLoader.closest("hint", words))
+        assertEquals("syllables", LessonLoader.closest("sylables", words))
+        assertEquals(null, LessonLoader.closest("x", words))
+        assertEquals(null, LessonLoader.closest("colour", words))
     }
 
     @Test

@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.app
 
+import net.bodhya.speak.desktop.TestContent.at
 import net.bodhya.speak.desktop.TestContent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -114,7 +115,7 @@ class PracticeFlowTest {
         practise(0)
         app.toggleRecording()
         val s = app.state.value
-        assertEquals(Screen.Feedback(0), s.screen)
+        assertEquals(Screen.Feedback(at(0)), s.screen)
         val r = s.result!!
         assertEquals(Score(5, 5, 3), r.score)
         assertEquals(25, r.xp)
@@ -122,15 +123,15 @@ class PracticeFlowTest {
 
         val saved = store.progress(id)
         assertEquals(25, saved.xpTotal)
-        assertEquals(listOf("bus_01"), saved.doneOn(today))
-        assertEquals(3, saved.bestStars["bus_01"])
+        assertEquals(listOf("starter.bus_01"), saved.doneOn(today))
+        assertEquals(3, saved.bestStars["starter.bus_01"])
         assertEquals(1, saved.streak.days)
         assertEquals(saved, s.progress)
 
         val row = rows().single()
-        assertEquals(AttemptRecord("2026-10-21T13:45:30+05:30", "bus_stand", "bus_01", "sentence", "Where is the bus stop?", "where is the bus stop", 5, 5, 3, "small.en", AttemptResult.SCORED, row.waitMs), row)
-        assertTrue("the latest recording is kept", store.recordingFile(id, "bus_01").isFile)
-        assertTrue(log.last(), log.last().startsWith("attempt | learner=$id | sentence | sentence=bus_01 | scored"))
+        assertEquals(AttemptRecord("2026-10-21T13:45:30+05:30", "starter.bus_stand", "starter.bus_01", "sentence", "Where is the bus stop?", "where is the bus stop", 5, 5, 3, "small.en", AttemptResult.SCORED, row.waitMs), row)
+        assertTrue("the latest recording is kept", store.recordingFile(id, "starter.bus_01").isFile)
+        assertTrue(log.last(), log.last().startsWith("attempt | learner=$id | sentence | sentence=starter.bus_01 | scored"))
     }
 
     @Test
@@ -146,7 +147,7 @@ class PracticeFlowTest {
         app.hindiHelp()
         assertEquals("hi 5 में से 4 शब्द सही। " + r.tip!!.template.textHi, spoken.last())
         app.feedbackPrimary()
-        assertEquals(Screen.Fix(0), app.state.value.screen)
+        assertEquals(Screen.Fix(at(0)), app.state.value.screen)
     }
 
     @Test
@@ -154,7 +155,7 @@ class PracticeFlowTest {
         practise(0)
         recognition.heard = "[BLANK_AUDIO]"
         app.toggleRecording()
-        assertEquals(Screen.Practice(0), app.state.value.screen)
+        assertEquals(Screen.Practice(at(0)), app.state.value.screen)
         assertEquals(SpeechCheckController.DIDNT_HEAR, app.state.value.message!!.message)
         assertEquals(LearnerProgress(), store.progress(id))
         val row = rows().single()
@@ -177,7 +178,7 @@ class PracticeFlowTest {
         assertEquals(AttemptResult.NOT_HEARD, row.result)
         assertEquals("", row.heard)
         assertNull(row.model)
-        assertTrue("no recording kept when the recognizer didn't run", !store.recordingFile(id, "bus_02").exists())
+        assertTrue("no recording kept when the recognizer didn't run", !store.recordingFile(id, "starter.bus_02").exists())
     }
 
     @Test
@@ -210,7 +211,7 @@ class PracticeFlowTest {
         assertEquals(Screen.Home, app.state.value.screen)
         assertEquals(emptyList<AttemptRecord>(), rows())
         assertEquals(LearnerProgress(), store.progress(id))
-        assertTrue(log.last(), log.last().startsWith("dropped a result for bus_01"))
+        assertTrue(log.last(), log.last().startsWith("dropped a result for starter.bus_01"))
     }
 
     @Test
@@ -219,7 +220,7 @@ class PracticeFlowTest {
         micReady = false
         app.toggleRecording()
         assertEquals(0, recognition.calls)
-        assertEquals(Screen.Practice(0), app.state.value.screen)
+        assertEquals(Screen.Practice(at(0)), app.state.value.screen)
     }
 
     @Test
@@ -267,7 +268,7 @@ class PracticeFlowTest {
     @Test
     fun `the fixing loop goes through its five steps, logs each try and goes on after step 5`() {
         fixWhere()
-        assertEquals(Screen.Fix(0), app.state.value.screen)
+        assertEquals(Screen.Fix(at(0)), app.state.value.screen)
         val view = app.state.value.fix!!
         assertEquals("Where", view.written)
         assertEquals(listOf("where"), view.syllables)
@@ -287,7 +288,7 @@ class PracticeFlowTest {
         say("where is")
         assertEquals(5, step)
         say("where is the bus stop")
-        assertEquals("step 5 passed: on to the next sentence", Screen.Practice(1), app.state.value.screen)
+        assertEquals("step 5 passed: on to the next sentence", Screen.Practice(at(1)), app.state.value.screen)
 
         val progress = store.progress(id)
         assertEquals("20 for the attempt, 5 for each of steps 3-5", 35, progress.xpTotal)
@@ -297,7 +298,7 @@ class PracticeFlowTest {
         assertEquals(listOf(AttemptResult.SCORED, AttemptResult.PASSED, AttemptResult.PASSED, AttemptResult.PASSED), rows.map { it.result })
         assertEquals(listOf(1, 2, 5), rows.drop(1).map { it.total })
         assertTrue("fix steps have no stars", rows.drop(1).all { it.stars == null })
-        assertTrue("only sentence attempts keep a recording", store.recordingFile(id, "bus_01").isFile)
+        assertTrue("only sentence attempts keep a recording", store.recordingFile(id, "starter.bus_01").isFile)
     }
 
     @Test
@@ -339,11 +340,11 @@ class PracticeFlowTest {
     fun `back goes to the feedback again, and skip goes on`() {
         fixWhere()
         app.backToFeedback()
-        assertEquals(Screen.Feedback(0), app.state.value.screen)
+        assertEquals(Screen.Feedback(at(0)), app.state.value.screen)
         assertEquals("Where", app.state.value.result!!.toFixWritten)
         app.fix()
         app.next()
-        assertEquals(Screen.Practice(1), app.state.value.screen)
+        assertEquals(Screen.Practice(at(1)), app.state.value.screen)
         assertNull(app.state.value.fix)
     }
 

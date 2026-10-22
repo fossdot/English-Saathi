@@ -8,7 +8,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
-import net.bodhya.speak.domain.GameConfig
 import net.bodhya.speak.domain.HintTemplate
 import net.bodhya.speak.domain.Hints
 import net.bodhya.speak.domain.Lesson
@@ -28,10 +27,12 @@ data class LoadedLesson(val lesson: Lesson, val warnings: List<String>)
  * sentences that may turn scoring off for a word (`"unscored"`).
  *
  * Errors make the file unusable ([ContentException]): broken JSON, a missing
- * or wrong field, what the domain rejects (no sentences, repeated sentence
- * ids, a sentence without English words, word keys that aren't normalized
- * words), and a sentence with nothing left to score. Everything else
- * docs/decisions.md asks the loader to flag is a warning
+ * or wrong field, a field it doesn't know in a lesson, word, sentence or tip
+ * (a typo such as "scored" would otherwise be ignored quietly; the message
+ * suggests the field meant), what the domain rejects (no sentences, repeated
+ * sentence ids, a sentence without English words, word keys that aren't
+ * normalized words), and a sentence with nothing left to score. Everything
+ * else docs/decisions.md asks the loader to flag is a warning
  * ([LoadedLesson.warnings]).
  */
 object LessonLoader {
@@ -39,20 +40,18 @@ object LessonLoader {
     private val WORD_KEYS = setOf("syllables", "hint_hi", "hint_tag", "accept", "score", "reviewed")
     private val SENTENCE_KEYS = setOf("id", "text", "hi", "chunks", "picture", "unscored")
     private val LESSON_KEYS = setOf("id", "title_en", "title_hi", "words", "sentences")
+    private val HINT_KEYS = setOf("text_hi", "reviewed")
 
-    /**
-     * Loads the lesson in [text] (from the file [name], for messages). [hints]
-     * and [config] are checked against it.
-     */
-    fun loadLesson(name: String, text: String, hints: Hints, config: GameConfig): LoadedLesson {
+    /** Loads the lesson in [text] (from the file [name], for messages). [hints] are checked against it. */
+    fun loadLesson(name: String, text: String, hints: Hints): LoadedLesson {
         val warnings = mutableListOf<String>()
         val lesson = parse(name) {
             val root = parseRoot(text)
-            unknownKeys(root, LESSON_KEYS, "lesson", warnings)
-            val words = root.obj("words").mapValues { (word, v) -> word(word, v.asObject("word \"$word\""), warnings) }
-            val sentences = root.array("sentences").mapIndexed { i, v -> sentence(v.asObject("sentence ${i + 1}"), warnings) }
+            refuseUnknown(root, LESSON_KEYS, "lesson")
+            val words = root.obj("words").mapValues { (word, v) -> word(word, v.asObject("word \"$word\"")) }
+            val sentences = root.array("sentences").mapIndexed { i, v -> sentence(v.asObject("sentence ${i + 1}")) }
             Lesson(root.string("id"), root.string("title_en"), root.string("title_hi"), sentences, words)
-                .also { check(it, hints, config, warnings) }
+                .also { check(it, hints, warnings) }
         }
         return LoadedLesson(lesson, warnings.map { "$name: $it" })
     }
@@ -64,12 +63,13 @@ object LessonLoader {
     fun loadHintTemplates(name: String, text: String): List<HintTemplate> = parse(name) {
         parseRoot(text).map { (tag, v) ->
             val o = v.asObject("hint \"$tag\"")
+            refuseUnknown(o, HINT_KEYS, "hint \"$tag\"")
             HintTemplate(tag, o.string("text_hi"), o.boolean("reviewed") ?: false)
         }
     }
 
-    private fun word(key: String, o: JsonObject, warnings: MutableList<String>): WordInfo {
-        unknownKeys(o, WORD_KEYS, "word \"$key\"", warnings)
+    private fun word(key: String, o: JsonObject): WordInfo {
+        refuseUnknown(o, WORD_KEYS, "word \"$key\"")
         return WordInfo(
             syllables = o.strings("syllables"),
             hintHi = o.stringOrNull("hint_hi"),
@@ -79,9 +79,9 @@ object LessonLoader {
         )
     }
 
-    private fun sentence(o: JsonObject, warnings: MutableList<String>): Sentence {
+    private fun sentence(o: JsonObject): Sentence {
         val id = o.string("id")
-        unknownKeys(o, SENTENCE_KEYS, "sentence $id", warnings)
+        refuseUnknown(o, SENTENCE_KEYS, "sentence $id")
         return Sentence(
             id = id,
             text = o.string("text"),
@@ -93,7 +93,7 @@ object LessonLoader {
     }
 
     /** The checks docs/decisions.md lists under "Check content when it is loaded" and "Unscored words". */
-    private fun check(lesson: Lesson, hints: Hints, config: GameConfig, warnings: MutableList<String>) {
+    private fun check(lesson: Lesson, hints: Hints, warnings: MutableList<String>) {
         val used = lesson.sentences.flatMap { it.targetWords }.toSet()
         for ((word, info) in lesson.words) {
             for (entry in info.accept) {
@@ -116,9 +116,6 @@ object LessonLoader {
                 throw ContentException("lesson ${lesson.id}: sentence ${s.id} has no scored word, so it can't be scored")
             }
         }
-        if (config.dailyGoal > lesson.sentences.size) {
-            warnings += "the daily goal (${config.dailyGoal}) is more than the ${lesson.sentences.size} sentences, so it can't be reached"
-        }
     }
 
     // ---------- JSON helpers: every problem names the field ----------
@@ -136,8 +133,34 @@ object LessonLoader {
 
     private fun parseRoot(text: String): JsonObject = Json.parseToJsonElement(text).asObject("the file")
 
-    private fun unknownKeys(o: JsonObject, known: Set<String>, what: String, warnings: MutableList<String>) {
-        for (key in o.keys - known) warnings += "$what: unknown field \"$key\" is ignored"
+    private fun refuseUnknown(o: JsonObject, known: Set<String>, what: String) {
+        val key = (o.keys - known).firstOrNull() ?: return
+        val meant = closest(key, known)?.let { " (did you mean \"$it\"?)" }.orEmpty()
+        throw ContentException("$what: unknown field \"$key\"$meant")
+    }
+
+    /**
+     * The field of [known] that [key] is probably a typo of: a letter or two
+     * different (one for short keys), or one the start of the other
+     * ("hint" for "hint_hi"). Null when nothing is close.
+     */
+    internal fun closest(key: String, known: Set<String>): String? {
+        val k = key.lowercase()
+        val near = maxOf(1, minOf(2, k.length / 3))
+        return known.map { it to editDistance(k, it) }
+            .filter { (field, d) -> d <= near || (k.length >= 3 && (field.startsWith(k) || k.startsWith(field))) }
+            .minByOrNull { it.second }?.first
+    }
+
+    private fun editDistance(a: String, b: String): Int {
+        var row = IntArray(b.length + 1) { it }
+        for (i in a.indices) {
+            val next = IntArray(b.length + 1)
+            next[0] = i + 1
+            for (j in b.indices) next[j + 1] = minOf(row[j + 1] + 1, next[j] + 1, row[j] + if (a[i] == b[j]) 0 else 1)
+            row = next
+        }
+        return row[b.length]
     }
 
     private fun JsonElement.asObject(what: String): JsonObject = this as? JsonObject ?: throw ContentException("$what must be an object")

@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop
 
+import net.bodhya.speak.desktop.app.SentenceRef
 import net.bodhya.speak.desktop.content.LessonLibrary
 import net.bodhya.speak.desktop.content.LessonPack
 import net.bodhya.speak.desktop.content.PackLoader
@@ -13,11 +14,14 @@ object TestContent {
     val projectDir = File(System.getProperty("projectDir") ?: error("run through Gradle: needs -DprojectDir"))
     val builtInDir = File(projectDir, "content/packs")
 
-    val starter: LessonPack by lazy { PackLoader.load("starter.json", File(builtInDir, "starter.json").readText(), emptyList(), GameConfig()).pack }
+    val starter: LessonPack by lazy { PackLoader.load("starter.json", File(builtInDir, "starter.json").readText(), emptyList()).pack }
 
     /** Bus stand, the first lesson. */
     val lesson: Lesson get() = starter.lessons.first()
     val hints: Hints get() = starter.hints
+
+    /** Sentence [index] of [lesson] (Bus stand), as the practice screens name it. */
+    fun at(index: Int, lesson: Lesson = this.lesson) = SentenceRef(lesson, index)
 
     fun library(dataDir: File, builtIn: File = builtInDir): LessonLibrary = LessonLibrary.load(builtIn, dataDir, GameConfig())
 

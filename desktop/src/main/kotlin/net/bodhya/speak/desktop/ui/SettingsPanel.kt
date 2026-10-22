@@ -179,6 +179,12 @@ private fun AddLessons(actions: SettingsActions) {
             }
             // Drafted for the desktop app; needs the teacher review.
             Bilingual("Students’ progress is kept.", "छात्रों की प्रगति बनी रहेगी।", size = 16.sp, color = Colors.muted)
+            if (p.warnings.isNotEmpty()) {
+                // What the checks flagged, for whoever made the pack (all of it is in the log too).
+                Bilingual("For whoever made this pack (the lessons still work):", "पैक बनाने वाले के लिए (पाठ फिर भी चलेंगे):", size = 16.sp, bold = true)
+                for (w in p.warnings.take(SHOWN_WARNINGS)) BasicText("• $w", style = textStyle(14.sp, Colors.muted), modifier = Modifier.testTag("pack-warning"))
+                if (p.warnings.size > SHOWN_WARNINGS) BasicText("…and ${p.warnings.size - SHOWN_WARNINGS} more in the log", style = textStyle(14.sp, Colors.muted))
+            }
             Row(horizontalArrangement = Gap) {
                 PilotButton("Add these lessons", "ये पाठ जोड़िए", {
                     done = actions.installPack(c)
@@ -251,3 +257,6 @@ private fun StudentRow(learner: Learner, openAll: Boolean, actions: SettingsActi
 }
 
 private enum class RowMode { SHOW, RENAME, CONFIRM_DELETE }
+
+/** How many of a pack's warnings the preview lists; the rest are in the log. */
+private const val SHOWN_WARNINGS = 8

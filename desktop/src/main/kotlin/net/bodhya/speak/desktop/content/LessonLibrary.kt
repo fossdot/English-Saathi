@@ -8,6 +8,9 @@ import net.bodhya.speak.domain.Hints
 import net.bodhya.speak.domain.Lesson
 import java.io.File
 import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.charset.CharacterCodingException
+import java.nio.charset.CodingErrorAction
 
 /** A pack in use: from inside the app, or added in Settings (a file in the data folder). */
 data class PackInUse(val pack: LessonPack, val builtIn: Boolean, val file: File)
@@ -28,7 +31,7 @@ data class PackPreview(
     val lessons: List<LessonLine>,
     /** Lessons the version in use has and this one doesn't (progress for them is kept). */
     val removed: List<LessonLine>,
-    /** What the checks flagged (written to the log); the pack still works. */
+    /** What the checks flagged (shown, and written to the log); the pack still works. */
     val warnings: List<String>,
 )
 
@@ -52,11 +55,10 @@ sealed interface PackCheck {
  * For each pack id the highest version is used; on a tie the app's own
  * copy. The packs that come with the app go first in the unlock order (the
  * first lesson pack stays first), then the added ones by their `order`, then
- * id. A pack whose
- * lesson or sentence ids another pack already uses is left out and
- * reported, never a pack that comes with the app; so is an added file that
- * can't be read. Nothing is ever written inside the app: an app update
- * replaces [builtInDir] and leaves the data folder alone.
+ * id. Packs can't clash: their lesson and sentence ids carry the pack's id.
+ * An added file that can't be read is left out and reported. Nothing is
+ * ever written inside the app: an app update replaces [builtInDir] and
+ * leaves the data folder alone.
  */
 class LessonLibrary private constructor(
     val packs: List<PackInUse>,
@@ -83,22 +85,18 @@ class LessonLibrary private constructor(
     val sentenceCount: Int get() = lessons.sumOf { it.lesson.sentences.size }
 
     /**
-     * Checks [file] as a pack to add: it must load, be in a format this app
-     * reads, be newer than any version in use, and use no lesson or sentence
-     * id another pack has. Changes nothing.
+     * Checks [file] as a pack to add: it must be UTF-8 text, load, be in a
+     * format this app reads, and be newer than any version in use. Changes
+     * nothing.
      */
     fun check(file: File): PackCheck {
-        val size = file.length()
-        if (size > MAX_PACK_BYTES) {
-            return PackCheck.Rejected(rejection("This file is too big to be a lesson pack (${size / 1_000_000} MB).", "यह फ़ाइल पाठों का पैक होने के लिए बहुत बड़ी है।"))
-        }
         val text = try {
-            file.readText()
-        } catch (e: IOException) {
-            return PackCheck.Rejected(rejection("The file couldn't be read: ${e.message ?: e}", "फ़ाइल पढ़ी नहीं जा सकी।"))
+            readPack(file)
+        } catch (e: PackFileException) {
+            return PackCheck.Rejected(rejection(e.message!!, e.hi))
         }
         val loaded = try {
-            PackLoader.load(file.name, text, builtInTemplates, config)
+            PackLoader.load(file.name, text, builtInTemplates)
         } catch (e: NewerFormatException) {
             return PackCheck.Rejected(rejection(
                 "This lesson pack needs a newer version of English Saathi. Install the newest English Saathi first.",
@@ -124,12 +122,6 @@ class LessonLibrary private constructor(
                 "यह पैक पुराना है (संस्करण ${pack.version}); इससे नया (संस्करण ${inUse.pack.version}) पहले से लगा है।",
             ))
         }
-        conflict(pack, packs.filter { it.pack.id != pack.id })?.let { (what, other) ->
-            return PackCheck.Rejected(rejection(
-                "$what is already in the pack “${other.titleEn}”, so this pack can't be added. Ask whoever made it for a corrected copy.",
-                "इस पैक का कुछ हिस्सा पहले से “${other.titleHi}” में है, इसलिए यह नहीं जुड़ सकता।",
-            ))
-        }
         val oldIds = inUse?.pack?.lessons?.map { it.id }?.toSet().orEmpty()
         val newIds = pack.lessons.map { it.id }.toSet()
         val preview = PackPreview(
@@ -144,11 +136,22 @@ class LessonLibrary private constructor(
     /**
      * Adds a pack [check] found ready: its file goes into the data folder
      * (written safely) and the lessons are read again. Returns the new library.
+     * It replaces the added file of the version in use, if that is one;
+     * otherwise it gets a name no file has, so nothing else in the folder is
+     * ever overwritten (such as a pack this version can't read).
      */
     fun install(ready: PackCheck.Ready): LessonLibrary {
-        SafeFiles.write(File(addedDir, "${ready.pack.id}.json"), ready.text)
+        val id = ready.pack.id
+        val replaced = packs.firstOrNull { it.pack.id == id && !it.builtIn }?.file
+        val file = replaced ?: generateSequence(1) { it + 1 }
+            .map { File(addedDir, if (it == 1) "$id.json" else "$id-$it.json") }
+            .first { !it.exists() }
+        SafeFiles.write(file, ready.text)
         return load(builtInDir, addedDir.parentFile, config)
     }
+
+    /** Why a pack file can't be read as text, in English ([message]) and Hindi. */
+    private class PackFileException(message: String, val hi: String) : Exception(message)
 
     companion object {
         /** Far more than 100 text lessons (about 300 KB); anything bigger is not a lesson pack. */
@@ -156,6 +159,35 @@ class LessonLibrary private constructor(
 
         /** Where added packs live in the data folder. */
         fun addedDir(dataDir: File) = File(dataDir, "lessons")
+
+        /**
+         * A pack file's text: at most [MAX_PACK_BYTES], and UTF-8, without the
+         * byte-order mark some editors put first. Anything else (UTF-16, or
+         * another encoding, which would turn Hindi into nonsense) is refused.
+         */
+        private fun readPack(file: File): String {
+            val size = file.length()
+            if (size > MAX_PACK_BYTES) {
+                throw PackFileException("This file is too big to be a lesson pack (${size / 1_000_000} MB).", "यह फ़ाइल पाठों का पैक होने के लिए बहुत बड़ी है।")
+            }
+            val bytes = try {
+                file.readBytes()
+            } catch (e: IOException) {
+                throw PackFileException("The file couldn't be read: ${e.message ?: e}", "फ़ाइल पढ़ी नहीं जा सकी।")
+            }
+            val text = try {
+                Charsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(bytes)).toString()
+            } catch (e: CharacterCodingException) {
+                throw PackFileException(
+                    "This file isn't UTF-8 text, so it isn't a lesson pack English Saathi can use. Ask whoever made it to save it as UTF-8.",
+                    "यह फ़ाइल UTF-8 में नहीं है, इसलिए English Saathi इसे इस्तेमाल नहीं कर सकता।",
+                )
+            }
+            return text.removePrefix("\uFEFF")
+        }
 
         /**
          * Reads the packs inside the app ([builtInDir]: every `.json`) and the
@@ -169,7 +201,7 @@ class LessonLibrary private constructor(
             val builtIn = mutableListOf<PackInUse>()
             val templates = mutableListOf<HintTemplate>()
             for (file in builtInDir.listFiles { f -> f.isFile && f.name.endsWith(".json") }.orEmpty().sortedBy { it.name }) {
-                val loaded = PackLoader.load(file.name, file.readText(), templates.toList(), config)
+                val loaded = PackLoader.load(file.name, readPack(file), templates.toList())
                 warnings += loaded.warnings
                 templates += loaded.pack.templates
                 builtIn += PackInUse(loaded.pack, builtIn = true, file)
@@ -179,7 +211,7 @@ class LessonLibrary private constructor(
             val addedDir = addedDir(dataDir)
             val added = addedDir.listFiles { f -> f.isFile && f.name.endsWith(".json") }.orEmpty().sortedBy { it.name }.mapNotNull { file ->
                 try {
-                    val loaded = PackLoader.load(file.name, file.readText(), templates, config)
+                    val loaded = PackLoader.load(file.name, readPack(file), templates)
                     warnings += loaded.warnings
                     PackInUse(loaded.pack, builtIn = false, file)
                 } catch (e: Exception) {
@@ -192,35 +224,12 @@ class LessonLibrary private constructor(
             val chosen = (builtIn + added).groupBy { it.pack.id }.values.map { same ->
                 same.maxWith(compareBy<PackInUse> { it.pack.version }.thenBy { it.builtIn })
             }
-            // The app's packs first, so a clash can only ever leave out an added pack.
-            val accepted = mutableListOf<PackInUse>()
-            for (p in chosen.sortedWith(compareByDescending<PackInUse> { it.builtIn }.thenBy { it.pack.order }.thenBy { it.pack.id })) {
-                val clash = conflict(p.pack, accepted)
-                if (clash == null) {
-                    accepted += p
-                } else {
-                    problems += "the lesson pack “${p.pack.titleEn}” is left out: ${clash.first.replaceFirstChar { it.lowercase() }} is already in “${clash.second.titleEn}”"
-                }
-            }
             // The app's packs (also a newer added copy of one) first, then the added ones.
             val appIds = builtIn.map { it.pack.id }.toSet()
-            val inOrder = accepted.sortedWith(compareByDescending<PackInUse> { it.pack.id in appIds }.thenBy { it.pack.order }.thenBy { it.pack.id })
+            val inOrder = chosen.sortedWith(compareByDescending<PackInUse> { it.pack.id in appIds }.thenBy { it.pack.order }.thenBy { it.pack.id })
+            val sentences = inOrder.sumOf { it.pack.sentenceCount }
+            if (sentences < config.dailyGoal) warnings += "the daily goal (${config.dailyGoal}) is more than all ${sentences} sentences, so it can't be reached"
             return LessonLibrary(inOrder, problems, warnings, builtInDir, addedDir, templates, config)
-        }
-
-        /** The first lesson or sentence id of [pack] that one of [others] already uses (ignoring case, as a Mac's disk does). */
-        private fun conflict(pack: LessonPack, others: List<PackInUse>): Pair<String, LessonPack>? {
-            for (other in others) {
-                val lessonIds = other.pack.lessons.map { it.id.lowercase() }.toSet()
-                val sentenceIds = other.pack.lessons.flatMap { l -> l.sentences.map { it.id.lowercase() } }.toSet()
-                for (lesson in pack.lessons) {
-                    if (lesson.id.lowercase() in lessonIds) return "The lesson “${lesson.titleEn}” (${lesson.id})" to other.pack
-                    for (s in lesson.sentences) {
-                        if (s.id.lowercase() in sentenceIds) return "The sentence “${s.text}” (${s.id})" to other.pack
-                    }
-                }
-            }
-            return null
         }
 
         /** Every rejection ends the same way: the facilitator should know nothing changed. */

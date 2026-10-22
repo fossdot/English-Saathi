@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import net.bodhya.speak.desktop.TestContent
+import net.bodhya.speak.desktop.TestContent.at
 import net.bodhya.speak.desktop.TestContent.bank
 import net.bodhya.speak.desktop.TestContent.market
 import net.bodhya.speak.desktop.TestContent.packJson
@@ -22,6 +23,7 @@ import net.bodhya.speak.desktop.speech.RecognitionState
 import net.bodhya.speak.desktop.speech.SpeechModel
 import net.bodhya.speak.desktop.speech.Transcript
 import net.bodhya.speak.domain.LearnerProgress
+import net.bodhya.speak.domain.LeitnerEntry
 import net.bodhya.speak.domain.Lesson
 import net.bodhya.speak.speech.ArrayPcmSource
 import net.bodhya.speak.speech.EngineState
@@ -40,15 +42,16 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 /**
- * Several lessons (docs/decisions.md, "Lessons unlock in order" and "Daily
- * goal with several lessons"): unlocking, the current lesson, Start practice
- * moving on, "Open all lessons", and adding a pack while the app runs.
+ * Several lessons (docs/decisions.md, "Lessons unlock in order", "Daily goal
+ * with several lessons" and "Lesson review: owner answers"): unlocking,
+ * moving on once a lesson is all said, never-said sentences first, revision
+ * from other lessons, "Open all lessons", and adding a pack while the app runs.
  */
 class LessonFlowTest {
     @get:Rule
     val tmp = TemporaryFolder()
 
-    private val clock = Clock.fixed(Instant.parse("2026-10-21T08:15:30Z"), ZoneId.of("Asia/Kolkata"))
+    private var clock = Clock.fixed(Instant.parse("2026-10-21T08:15:30Z"), ZoneId.of("Asia/Kolkata"))
     private val today = LocalDate.of(2026, 10, 21)
     private val output = object : SpeechOutput {
         override fun english(text: String, speed: Float) = Unit
@@ -56,7 +59,7 @@ class LessonFlowTest {
         override fun stop() = Unit
     }
 
-    /** Says whatever sentence is on screen, perfectly. */
+    /** Says whatever it is told to. */
     private inner class Echo : Recognition {
         var heard = ""
         override val state: StateFlow<RecognitionState> = MutableStateFlow(RecognitionState(SpeechModel.SMALL_EN, EngineState.Ready(1)))
@@ -82,32 +85,49 @@ class LessonFlowTest {
 
     private fun app() = AppController(store, TestContent.library(dataDir), output, listening, clock = clock, onLessonChange = { changes += it.id })
 
+    /** The same learner's next day, with a fresh app. */
+    private fun nextDay(): AppController {
+        clock = Clock.offset(clock, java.time.Duration.ofDays(1))
+        return app()
+    }
+
     private val id by lazy { store.add("Anita", Card(CardColour.BLUE, CardSymbol.FISH)).id }
 
-    /** Says sentence [index] of the current lesson right and goes back home. */
-    private fun AppController.say(index: Int) {
-        openSentence(index)
-        echo.heard = lesson.sentences[index].text
+    private val busStand get() = TestContent.lesson
+
+    /** Says what is on the practice screen, as [words] (the sentence itself, right, by default). */
+    private fun AppController.sayShown(words: String? = null) {
+        val screen = state.value.screen as Screen.Practice
+        echo.heard = words ?: screen.ref.sentence.text
         toggleRecording()
+    }
+
+    /** Says sentence [index] of the current lesson right and goes back home. */
+    private fun AppController.say(index: Int, words: String? = null) {
+        openSentence(index)
+        sayShown(words)
         home()
     }
 
     private val AppController.rows get() = state.value.lessons.map { it.lesson.id to it.open }
 
     @Test
-    fun `lesson 2 opens once every sentence of lesson 1 has been said, with any stars`() {
+    fun `lesson 2 opens once every sentence of lesson 1 has been said, with any stars, and becomes current`() {
         addPack(packJson("bihar1", 1, 1, market, bank))
         val app = app()
         app.pick(id)
-        assertEquals(listOf("bus_stand" to true, "market" to false, "bank" to false), app.rows)
+        assertEquals(listOf("starter.bus_stand" to true, "bihar1.market" to false, "bihar1.bank" to false), app.rows)
         for (i in 0..3) app.say(i)
         assertEquals("four of five said: still locked", false, app.rows[1].second)
         app.openSentence(4)
-        echo.heard = "does" // one word right of five: 1 star, but said
-        app.toggleRecording()
-        assertEquals(listOf("market"), app.state.value.result!!.opened.map(Lesson::id))
-        assertEquals(listOf("bus_stand" to true, "market" to true, "bank" to false), app.rows)
-        assertEquals(listOf("bus_stand", "market"), store.lessons(id).opened)
+        app.sayShown("does") // one word right of five: 1 star, but said
+        assertEquals(listOf("bihar1.market"), app.state.value.result!!.opened.map(Lesson::id))
+        assertEquals("the feedback is still for the sentence just said", Screen.Feedback(at(4)), app.state.value.screen)
+        assertEquals(listOf("starter.bus_stand" to true, "bihar1.market" to true, "bihar1.bank" to false), app.rows)
+        assertEquals(listOf("starter.bus_stand", "bihar1.market"), store.lessons(id).opened)
+        assertEquals("bihar1.market", app.lesson.id)
+        assertEquals("bihar1.market", store.lessons(id).current)
+        assertEquals("bihar1.market", changes.last())
     }
 
     @Test
@@ -117,9 +137,9 @@ class LessonFlowTest {
         app.pick(id)
         for (i in 0..3) app.say(i)
         app.openSentence(4)
-        echo.heard = "[BLANK_AUDIO]"
-        app.toggleRecording()
+        app.sayShown("[BLANK_AUDIO]")
         assertEquals(false, app.rows[1].second)
+        assertEquals("starter.bus_stand", app.lesson.id)
     }
 
     @Test
@@ -141,38 +161,88 @@ class LessonFlowTest {
         )
         val updated = AppController(store, TestContent.library(dataDir, newApp), output, listening, clock = clock)
         updated.pick(id)
-        assertEquals(6, updated.lesson.sentences.size)
-        assertEquals(listOf("bus_stand" to true, "market" to true), updated.rows)
+        assertEquals(listOf("starter.bus_stand" to true, "bihar1.market" to true), updated.rows)
+        assertEquals("the first open lesson with a sentence never said", "starter.bus_stand", updated.lesson.id)
+        updated.startPractice()
+        assertEquals("the new sentence first", "starter.bus_06", (updated.state.value.screen as Screen.Practice).ref.sentence.id)
     }
 
     @Test
-    fun `start practice moves to the next open lesson once the current one is all done today`() {
+    fun `stopping at the goal screen after the last sentence of a lesson, the next day starts the next lesson`() {
         addPack(packJson("bihar1", 1, 1, market))
         val app = app()
         app.pick(id)
-        for (i in 0..4) app.say(i)
-        assertEquals("the goal of 5 counts any lesson", 5, app.state.value.progress.doneOn(today).size)
-        // Every Bus stand sentence is done today, so Start practice goes on to Market.
-        app.startPractice()
-        assertEquals("market", app.lesson.id)
-        assertEquals(Screen.Practice(0), app.state.value.screen)
-        assertEquals("market", store.lessons(id).current)
-        assertTrue(changes.toString(), changes.last() == "market")
+        for (i in 0..3) app.say(i)
+        app.openSentence(4)
+        app.sayShown()
+        app.next()
+        assertEquals("the goal of 5", Screen.GoalDone, app.state.value.screen)
+        assertEquals("bihar1.market", app.lesson.id)
+        // The student stops here. The next day:
+        val tomorrow = nextDay()
+        tomorrow.pick(id)
+        assertEquals("bihar1.market", tomorrow.lesson.id)
+        tomorrow.startPractice()
+        assertEquals(Screen.Practice(SentenceRef(tomorrow.lesson, 0)), tomorrow.state.value.screen)
     }
 
     @Test
-    fun `next goes on to the next open lesson after the last sentence not done today`() {
+    fun `next goes on to the next lesson after the last sentence of this one`() {
         addPack(packJson("bihar1", 1, 1, market))
         store.saveProgress(id, LearnerProgress(goalCelebratedOn = today))
         val app = app()
         app.pick(id)
         for (i in 0..3) app.say(i)
         app.openSentence(4)
-        echo.heard = app.lesson.sentences[4].text
-        app.toggleRecording()
+        app.sayShown()
         app.next()
-        assertEquals("market", app.lesson.id)
-        assertEquals(Screen.Practice(0), app.state.value.screen)
+        assertEquals("bihar1.market", app.lesson.id)
+        assertEquals(Screen.Practice(SentenceRef(app.lesson, 0)), app.state.value.screen)
+    }
+
+    @Test
+    fun `sentences never said come before ones said on another day`() {
+        val app = app()
+        app.pick(id)
+        app.say(0)
+        app.say(1)
+        val tomorrow = nextDay()
+        tomorrow.pick(id)
+        tomorrow.startPractice()
+        assertEquals("the pilot would start again at sentence 1", Screen.Practice(at(2)), tomorrow.state.value.screen)
+        tomorrow.sayShown()
+        tomorrow.next()
+        assertEquals(Screen.Practice(at(3)), tomorrow.state.value.screen)
+    }
+
+    @Test
+    fun `a word due for revision brings back a sentence from an earlier lesson, then the current lesson goes on`() {
+        addPack(packJson("bihar1", 1, 1, market))
+        val app = app()
+        app.pick(id)
+        for (i in listOf(0, 1, 2, 4)) app.say(i)
+        app.say(3, "how much is the jacket") // "ticket" wrong: due tomorrow
+        assertEquals("bihar1.market", app.lesson.id)
+        val tomorrow = nextDay()
+        tomorrow.pick(id)
+        tomorrow.startPractice()
+        val revision = (tomorrow.state.value.screen as Screen.Practice).ref
+        assertEquals("the first Bus stand sentence with \"ticket\"", busStand.sentences[2].id, revision.sentence.id)
+        assertEquals("bihar1.market", tomorrow.lesson.id)
+        tomorrow.sayShown()
+        assertEquals("logged under its own lesson", "starter.bus_stand", store.attempts(id).last().lesson)
+        tomorrow.next()
+        assertEquals("back to the current lesson", Screen.Practice(SentenceRef(tomorrow.lesson, 0)), tomorrow.state.value.screen)
+    }
+
+    @Test
+    fun `the goal screen lists only words that can come back`() {
+        val tomorrow = today.plusDays(1)
+        // "bananas" is only in Market, which isn't installed (a pack removed, say); "ticket" is in Bus stand.
+        store.saveProgress(id, LearnerProgress(leitner = mapOf("bananas" to LeitnerEntry(1, tomorrow), "ticket" to LeitnerEntry(1, tomorrow))))
+        val app = app()
+        app.pick(id)
+        assertEquals(listOf("ticket"), app.wordsForTomorrow())
     }
 
     @Test
@@ -180,16 +250,44 @@ class LessonFlowTest {
         addPack(packJson("bihar1", 1, 1, market, bank))
         val app = app()
         app.pick(id)
-        app.chooseLesson("market")
-        assertEquals("bus_stand", app.lesson.id)
+        app.chooseLesson("bihar1.market")
+        assertEquals("starter.bus_stand", app.lesson.id)
         app.setOpenAll(id, true)
         assertEquals(listOf(true, true, true), app.rows.map { it.second })
-        app.chooseLesson("bank")
-        assertEquals("bank", app.lesson.id)
+        app.chooseLesson("bihar1.bank")
+        assertEquals("bihar1.bank", app.lesson.id)
         assertEquals(true, app.state.value.students.single().openAll)
         app.setOpenAll(id, false)
-        assertEquals("back to the unlock order: Bank closes and Bus stand is current again", "bus_stand", app.lesson.id)
+        assertEquals("back to the unlock order: Bank closes and Bus stand is current again", "starter.bus_stand", app.lesson.id)
         assertEquals(listOf(true, false, false), app.rows.map { it.second })
+    }
+
+    @Test
+    fun `changing lessons after a sentence late in a long lesson starts the new lesson at its beginning`() {
+        addPack(packJson("bihar1", 1, 1, bank))
+        val app = app()
+        app.pick(id)
+        app.setOpenAll(id, true)
+        app.say(4)
+        app.chooseLesson("bihar1.bank")
+        app.say(0)
+        app.next() // Bank has one sentence: the pilot's order must not use Bus stand's sentence 5 there
+        assertEquals(Screen.Practice(SentenceRef(app.lesson, 0)), app.state.value.screen)
+    }
+
+    @Test
+    fun `turning Open all lessons off while practising a lesson that closes goes home`() {
+        addPack(packJson("bihar1", 1, 1, market, bank))
+        val app = app()
+        app.pick(id)
+        app.setOpenAll(id, true)
+        app.chooseLesson("bihar1.bank")
+        app.openSentence(0)
+        app.setOpenAll(id, true)
+        assertTrue("still open: the student carries on", app.state.value.screen is Screen.Practice)
+        app.setOpenAll(id, false)
+        assertEquals(Screen.Home, app.state.value.screen)
+        assertEquals("starter.bus_stand", app.lesson.id)
     }
 
     @Test
@@ -201,20 +299,21 @@ class LessonFlowTest {
         val ready = app.checkPack(file) as PackCheck.Ready
         assertTrue(app.installPack(ready).en.startsWith("Added “Pack bihar1” (version 1): 1 lesson."))
         assertEquals(Screen.Home, app.state.value.screen)
-        assertEquals(listOf("bus_stand" to true, "market" to false), app.rows)
+        assertEquals(listOf("starter.bus_stand" to true, "bihar1.market" to false), app.rows)
         assertEquals(7, app.sentenceCount())
         val again = app.checkPack(file)
         assertTrue(again is PackCheck.Rejected)
     }
 
     @Test
-    fun `a learner from before lesson packs keeps what they earned`() {
-        // Progress saved by D5-D8: Bus stand all said, no lessons.json.
+    fun `a learner from before lesson packs keeps what they earned and moves on`() {
+        // Progress saved by D5-D8: Bus stand all said under the old ids, no lessons.json.
         store.saveProgress(id, LearnerProgress(bestStars = (1..5).associate { "bus_0$it" to 2 }))
         addPack(packJson("bihar1", 1, 1, market))
         val app = app()
         app.pick(id)
-        assertEquals(listOf("bus_stand" to true, "market" to true), app.rows)
-        assertEquals("bus_stand", app.lesson.id)
+        assertEquals(listOf("starter.bus_stand" to true, "bihar1.market" to true), app.rows)
+        assertEquals(5, app.state.value.lessons[0].said)
+        assertEquals("bihar1.market", app.lesson.id)
     }
 }

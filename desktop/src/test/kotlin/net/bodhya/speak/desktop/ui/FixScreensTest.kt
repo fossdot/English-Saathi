@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.ui
 
+import net.bodhya.speak.desktop.TestContent.at
 import net.bodhya.speak.desktop.TestContent
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -45,7 +46,7 @@ class FixScreensTest {
     )
 
     private fun show(step: Int, actions: FixActions = FixActions({}, {}, {}, {}, {}, {}, {})) = compose.setContent {
-        FixScreen(AppState(Screen.Fix(3), learner = anita, today = today), view(step), Listening.State(), ready, actions)
+        FixScreen(AppState(Screen.Fix(at(3)), learner = anita, today = today), view(step), Listening.State(), ready, actions)
     }
 
     @Test

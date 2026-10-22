@@ -25,7 +25,7 @@ data class LoggedAttempt(val learner: Learner, val record: AttemptRecord)
  * learners/<id>/progress.json           XP, done sentences, best stars, streak, Leitner box
  * learners/<id>/lessons.json           which lessons are open, and the current one
  * learners/<id>/attempts/<day>.jsonl    the attempt log, one row per line
- * learners/<id>/recordings/<sentence>.wav  the latest recording of each sentence
+ * learners/<id>/recordings/<sentence>.wav  the latest recording of each sentence (starter.bus_01.wav)
  * ```
  *
  * Every write replaces a whole file safely ([SafeFiles]). A file that can't
@@ -142,7 +142,9 @@ class LearnerStore(
         val file = File(dirOf(id), LESSONS)
         if (!file.isFile) return LearnerLessons()
         return try {
-            pretty.decodeFromString<LearnerLessons>(file.readText())
+            pretty.decodeFromString<LearnerLessons>(file.readText()).let { l ->
+                l.copy(current = l.current?.let(SavedIds::qualify), opened = l.opened.map(SavedIds::qualify).distinct())
+            }
         } catch (e: Exception) {
             val aside = File(file.parentFile, "lessons.damaged-${clock.millis()}.json")
             file.renameTo(aside)
@@ -168,13 +170,21 @@ class LearnerStore(
         SafeFiles.write(file, old + separator + oneLine.encodeToString(record) + "\n")
     }
 
-    /** The learner's log, oldest first. Rows that can't be read, or whose time isn't a time, are reported and left out. */
+    /**
+     * The learner's log, oldest first. Rows that can't be read, or whose time
+     * isn't a time, are reported and left out. Ids saved before they carried
+     * their pack's id are read in full ([SavedIds]).
+     */
     @Synchronized
     fun attempts(id: String): List<AttemptRecord> {
         val files = File(dirOf(id), ATTEMPTS).listFiles { f -> f.isFile && f.name.endsWith(".jsonl") }?.sortedBy { it.name } ?: return emptyList()
         return files.flatMap { file ->
             file.readLines().withIndex().filter { it.value.isNotBlank() }.mapNotNull { (i, text) ->
-                runCatching { oneLine.decodeFromString<AttemptRecord>(text).also { OffsetDateTime.parse(it.time) } }
+                runCatching {
+                    oneLine.decodeFromString<AttemptRecord>(text)
+                        .also { OffsetDateTime.parse(it.time) }
+                        .let { it.copy(lesson = SavedIds.qualify(it.lesson), sentence = SavedIds.qualify(it.sentence)) }
+                }
                     .onFailure { problem("$file line ${i + 1} could not be read: ${it.message ?: it}") }
                     .getOrNull()
             }

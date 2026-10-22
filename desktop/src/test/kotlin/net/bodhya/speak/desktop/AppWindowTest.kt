@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import net.bodhya.speak.desktop.data.AttemptRecord
 import net.bodhya.speak.desktop.data.AttemptResult
@@ -85,6 +86,7 @@ class AppWindowTest {
     @Test
     fun `Results reads the attempt log and saves the CSV where the facilitator chose`() {
         val anita = ready.store.add("Anita", Card(CardColour.BLUE, CardSymbol.FISH))
+        // A row saved before ids carried their pack's id: it is read, and exported, as starter.bus_01.
         ready.store.logAttempt(
             anita.id,
             AttemptRecord("2026-10-21T13:45:30+05:30", "bus_stand", "bus_01", "sentence", "Where is the bus stop?", "where is the bus stop", 5, 5, 3, "tiny.en", AttemptResult.SCORED, 420),
@@ -98,7 +100,7 @@ class AppWindowTest {
         compose.waitUntil(5_000) { target.isFile }
         compose.waitUntil(5_000) { compose.onAllNodesWithText("Results saved: results.csv").fetchSemanticsNodes().isNotEmpty() }
         val lines = target.readText().removePrefix("\uFEFF").lines()
-        assertEquals("2026-10-21 13:45:30,Anita,bus_01,sentence,Where is the bus stop?,where is the bus stop,5,5,3,tiny.en,scored,420", lines[1])
+        assertEquals("2026-10-21 13:45:30,Anita,starter.bus_01,sentence,Where is the bus stop?,where is the bus stop,5,5,3,tiny.en,scored,420", lines[1])
     }
 
     @Test
@@ -127,6 +129,33 @@ class AppWindowTest {
         compose.onNodeWithText("To be checked by an English teacher").assertExists()
         compose.onNodeWithText("English: ", substring = true).assertExists()
         compose.onNodeWithText(ready.dataDir.path).assertExists()
+    }
+
+    @Test
+    fun `Add lessons shows what a pack adds and what its checks flagged, then adds it`() {
+        val market = TestContent.market.replace("\"words\": {}", "\"words\": { \"zebra\": { \"syllables\": [\"ze\", \"bra\"] } }")
+        val pack = File(tmp.root, "bihar1.json").also { it.writeText(TestContent.packJson("bihar1", 1, 1, market, title = "Places in town")) }
+        compose.setContent { Settings(ready, parts, choosePack = { pack }) }
+        compose.onNodeWithText("Add lessons…").performClick()
+        compose.onNodeWithTag("pack-preview").assertExists()
+        compose.onNodeWithText("“Places in town”, version 1").assertExists()
+        compose.onNodeWithText("Market: 2 sentences (new)").assertExists()
+        compose.onNodeWithText("For whoever made this pack (the lessons still work):").assertExists()
+        compose.onNodeWithText("word \"zebra\" is in no sentence", substring = true).assertExists()
+        compose.onNodeWithText("Add these lessons").performScrollTo().performClick()
+        compose.onNodeWithText("Added “Places in town” (version 1): 1 lesson.").assertExists()
+        assertEquals(listOf("starter.bus_stand", "bihar1.market"), parts.app.library.lessons.map { it.lesson.id })
+    }
+
+    @Test
+    fun `Add lessons refuses a pack with a misspelt field and changes nothing`() {
+        val market = TestContent.market.replace("\"words\": {}", "\"words\": { \"rice\": { \"syllables\": [\"rice\"], \"scored\": false } }")
+        val pack = File(tmp.root, "bihar1.json").also { it.writeText(TestContent.packJson("bihar1", 1, 1, market)) }
+        compose.setContent { Settings(ready, parts, choosePack = { pack }) }
+        compose.onNodeWithText("Add lessons…").performClick()
+        compose.onNodeWithText("unknown field \"scored\" (did you mean \"score\"?)", substring = true).assertExists()
+        compose.onNodeWithText("Nothing was changed.", substring = true).assertExists()
+        assertTrue(!File(ready.dataDir, "lessons").exists())
     }
 
     @Test

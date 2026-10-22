@@ -10,7 +10,7 @@ so they and all progress survive app updates.
 ## The file
 
 One UTF-8 `.json` file, format 1 (text only; a later format may add pictures
-in a `.zip`):
+in a `.zip`). A byte-order mark at the start is fine:
 
 ```json
 {
@@ -54,26 +54,37 @@ in a `.zip`):
   table, sentences with `chunks`, `"score": false` for words the recognizer
   can't be expected to hear (place names), `"unscored"` for a sentence-only
   override.
+- **Lesson and sentence ids** (`market`, `mkt_01`) need only be unique within
+  the pack. The app keeps them with the pack's id in front
+  (`bihar-places-1.market`, `bihar-places-1.mkt_01`), so packs never clash.
+  The results CSV shows sentence ids that way.
 
 ## What the app checks
 
 A pack is refused, and nothing changes, when:
 
-- it isn't valid JSON, or a field is missing or of the wrong kind;
+- it isn't UTF-8 text (UTF-16, or an older encoding, would garble the Hindi),
+  or isn't valid JSON, or a field is missing or of the wrong kind;
+- a lesson, word, sentence or tip has a field the app doesn't know: usually
+  a typo, which would otherwise be ignored quietly. The message names it
+  and the field probably meant: `word "patna": unknown field "scored" (did
+  you mean "score"?)`. (Unknown fields at the top of the pack are only
+  warnings, so a later format can add some.);
 - it has no lessons, or a lesson fails the lesson checks (a sentence without
   English words, a sentence with nothing to score, word keys that aren't
   normalized words, …);
-- a lesson id or sentence id is used twice in the pack, or by another pack
-  (ignoring case), or isn't made of letters, digits, `-` and `_` (sentence
-  ids name the learners' recordings);
+- a lesson id or sentence id is used twice in the pack (ignoring case), or
+  isn't made of letters, digits, `-` and `_` (sentence ids name the
+  learners' recordings);
+- lists and objects nest more than 32 deep (a lesson needs 6);
 - its `format` is newer than the app reads ("needs a newer version of
   English Saathi");
 - the same pack is already there in the same or a newer version;
 - the file is over 20 MB.
 
 What the lesson checks only warn about (an unused word entry, a word
-without one, an unknown hint tag, …) is written to the log, and the pack is
-added.
+without one, an unknown hint tag, …) is shown in the preview (the first 8)
+and written to the log, and the pack can still be added.
 
 ## Unlocking and progress
 
@@ -83,11 +94,26 @@ added.
   for one student.
 - A lesson that has opened for a student stays open, even if a later version
   of a pack adds a sentence to the lesson before it.
+- Once every sentence of a student's current lesson has been said, the next
+  open lesson becomes current. Start practice brings back sentences with
+  words due for revision first, also from earlier lessons, then the current
+  lesson's sentences never said.
 - Progress is kept by sentence id, so **never reuse a sentence id for a
-  different sentence**. A new version may change a sentence's wording, add
-  sentences and lessons, or drop them; dropped lessons disappear from Home but
-  the students' progress for them stays in the data folder (and returns if
-  the lesson comes back).
+  different sentence**. A new version may fix a sentence's punctuation or
+  Hindi, add sentences and lessons, or drop them. **A sentence whose English
+  words change needs a new id**: otherwise its old stars and recordings
+  would belong to words the student never said. Dropped lessons disappear
+  from Home, but the students' progress for them stays in the data folder
+  (and returns if the lesson comes back).
+
+## Releasing a pack
+
+Give every copy you send out a higher `version`, and keep it in
+`desktop/src/test/resources/released-packs/` as `<id>-<version>.json`.
+`ReleasedPacksTest` checks that every released pack still loads in each
+later version of the app, so tightening a check can never make an app update
+drop lessons students have opened. It also fails if a pack inside the app
+changes without a new version.
 
 ## Size
 

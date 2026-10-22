@@ -28,7 +28,7 @@ class SetupTest {
         val loaded = runBlocking { setup.recognition.state.first { it.engine !is EngineState.Loading } }
         assertEquals("small.en is the default (owner, 2026-10-21)", SpeechModel.SMALL_EN, loaded.model)
         assertTrue(loaded.engine.toString(), loaded.engine is EngineState.Ready)
-        assertEquals(listOf("bus_stand"), setup.library.lessons.map { it.lesson.id })
+        assertEquals(listOf("starter.bus_stand"), setup.library.lessons.map { it.lesson.id })
         assertEquals(5, setup.library.sentenceCount)
 
         val log = setup.log.file.readText()

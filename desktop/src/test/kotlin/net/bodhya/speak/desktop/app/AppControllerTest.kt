@@ -1,5 +1,6 @@
 package net.bodhya.speak.desktop.app
 
+import net.bodhya.speak.desktop.TestContent.at
 import net.bodhya.speak.desktop.TestContent
 import net.bodhya.speak.desktop.check.SpeechOutput
 import net.bodhya.speak.desktop.content.LessonLoader
@@ -87,15 +88,15 @@ class AppControllerTest {
     }
 
     @Test
-    fun `start practice opens the first sentence not done today`() {
+    fun `start practice opens the first sentence never said`() {
         val id = store.add("Anita", blueFish).id
-        store.saveProgress(id, LearnerProgress(doneByDay = mapOf(today to listOf("bus_01", "bus_02"))))
+        store.saveProgress(id, LearnerProgress(doneByDay = mapOf(today to listOf("starter.bus_01", "starter.bus_02")), bestStars = mapOf("starter.bus_01" to 3, "starter.bus_02" to 3)))
         app.pick(id)
         app.startPractice()
-        assertEquals(Screen.Practice(2), app.state.value.screen)
+        assertEquals(Screen.Practice(at(2)), app.state.value.screen)
         app.home()
         app.openSentence(4)
-        assertEquals(Screen.Practice(4), app.state.value.screen)
+        assertEquals(Screen.Practice(at(4)), app.state.value.screen)
     }
 
     @Test

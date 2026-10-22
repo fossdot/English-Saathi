@@ -7,7 +7,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.intOrNull
-import net.bodhya.speak.domain.GameConfig
 import net.bodhya.speak.domain.HintTemplate
 import net.bodhya.speak.domain.Hints
 import net.bodhya.speak.domain.Lesson
@@ -17,7 +16,8 @@ import net.bodhya.speak.domain.Lesson
  * version of it (docs/decisions.md, "Lessons are kept separate from the
  * app"). [id] stays the same across versions; a higher [version] replaces a
  * lower one, never the other way round. Packs are placed in the unlock
- * order by [order], then [id].
+ * order by [order], then [id]. Its lessons' and sentences' ids carry the
+ * pack's id ([PackLoader.qualified]).
  */
 data class LessonPack(
     val id: String,
@@ -52,10 +52,16 @@ class NewerFormatException(message: String, val format: Int) : Exception(message
  *
  * Every lesson goes through [LessonLoader]'s checks. On top of those, a
  * pack is unusable ([ContentException]) when a field is missing or wrong,
- * when it has no lessons, or when lesson or sentence ids repeat (ignoring
+ * when it has no lessons, when lesson or sentence ids repeat in it (ignoring
  * case: a Mac's disk does) or aren't safe as file names (a sentence id
- * names its recordings). A pack in a later [FORMAT] throws
+ * names its recordings), or when lists and objects nest deeper than any
+ * lesson needs. An unknown field at the top of the pack is only a warning,
+ * so a later format can add one. A pack in a later [FORMAT] throws
  * [NewerFormatException].
+ *
+ * The app keeps every lesson and sentence id with the pack's id in front
+ * ([qualified]: `starter.bus_01`), so two packs can never clash
+ * (docs/decisions.md, "Lesson review: owner answers").
  */
 object PackLoader {
     /** The pack format this version of the app reads. */
@@ -64,18 +70,25 @@ object PackLoader {
     /** Pack ids are file names in the data folder. */
     val PACK_ID = Regex("[a-z0-9][a-z0-9_-]{0,39}")
 
-    /** Lesson and sentence ids: sentence ids name recordings (`recordings/<sentence>.wav`). */
+    /** Lesson and sentence ids as a pack writes them: sentence ids name recordings (`recordings/<sentence>.wav`). */
     val ITEM_ID = Regex("[A-Za-z0-9][A-Za-z0-9_-]{0,63}")
 
+    /** How deep lists and objects may nest: a lesson needs 6. Much deeper is not a lesson pack, and could overflow the JSON reader. */
+    const val MAX_DEPTH = 32
+
     private val PACK_KEYS = setOf("format", "id", "version", "order", "title_en", "title_hi", "hints", "lessons")
+
+    /** The id the app keeps for lesson or sentence [id] of pack [pack]: `starter.bus_01`. Neither part has a dot. */
+    fun qualified(pack: String, id: String) = "$pack.$id"
 
     /**
      * Loads the pack in [text] (from the file [name], for messages). Its tips
      * fall back to [base], the templates of the packs that come with the app;
      * together they must have the generic tip.
      */
-    fun load(name: String, text: String, base: List<HintTemplate>, config: GameConfig): LoadedPack {
+    fun load(name: String, text: String, base: List<HintTemplate>): LoadedPack {
         val warnings = mutableListOf<String>()
+        checkDepth(name, text)
         val root = try {
             Json.parseToJsonElement(text) as? JsonObject ?: throw ContentException("$name: the file must be a JSON object")
         } catch (e: SerializationException) {
@@ -110,12 +123,37 @@ object PackLoader {
         val items = root["lessons"] as? JsonArray ?: throw ContentException("$name: \"lessons\" must be a list")
         if (items.isEmpty()) throw ContentException("$name: the pack has no lessons")
         val lessons = items.mapIndexed { i, item ->
-            val loaded = LessonLoader.loadLesson("$name lesson ${i + 1}", item.toString(), hints, config)
+            val loaded = LessonLoader.loadLesson("$name lesson ${i + 1}", item.toString(), hints)
             warnings += loaded.warnings
             loaded.lesson
         }
         checkIds(name, lessons)
-        return LoadedPack(LessonPack(id, version, order, titleEn, titleHi, lessons, hints, own), warnings.map { if (it.startsWith(name)) it else "$name: $it" })
+        val kept = lessons.map { lesson ->
+            lesson.copy(id = qualified(id, lesson.id), sentences = lesson.sentences.map { it.copy(id = qualified(id, it.id)) })
+        }
+        return LoadedPack(LessonPack(id, version, order, titleEn, titleHi, kept, hints, own), warnings.map { if (it.startsWith(name)) it else "$name: $it" })
+    }
+
+    /** Refuses lists and objects nested deeper than [MAX_DEPTH], before the JSON reader recurses into them. */
+    private fun checkDepth(name: String, text: String) {
+        var depth = 0
+        var inString = false
+        var escaped = false
+        for (c in text) {
+            if (inString) {
+                when {
+                    escaped -> escaped = false
+                    c == '\\' -> escaped = true
+                    c == '"' -> inString = false
+                }
+            } else {
+                when (c) {
+                    '"' -> inString = true
+                    '{', '[' -> if (++depth > MAX_DEPTH) throw ContentException("$name: lists and objects nest more than $MAX_DEPTH deep")
+                    '}', ']' -> depth--
+                }
+            }
+        }
     }
 
     private fun checkIds(name: String, lessons: List<Lesson>) {

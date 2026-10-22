@@ -4,7 +4,6 @@ import net.bodhya.speak.desktop.TestContent
 import net.bodhya.speak.desktop.TestContent.lessonJson
 import net.bodhya.speak.desktop.TestContent.market
 import net.bodhya.speak.desktop.TestContent.packJson
-import net.bodhya.speak.domain.GameConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -13,7 +12,7 @@ import org.junit.Test
 class PackLoaderTest {
     private val base = TestContent.starter.templates
 
-    private fun load(text: String) = PackLoader.load("pack.json", text, base, GameConfig())
+    private fun load(text: String) = PackLoader.load("pack.json", text, base)
 
     private fun rejects(text: String, reason: String) {
         val e = assertThrows(ContentException::class.java) { load(text) }
@@ -22,12 +21,12 @@ class PackLoaderTest {
 
     @Test
     fun `the pack that comes with the app is Bus stand, unchanged`() {
-        val loaded = PackLoader.load("starter.json", java.io.File(TestContent.builtInDir, "starter.json").readText(), emptyList(), GameConfig())
+        val loaded = PackLoader.load("starter.json", java.io.File(TestContent.builtInDir, "starter.json").readText(), emptyList())
         assertEquals(emptyList<String>(), loaded.warnings)
         with(loaded.pack) {
             assertEquals("starter" to 1, id to version)
-            assertEquals(listOf("bus_stand"), lessons.map { it.id })
-            assertEquals(listOf("bus_01", "bus_02", "bus_03", "bus_04", "bus_05"), lessons[0].sentences.map { it.id })
+            assertEquals(listOf("starter.bus_stand"), lessons.map { it.id })
+            assertEquals(listOf("starter.bus_01", "starter.bus_02", "starter.bus_03", "starter.bus_04", "starter.bus_05"), lessons[0].sentences.map { it.id })
             assertEquals(setOf("patna"), lessons[0].unscoredIn(lessons[0].sentences[2]))
             assertEquals("v_w", hints.forTag("v_w").tag)
         }
@@ -36,7 +35,8 @@ class PackLoaderTest {
     @Test
     fun `a pack with two lessons loads in order, with the app's tips behind its own`() {
         val pack = load(packJson("bihar1", 3, 1, market, TestContent.bank, extra = """, "hints": { "v_w": { "text_hi": "नया", "reviewed": false } }""")).pack
-        assertEquals(listOf("market", "bank"), pack.lessons.map { it.id })
+        assertEquals(listOf("bihar1.market", "bihar1.bank"), pack.lessons.map { it.id })
+        assertEquals(listOf("bihar1.mkt_01", "bihar1.mkt_02"), pack.lessons[0].sentences.map { it.id })
         assertEquals(3, pack.sentenceCount)
         assertEquals("नया", pack.hints.forTag("v_w").textHi)
         assertEquals("th", pack.hints.forTag("th").tag)
@@ -65,13 +65,30 @@ class PackLoaderTest {
     }
 
     @Test
+    fun `ids carry the pack's id, so two packs can use the same ones`() {
+        val one = load(packJson("bihar1", 1, 1, market)).pack
+        val two = load(packJson("bihar2", 1, 2, market)).pack
+        assertEquals("bihar1.mkt_01" to "bihar2.mkt_01", one.lessons[0].sentences[0].id to two.lessons[0].sentences[0].id)
+        assertEquals("bihar1.market", PackLoader.qualified("bihar1", "market"))
+    }
+
+    @Test
+    fun `lists and objects nested deeper than any lesson are refused before they are read`() {
+        rejects("[".repeat(100_000), "nest more than ${PackLoader.MAX_DEPTH} deep")
+        rejects(packJson("p", 1, 0, market, extra = ", \"x\": " + "[".repeat(40) + "]".repeat(40)), "nest more than")
+        // Brackets inside text don't count.
+        val title = "X " + "[".repeat(40)
+        assertEquals(title, load(packJson("p", 1, 0, lessonJson("x", title, "एक्स", listOf("s1" to "Hello there.")))).pack.lessons[0].titleEn)
+    }
+
+    @Test
     fun `a lesson the loader rejects makes the pack unusable`() {
         rejects(packJson("p", 1, 0, lessonJson("x", "X", "एक्स", listOf("s1" to "?"))), "has no English words")
     }
 
     @Test
     fun `tips need a generic template somewhere`() {
-        val e = assertThrows(ContentException::class.java) { PackLoader.load("pack.json", packJson("p", 1, 0, market), emptyList(), GameConfig()) }
+        val e = assertThrows(ContentException::class.java) { PackLoader.load("pack.json", packJson("p", 1, 0, market), emptyList()) }
         assertTrue(e.message, "no \"generic\" tip" in e.message!!)
     }
 
