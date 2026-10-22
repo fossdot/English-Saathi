@@ -259,7 +259,7 @@ class AppController(
         val stored = store.progress(id)
         val progress = Practice.openApp(stored, today, config)
         if (progress != stored) store.saveProgress(id, progress)
-        val lessons = openLessons(id, store.lessons(id), progress)
+        val lessons = movedOn(id, openLessons(id, store.lessons(id), progress), progress)
         val current = currentLesson(lessons, progress)
         cursor = null
         go { AppState(Screen.Home, cards(today), learner, progress, today, lesson = current, lessons = rows(progress, lessons, current), learnerLessons = lessons) }
@@ -287,9 +287,9 @@ class AppController(
     /**
      * The sentence to practise next (docs/decisions.md, "Lesson review: owner
      * answers"): one not done today with a word due for revision (scored
-     * there), in the current lesson first, then in the other open lessons in
-     * their order; then the current lesson's first sentence never said;
-     * otherwise [fallback], the pilot's choice in the current lesson.
+     * there), in the current lesson first, then in the earlier open lessons
+     * ([revisionLessons]); then the current lesson's first sentence never
+     * said; otherwise [fallback], the pilot's choice in the current lesson.
      */
     private fun choose(progress: LearnerProgress, fallback: Int): SentenceRef {
         val today = today()
@@ -297,9 +297,7 @@ class AppController(
         val due = Leitner.due(progress.leitner, today, config).toSet()
         if (due.isNotEmpty()) {
             val done = progress.doneOn(today).toSet()
-            val opened = _state.value.learnerLessons
-            val others = library.lessons.map { it.lesson }.filter { it.id != current.id && opened.isOpen(it.id) }
-            for (l in listOf(current) + others) {
+            for (l in revisionLessons()) {
                 val i = l.sentences.indexOfFirst { s -> s.id !in done && s.targetWords.any { it in due && it !in l.unscoredIn(s) } }
                 if (i >= 0) return SentenceRef(l, i)
             }
@@ -308,11 +306,23 @@ class AppController(
         return SentenceRef(current, if (unsaid >= 0) unsaid else fallback)
     }
 
+    /**
+     * Where words due for revision come back from: the current lesson, then the
+     * open lessons before it in the unlock order (the owner: "a sentence from
+     * an earlier open lesson"), never a later one the student hasn't reached.
+     */
+    private fun revisionLessons(): List<Lesson> {
+        val current = lesson
+        val opened = _state.value.learnerLessons
+        return listOf(current) + library.lessons.map { it.lesson }.takeWhile { it.id != current.id }.filter { opened.isOpen(it.id) }
+    }
+
     /** Where the pilot's sentence order continues in [lesson]: after the sentence of it last shown (0 at first). */
     private fun cursorIn(lesson: Lesson): Int = cursor?.takeIf { it.lesson.id == lesson.id && it.index in lesson.sentences.indices }?.index ?: 0
 
+    /** The student chose [lesson] on Home: it stays current, even once all of it has been said. */
     private fun switchLesson(learner: Learner, lesson: Lesson) {
-        val lessons = _state.value.learnerLessons.copy(current = lesson.id)
+        val lessons = _state.value.learnerLessons.copy(current = lesson.id, chosen = true)
         store.saveLessons(learner.id, lessons)
         cursor = null
         _state.update { it.copy(lesson = lesson, learnerLessons = lessons, lessons = rows(it.progress, lessons, lesson)) }
@@ -336,6 +346,20 @@ class AppController(
         val all = library.lessons.map { it.lesson }
         val open = all.filter { lessons.isOpen(it.id) }
         return open.firstOrNull { it.id == lessons.current } ?: open.firstOrNull { !allSaid(it, progress) } ?: open.lastOrNull() ?: all.first()
+    }
+
+    /**
+     * Moving on outside an attempt, at start and when the lessons change: the
+     * saved current lesson is all said and wasn't chosen on Home, and an open
+     * lesson after it has a sentence never said (it came later, with a new
+     * pack or a pack update). That lesson becomes current, saved.
+     */
+    private fun movedOn(id: String, lessons: LearnerLessons, progress: LearnerProgress): LearnerLessons {
+        val saved = lessons.current?.let { library.lesson(it)?.lesson } ?: return lessons
+        if (lessons.chosen || !lessons.isOpen(saved.id) || !allSaid(saved, progress)) return lessons
+        val next = nextLesson(saved, lessons, progress) ?: return lessons
+        log("student $id: every sentence of ${saved.id} said, on to ${next.id}")
+        return lessons.copy(current = next.id).also { store.saveLessons(id, it) }
     }
 
     /** The lesson after [done] to move on to: the first open one with a sentence never said; null to stay. */
@@ -423,7 +447,7 @@ class AppController(
                         var current = this.lesson
                         if (lesson.id == current.id && !allSaid(current, s.progress) && allSaid(current, attempt.progress)) {
                             nextLesson(current, lessons, attempt.progress)?.let { next ->
-                                lessons = lessons.copy(current = next.id)
+                                lessons = lessons.copy(current = next.id, chosen = false)
                                 store.saveLessons(learner.id, lessons)
                                 log("student ${learner.id}: every sentence of ${current.id} said, on to ${next.id}")
                                 current = next
@@ -568,13 +592,13 @@ class AppController(
     /**
      * Words for the goal screen's "Practise again tomorrow", as written in the
      * lessons, in the order they entered the box: only words that can come
-     * back, scored in a sentence of an open lesson (not ones only in a lesson
-     * a pack update dropped, for example).
+     * back, scored in a sentence of the current lesson or an earlier open one
+     * ([revisionLessons]); not ones only in a lesson a pack update dropped,
+     * for example.
      */
     fun wordsForTomorrow(): List<String> {
         val s = _state.value
-        val open = library.lessons.map { it.lesson }.filter { s.learnerLessons.isOpen(it.id) }
-        val revisable = open.flatMap { l -> l.sentences.flatMap { st -> st.targetWords.filter { it !in l.unscoredIn(st) } } }.toSet()
+        val revisable = revisionLessons().flatMap { l -> l.sentences.flatMap { st -> st.targetWords.filter { it !in l.unscoredIn(st) } } }.toSet()
         return Practice.wordsForTomorrow(s.progress, s.today, config).filter { it in revisable }.map { writtenInLesson(it) }
     }
 
@@ -671,7 +695,7 @@ class AppController(
     private fun lessonsChanged(stored: LearnerLessons, libraryChanged: Boolean) {
         val s = _state.value
         val learner = s.learner ?: return _state.update { it.copy(lesson = null, lessons = emptyList()) }
-        val lessons = openLessons(learner.id, stored, s.progress)
+        val lessons = movedOn(learner.id, openLessons(learner.id, stored, s.progress), s.progress)
         val current = currentLesson(lessons, s.progress)
         val onScreen = when (val screen = s.screen) {
             is Screen.Practice -> screen.ref

@@ -16,6 +16,12 @@ data class LearnerLessons(
     val opened: List<String> = emptyList(),
     /** Settings › Students › "Open all lessons": every lesson open, for testing or for a student who knows the basics. */
     @SerialName("open_all") val openAll: Boolean = false,
+    /**
+     * The student chose [current] on Home, so it stays current even when all of
+     * it has been said. A lesson reached by moving on gives way to the next one
+     * once it is all said, also when that next lesson comes later (a new pack).
+     */
+    val chosen: Boolean = false,
 ) {
     fun isOpen(lessonId: String): Boolean = openAll || lessonId in opened
 

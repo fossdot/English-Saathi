@@ -236,6 +236,64 @@ class LessonFlowTest {
     }
 
     @Test
+    fun `revision never brings a sentence from a later lesson`() {
+        addPack(packJson("bihar1", 1, 1, market))
+        // "bananas" is only in Market, which "Open all lessons" opens before the student reached it.
+        store.saveProgress(id, LearnerProgress(leitner = mapOf("bananas" to LeitnerEntry(1, today), "ticket" to LeitnerEntry(1, today.plusDays(1)))))
+        store.saveLessons(id, store.lessons(id).copy(openAll = true))
+        val app = app()
+        app.pick(id)
+        app.startPractice()
+        assertEquals("Bus stand's first sentence never said, not Market's", Screen.Practice(at(0)), app.state.value.screen)
+        assertEquals(listOf("ticket"), app.wordsForTomorrow())
+    }
+
+    @Test
+    fun `a student who finished the last lesson moves on when a new pack brings the next one`() {
+        addPack(packJson("bihar1", 1, 1, market))
+        val app = app()
+        app.pick(id)
+        for (i in 0..4) app.say(i)
+        app.say(0)
+        app.say(1)
+        assertEquals("every lesson said: Market stays current", "bihar1.market", app.lesson.id)
+        val file = File(tmp.root, "bihar2.json").also { it.writeText(packJson("bihar2", 1, 2, bank)) }
+        app.installPack(app.checkPack(file) as PackCheck.Ready)
+        assertEquals("bihar2.bank", app.lesson.id)
+        assertEquals("bihar2.bank", store.lessons(id).current)
+        app.startPractice()
+        assertEquals(Screen.Practice(SentenceRef(app.lesson, 0)), app.state.value.screen)
+    }
+
+    @Test
+    fun `a pack found at the next start also moves a student on`() {
+        addPack(packJson("bihar1", 1, 1, market))
+        val app = app()
+        app.pick(id)
+        for (i in 0..4) app.say(i)
+        app.say(0)
+        app.say(1)
+        File(LessonLibrary.addedDir(dataDir), "q.json").writeText(packJson("bihar2", 1, 2, bank))
+        val tomorrow = nextDay()
+        tomorrow.pick(id)
+        assertEquals("bihar2.bank", tomorrow.lesson.id)
+    }
+
+    @Test
+    fun `a lesson chosen on Home stays current, even when all of it has been said`() {
+        addPack(packJson("bihar1", 1, 1, market))
+        val app = app()
+        app.pick(id)
+        for (i in 0..4) app.say(i)
+        assertEquals("bihar1.market", app.lesson.id)
+        app.chooseLesson("starter.bus_stand")
+        assertEquals(true, store.lessons(id).chosen)
+        val tomorrow = nextDay()
+        tomorrow.pick(id)
+        assertEquals("starter.bus_stand", tomorrow.lesson.id)
+    }
+
+    @Test
     fun `the goal screen lists only words that can come back`() {
         val tomorrow = today.plusDays(1)
         // "bananas" is only in Market, which isn't installed (a pack removed, say); "ticket" is in Bus stand.

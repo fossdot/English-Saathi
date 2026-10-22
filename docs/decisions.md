@@ -278,8 +278,9 @@ The owner's answers:
 
 - **The sentence order** for Start practice, Next and Skip:
   1. A sentence not done today with a word due for revision (scored in that
-     sentence): the current lesson's first, then the other open lessons' in
-     the unlock order.
+     sentence): the current lesson's first, then the earlier open lessons'
+     in the unlock order. Never a later lesson, even one "Open all lessons"
+     opened: the owner's answer says "an earlier open lesson".
   2. The current lesson's first sentence never said.
   3. Otherwise the pilot's order in the current lesson. It continues after
      the current lesson's sentence last shown, so a revision sentence
@@ -288,9 +289,12 @@ The owner's answers:
   last unsaid sentence is scored. The next open lesson in the unlock order
   with a sentence never said becomes current; if there is none, the lesson
   stays current. The feedback screen still shows the sentence just said,
-  with "New lesson open: …", and Next continues in the new lesson. A lesson
-  the student chooses on Home stays current, even once all of it has been
-  said.
+  with "New lesson open: …", and Next continues in the new lesson. It also
+  happens at start and when the lessons change, for a lesson that is all
+  said with nothing after it yet: once a new pack or a pack update brings
+  the next lesson, that becomes current. A lesson the student chooses on
+  Home stays current, even once all of it has been said
+  (`lessons.json` remembers that it was chosen).
 - **When the saved current lesson can't be used** (none yet, dropped by a
   pack update, or closed when "Open all lessons" is turned off), the current
   lesson is the first open lesson with a sentence never said, or else the
@@ -301,7 +305,8 @@ The owner's answers:
   teacher review). Its speech isn't prepared with the current lesson's, so
   its first Listen takes a moment longer.
 - **The goal screen's "Practise again tomorrow"** lists only words that can
-  come back: words scored in a sentence of an open lesson.
+  come back: words scored in a sentence of the current lesson or an earlier
+  open one.
 - **Data saved before this change** has bare ids, which can only be the
   first pack's (Bus stand was the only lesson in use). Progress, open lessons
   and the attempt log read them as `starter.<id>`, so old rows also export as
