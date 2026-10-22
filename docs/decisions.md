@@ -284,9 +284,12 @@ How the app is built is in `docs/packaging.md`; the staff guide is
   opened again, so the app's message and the guide both say: turn on
   English Saathi, then Quit & Reopen if macOS offers it, or quit and open
   it again.
-- **The staff guide's steps are for macOS 13 to 26.** The app runs on 11 and
-  12 too, where System Preferences looks different; the app's own voice
-  hint gives their path.
+- **The staff guide is English only, simple and short** (owner,
+  2026-10-22), replacing the two-column English and Hindi version: one
+  page, six steps. Its steps are for macOS 13 to 26, worded so they fit
+  every version (Done or Cancel, Open Anyway or Open). The app runs on 11
+  and 12 too, where System Preferences looks different; the app's own
+  voice hint gives their path.
 
 ## Lesson review: owner answers (2026-10-22)
 

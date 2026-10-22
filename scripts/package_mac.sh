@@ -131,7 +131,7 @@ if [ -f docs/setup-guide.pdf ]; then
   if [ docs/setup-guide.html -nt docs/setup-guide.pdf ]; then
     echo "warning: docs/setup-guide.html is newer than its PDF; run scripts/make_setup_guide.sh if the guide changed" >&2
   fi
-  cp docs/setup-guide.pdf "$stage/Setup guide · सेटअप गाइड.pdf"
+  cp docs/setup-guide.pdf "$stage/Setup guide.pdf"
 else
   echo "note: docs/setup-guide.pdf is missing, so the .dmg has no setup guide" >&2
 fi

@@ -8,140 +8,95 @@
   @font-face { font-family: Mukta; src: url("../desktop/src/main/resources/fonts/Mukta-Regular.ttf"); font-weight: 400; }
   @font-face { font-family: Mukta; src: url("../desktop/src/main/resources/fonts/Mukta-SemiBold.ttf"); font-weight: 600; }
   @font-face { font-family: Mukta; src: url("../desktop/src/main/resources/fonts/Mukta-Bold.ttf"); font-weight: 700; }
-  @page { size: A4; margin: 10mm 11mm; }
-  :root { --ink: #1D1B18; --muted: #5A554D; --line: #E4DED2; --primary: #2C3E9E; --primary-soft: #E6E9F7; --reward: #C25E00; --reward-soft: #FFF0DC; }
+  @page { size: A4; margin: 16mm 18mm; }
+  :root { --ink: #1D1B18; --muted: #5A554D; --line: #E4DED2; --primary: #2C3E9E; --reward-soft: #FFF0DC; }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: Mukta, "Noto Sans Devanagari", sans-serif; color: var(--ink); font-size: 9.6pt; line-height: 1.3; }
-  header { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--primary); padding-bottom: 4px; margin-bottom: 4px; }
-  header img { width: 36px; height: 36px; }
-  h1 { font-size: 15pt; margin: 0; line-height: 1.1; }
+  body { margin: 0; font-family: Mukta, sans-serif; color: var(--ink); font-size: 12pt; line-height: 1.4; }
+  header { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 14px; }
+  header img { width: 44px; height: 44px; }
+  h1 { font-size: 20pt; margin: 0; line-height: 1.1; }
   h1 span { display: block; font-size: 11pt; font-weight: 400; color: var(--muted); }
-  .meta { margin-left: auto; text-align: right; color: var(--muted); font-size: 8.2pt; }
-  table { width: 100%; border-collapse: collapse; }
-  td { vertical-align: top; padding: 3px 5px; border-bottom: 1px solid var(--line); }
-  td.n { width: 22px; padding-right: 0; }
-  .num { display: inline-block; width: 18px; height: 18px; border-radius: 9px; background: var(--primary); color: #fff; text-align: center; font-weight: 700; font-size: 9pt; line-height: 18px; }
-  td.en { width: 51%; }
-  td.hi { width: 47%; font-size: 9.8pt; }
-  h2 { font-size: 10.6pt; margin: 0 0 1px; }
-  td.hi h2 { font-size: 10.8pt; }
-  p, ul, ol { margin: 0 0 2px; }
-  ul, ol { padding-left: 14px; }
-  li { margin: 0; }
-  .os { font-weight: 600; color: var(--primary); }
-  .ui { font-weight: 600; }
-  .note { background: var(--reward-soft); border-radius: 6px; padding: 2px 7px; margin-top: 2px; }
-  footer { margin-top: 4px; color: var(--muted); font-size: 8pt; display: flex; justify-content: space-between; gap: 12px; }
+  section { display: flex; gap: 12px; margin-bottom: 14px; }
+  .num { flex: none; width: 26px; height: 26px; border-radius: 13px; background: var(--primary); color: #fff; text-align: center; font-weight: 700; line-height: 26px; }
+  h2 { font-size: 14pt; margin: 0 0 3px; }
+  p, ol { margin: 0 0 4px; }
+  ol { padding-left: 18px; }
+  b { font-weight: 600; }
+  .note { background: var(--reward-soft); border-radius: 8px; padding: 6px 10px; margin-top: 6px; }
+  footer { border-top: 1px solid var(--line); padding-top: 8px; color: var(--muted); font-size: 10.5pt; }
 </style>
 </head>
 <body>
 <header>
   <img src="../desktop/packaging/icon-1024.png" alt="">
-  <h1>English Saathi: setting up a MacBook<span>English Saathi: MacBook पर लगाना</span></h1>
-  <div class="meta">For Hikmat Foundation staff · steps for macOS 13 to 26<br>About 20 minutes, once per MacBook</div>
+  <h1>Setting up English Saathi<span>For Hikmat Foundation staff · once per MacBook, about 15 minutes</span></h1>
 </header>
-<table>
-<tr>
-  <td class="n"><span class="num">1</span></td>
-  <td class="en">
+
+<section>
+  <div class="num">1</div>
+  <div>
     <h2>Install</h2>
-    <ul>
-      <li>Download the English Saathi file from the Google Drive folder (<span class="ui">English-Saathi-1.0.0.dmg</span>; the number grows with each new version). Google Drive says it can’t scan it for viruses, as it is big: click <span class="ui">Download anyway</span>. Then double-click the file.</li>
-      <li>Drag <span class="ui">English Saathi</span> onto <span class="ui">Applications</span>. If macOS asks for a password, type an administrator’s name and password. Then eject the “English Saathi” disk (⏏ in Finder).</li>
-    </ul>
-  </td>
-  <td class="hi">
-    <h2>लगाइए</h2>
-    <ul>
-      <li>Google Drive फ़ोल्डर से English Saathi की फ़ाइल (<span class="ui">English-Saathi-1.0.0.dmg</span>; हर नए संस्करण के साथ नंबर बढ़ता है) डाउनलोड कीजिए। फ़ाइल बड़ी है, इसलिए Google Drive कहेगा कि वह वायरस जाँच नहीं कर सकता: <span class="ui">Download anyway</span> दबाइए। फिर फ़ाइल पर डबल-क्लिक कीजिए।</li>
-      <li><span class="ui">English Saathi</span> को खींचकर <span class="ui">Applications</span> पर छोड़िए। पासवर्ड माँगे तो administrator का नाम और पासवर्ड लिखिए। फिर Finder में “English Saathi” डिस्क को ⏏ से निकालिए।</li>
-    </ul>
-  </td>
-</tr>
-<tr>
-  <td class="n"><span class="num">2</span></td>
-  <td class="en">
-    <h2>Open it the first time: Open Anyway</h2>
-    <p class="os">macOS 15 or 26</p>
     <ol>
-      <li>Double-click English Saathi in Applications. macOS says <span class="ui">“English Saathi” Not Opened</span>: click <span class="ui">Done</span> (not Move to Trash or Move to Bin).</li>
-      <li>Apple menu › <span class="ui">System Settings</span> › <span class="ui">Privacy &amp; Security</span>. Scroll down to Security: next to “English Saathi” was blocked…, click <span class="ui">Open Anyway</span>.</li>
-      <li>macOS asks again: click <span class="ui">Open Anyway</span>. Then use an administrator’s Touch ID, or click <span class="ui">Use Password…</span> and type an administrator’s name and password. The app opens.</li>
+      <li>Download the English Saathi file from Google Drive. If Drive says it can’t scan it for viruses, click <b>Download anyway</b>.</li>
+      <li>Double-click the file. Drag <b>English Saathi</b> onto <b>Applications</b>. If macOS asks, type an administrator’s name and password.</li>
+      <li>Eject the “English Saathi” disk (⏏ in Finder).</li>
     </ol>
-    <p><span class="os">macOS 13 or 14:</span> click <span class="ui">Cancel</span>, then in Privacy &amp; Security click <span class="ui">Open Anyway</span>, then <span class="ui">Open</span>.</p>
-    <p class="note">Once per Mac, and again after each new version. Open Anyway shows for about an hour after the first try; if it isn’t there, double-click the app again. If macOS says the app “is damaged”, don’t use it: ask for a new copy.</p>
-  </td>
-  <td class="hi">
-    <h2>पहली बार खोलना: Open Anyway</h2>
-    <p class="os">macOS 15 या 26</p>
+  </div>
+</section>
+
+<section>
+  <div class="num">2</div>
+  <div>
+    <h2>Open it the first time</h2>
+    <p>macOS blocks it the first time. This is expected.</p>
     <ol>
-      <li>Applications में English Saathi पर डबल-क्लिक कीजिए। macOS कहेगा <span class="ui">“English Saathi” Not Opened</span>: <span class="ui">Done</span> दबाइए (Move to Trash या Move to Bin नहीं)।</li>
-      <li>Apple मेनू › <span class="ui">System Settings</span> › <span class="ui">Privacy &amp; Security</span>। नीचे Security में “English Saathi” was blocked… के आगे <span class="ui">Open Anyway</span> दबाइए।</li>
-      <li>macOS फिर पूछेगा: <span class="ui">Open Anyway</span> दबाइए। फिर administrator का Touch ID लगाइए, या <span class="ui">Use Password…</span> दबाकर administrator का नाम और पासवर्ड लिखिए। ऐप खुल जाएगा।</li>
+      <li>Open <b>Applications</b> and double-click <b>English Saathi</b>. When macOS warns you, click <b>Done</b> (or <b>Cancel</b>).</li>
+      <li>Open <b>System Settings › Privacy &amp; Security</b>. Scroll down and click <b>Open Anyway</b>.</li>
+      <li>Click <b>Open Anyway</b> (or <b>Open</b>) again. If asked, use an administrator’s Touch ID, or click <b>Use Password…</b> and type their name and password.</li>
     </ol>
-    <p><span class="os">macOS 13 या 14:</span> <span class="ui">Cancel</span> दबाइए, फिर Privacy &amp; Security में <span class="ui">Open Anyway</span>, फिर <span class="ui">Open</span>।</p>
-    <p class="note">हर Mac पर एक बार, और हर नए संस्करण के बाद फिर। पहली कोशिश के बाद लगभग एक घंटे तक Open Anyway दिखता है; न दिखे तो ऐप पर फिर डबल-क्लिक कीजिए। अगर macOS कहे कि ऐप “damaged” है, तो उसे न चलाइए: नई कॉपी माँगिए।</p>
-  </td>
-</tr>
-<tr>
-  <td class="n"><span class="num">3</span></td>
-  <td class="en">
+    <p>Open Anyway shows for about an hour. If it isn’t there, double-click the app again.</p>
+  </div>
+</section>
+
+<section>
+  <div class="num">3</div>
+  <div>
     <h2>Allow the microphone</h2>
-    <ul>
-      <li>When the app starts, macOS asks: <span class="ui">“English Saathi” would like to access the microphone</span>. Click <span class="ui">Allow</span> (<span class="ui">OK</span> on macOS 13). After a new version, it asks again.</li>
-      <li>If it was refused: System Settings › Privacy &amp; Security › <span class="ui">Microphone</span>, turn on <span class="ui">English Saathi</span>. Then click <span class="ui">Quit &amp; Reopen</span> if macOS offers it, or quit English Saathi (⌘Q) and open it again.</li>
-    </ul>
-  </td>
-  <td class="hi">
-    <h2>माइक की अनुमति दीजिए</h2>
-    <ul>
-      <li>ऐप खुलते ही macOS पूछेगा: <span class="ui">“English Saathi” would like to access the microphone</span>। <span class="ui">Allow</span> दबाइए (macOS 13 में <span class="ui">OK</span>)। नए संस्करण के बाद यह फिर पूछेगा।</li>
-      <li>अगर मना हो गया: System Settings › Privacy &amp; Security › <span class="ui">Microphone</span> में <span class="ui">English Saathi</span> चालू कीजिए। फिर macOS <span class="ui">Quit &amp; Reopen</span> दिखाए तो उसे दबाइए, नहीं तो English Saathi बंद (⌘Q) करके फिर खोलिए।</li>
-    </ul>
-  </td>
-</tr>
-<tr>
-  <td class="n"><span class="num">4</span></td>
-  <td class="en">
-    <h2>Download clearer voices (needs internet once)</h2>
-    <ul>
-      <li>System Settings › <span class="ui">Accessibility</span>, then: <span class="os">macOS 26:</span> <span class="ui">Read &amp; Speak</span> › ⓘ next to System voice. <span class="os">macOS 15:</span> <span class="ui">Spoken Content</span> › ⓘ next to System voice. <span class="os">macOS 13 or 14:</span> <span class="ui">Spoken Content</span> › System voice › <span class="ui">Manage Voices…</span></li>
-      <li>Download <span class="ui">Rishi (Enhanced)</span> under English (India), about 250 MB, and <span class="ui">Lekha (Enhanced)</span> under Hindi, about 100 MB. When both have finished downloading, quit English Saathi (⌘Q) and open it again: Settings (⌘,) › Voices names them.</li>
-    </ul>
-  </td>
-  <td class="hi">
-    <h2>साफ़ आवाज़ें डाउनलोड कीजिए (एक बार इंटरनेट चाहिए)</h2>
-    <ul>
-      <li>System Settings › <span class="ui">Accessibility</span>, फिर: <span class="os">macOS 26:</span> <span class="ui">Read &amp; Speak</span> › System voice के आगे ⓘ। <span class="os">macOS 15:</span> <span class="ui">Spoken Content</span> › System voice के आगे ⓘ। <span class="os">macOS 13 या 14:</span> <span class="ui">Spoken Content</span> › System voice › <span class="ui">Manage Voices…</span></li>
-      <li>English (India) में <span class="ui">Rishi (Enhanced)</span> (लगभग 250 MB) और Hindi में <span class="ui">Lekha (Enhanced)</span> (लगभग 100 MB) डाउनलोड कीजिए। दोनों का डाउनलोड पूरा होने पर English Saathi बंद (⌘Q) करके दोबारा खोलिए: Settings (⌘,) › Voices में ये नाम दिखेंगे।</li>
-    </ul>
-  </td>
-</tr>
-<tr>
-  <td class="n"><span class="num">5</span></td>
-  <td class="en">
+    <p>When macOS asks to use the microphone, click <b>Allow</b> (<b>OK</b> on macOS 13).</p>
+    <p>Clicked Don’t Allow by mistake? Go to <b>System Settings › Privacy &amp; Security › Microphone</b>, turn on English Saathi, then quit the app and open it again.</p>
+  </div>
+</section>
+
+<section>
+  <div class="num">4</div>
+  <div>
+    <h2>Clearer voices (optional, needs internet)</h2>
+    <p>In <b>System Settings › Accessibility</b>, open <b>Read &amp; Speak</b> (or <b>Spoken Content</b>) and the <b>System voice</b> list. Download <b>Rishi (Enhanced)</b> and <b>Lekha (Enhanced)</b>. Wait until both finish, then quit and reopen English Saathi. <b>Settings (⌘,) › Voices</b> shows their names.</p>
+  </div>
+</section>
+
+<section>
+  <div class="num">5</div>
+  <div>
     <h2>Every day</h2>
-    <ul>
-      <li>Each student picks their own card. Everything stays on this Mac.</li>
-      <li><span class="ui">Settings</span> (⌘,): students, Add lessons…, speech model, microphone, voices.</li>
-      <li><span class="ui">Results</span> › <span class="ui">Save as CSV…</span> saves every attempt (for the evidence).</li>
-      <li>A new version: quit English Saathi, drag the new one onto Applications and choose <span class="ui">Replace</span>. Progress and added lessons stay. Then steps 2 and 3 again.</li>
-    </ul>
-  </td>
-  <td class="hi">
-    <h2>रोज़</h2>
-    <ul>
-      <li>हर छात्र अपना कार्ड चुनता है। सब कुछ इसी Mac पर रहता है।</li>
-      <li><span class="ui">Settings</span> (⌘,): छात्र, Add lessons…, मॉडल, माइक, आवाज़ें।</li>
-      <li><span class="ui">Results</span> › <span class="ui">Save as CSV…</span> से हर कोशिश की फ़ाइल सेव होती है।</li>
-      <li>नया संस्करण: English Saathi बंद कीजिए, नया ऐप Applications पर छोड़कर <span class="ui">Replace</span> चुनिए। प्रगति और जोड़े गए पाठ बने रहते हैं। फिर चरण 2 और 3 दोबारा।</li>
-    </ul>
-  </td>
-</tr>
-</table>
-<footer>
-  <span>Keep the MacBook plugged in during sessions. Problems: Settings (⌘,) shows the data folder and the log.</span>
-  <span>Hindi text to be checked by a teacher · हिंदी की जाँच बाकी</span>
-</footer>
+    <ol>
+      <li>Each student picks their own card.</li>
+      <li><b>Settings</b> (⌘,): students, Add lessons…, speech model, microphone, voices.</li>
+      <li><b>Results › Save as CSV…</b> saves every attempt, for the evidence.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="num">6</div>
+  <div>
+    <h2>New versions</h2>
+    <p>Quit English Saathi, drag the new one onto Applications and choose <b>Replace</b>. Students’ progress stays. Then do steps 2 and 3 again.</p>
+  </div>
+</section>
+
+<p class="note">If macOS ever says the app is <b>damaged</b>, don’t use it. Ask for a new copy.</p>
+
+<footer>Keep the MacBook plugged in during sessions. Everything stays on this Mac.</footer>
 </body>
 </html>
