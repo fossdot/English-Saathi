@@ -12,10 +12,10 @@ use the desktop app for the next three months, as a normal Mac app with
 lessons that can be added later (see "Distribution, defaults and lessons:
 owner answers").
 
-**Assessment (2026-10-23):** the monthly assessment, cohort dashboard and
-Ubuntu build are designed in `docs/assessment-design.md`, not built. The
-owner's first answers, and the change to a monthly check plus a full test
-every three months, are under "Assessment design: owner answers".
+**Assessment and Linux paused (2026-10-23):** the monthly assessment,
+cohort dashboard and Ubuntu build are designed in
+`docs/assessment-design.md` and not built; both are now on hold (see
+"Assessment and Linux paused" below). The focus is the Mac practice app.
 
 ## Direction change: macOS desktop app first (2026-10-19)
 
@@ -447,6 +447,42 @@ The owner's answers:
   Android build is shared, it needs the same rebuild, or sherpa-onnx 2.0,
   which drops eSpeak NG.
 
+## Assessment and Linux paused (2026-10-23)
+
+- **Paused:** the Linux (Ubuntu) work and the assessment module (monthly
+  checks, full tests, cohort dashboard, AI scoring). Nothing is built or
+  planned for them until the owner resumes them.
+  `docs/assessment-design.md` stays as it is, for later; its open
+  questions (§13) wait too.
+- **Focus now:** the Mac practice app: finish what is still open from the
+  packaging work (the `.dmg`, lesson packs, the setup guide) and get it
+  ready for students.
+- **Hikmat's computers** (owner): 20 Macs, all 2019 Intel 16-inch MacBook
+  Pros with 16 GB RAM, and 130 Ubuntu PCs. All users have administrator
+  rights. So the practice app, which is Mac-only, runs on the 20 MacBooks
+  for now; staff can do Open Anyway and app updates themselves on any of
+  them.
+- This also answers the device questions of the assessment design (Q28,
+  except models, Ubuntu version and headphones of the PCs; Q29), for when
+  it resumes.
+
+### Choices made while finishing the packaging (2026-10-23)
+
+- **Nothing in the app needed finishing.** The 1.0.0 `.dmg` already matched
+  the code; it was rebuilt only so that it carries the corrected guide.
+  It stays 1.0.0, because no copy has been sent out yet.
+- **Setup guide**, still one page and six steps: it names the file to
+  download (`English-Saathi-….dmg`, not the corretto file), says macOS 13
+  to 26, asks for "your Mac password" or Touch ID now that every user is
+  an administrator, and gives the voice list's exact button (System voice ›
+  ⓘ, or Manage Voices…).
+- **Hindi review sheet:** `docs/hindi-review.csv` lists every Hindi text in
+  the app and the starter pack (178), with where it is, the English beside
+  it, and whether it came from the web pilot (90) or was drafted for the
+  desktop app (88), with columns for the teacher's answer. It opens in
+  Excel or Google Sheets. `tools/hindi-review/extract.py` makes it again
+  after any change.
+
 ## Assessment design: owner answers (2026-10-23)
 
 Answers to the open questions in `docs/assessment-design.md` (§13), and one
@@ -492,10 +528,10 @@ remaining questions first.
   - three full forms and three check forms per skill, given to three random
     groups, so no student repeats a form within nine months, and a second
     set of forms from month 10.
-- **Still open (Q25, Q26, Q28, Q29):** the answers arrived with blanks
-  where the figures and names go: the EF SET levels, the judges and their
-  days, the number of Macs and Ubuntu PCs, and who holds the administrator
-  passwords.
+- **Still open (Q25, Q26):** the answers arrived with blanks where the
+  figures go: the EF SET levels, the judges and their days. (Q28 and Q29,
+  also blank here, were answered later the same day: see "Assessment and
+  Linux paused".)
 
 ### Choices made while revising the design
 
