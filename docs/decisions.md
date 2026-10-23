@@ -17,6 +17,10 @@ cohort dashboard and Ubuntu build are designed in
 `docs/assessment-design.md` and not built; both are now on hold (see
 "Assessment and Linux paused" below). The focus is the Mac practice app.
 
+**Campus server (2026-10-23):** one Mac as a local server for a progress
+dashboard on the campus Wi-Fi is planned in `docs/campus-server-plan.md`,
+waiting for the owner's OK and the answers in its §12. Nothing is built.
+
 ## Direction change: macOS desktop app first (2026-10-19)
 
 - **Build a macOS desktop app first**, with Compose Multiplatform (desktop,
