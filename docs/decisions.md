@@ -12,6 +12,11 @@ use the desktop app for the next three months, as a normal Mac app with
 lessons that can be added later (see "Distribution, defaults and lessons:
 owner answers").
 
+**Assessment (2026-10-23):** the monthly assessment, cohort dashboard and
+Ubuntu build are designed in `docs/assessment-design.md`, not built. The
+owner's first answers, and the change to a monthly check plus a full test
+every three months, are under "Assessment design: owner answers".
+
 ## Direction change: macOS desktop app first (2026-10-19)
 
 - **Build a macOS desktop app first**, with Compose Multiplatform (desktop,
@@ -441,6 +446,90 @@ The owner's answers:
   has the same text-to-speech code inside. Android is paused; before an
   Android build is shared, it needs the same rebuild, or sherpa-onnx 2.0,
   which drops eSpeak NG.
+
+## Assessment design: owner answers (2026-10-23)
+
+Answers to the open questions in `docs/assessment-design.md` (§13), and one
+change to the design. Nothing is built yet: the owner asked for the
+remaining questions first.
+
+- **Data leaving the student computers (Q1):** results may leave the
+  student computers for the facilitator dashboard. Answer text with names
+  removed may go to Anthropic, but only with recorded consent, and only
+  after an Indian data-protection lawyer reviews the consent design. Until
+  then, open answers (writing and speaking) are teacher-scored only.
+  - This changes "All data stays on that Mac. No tracking or sharing for
+    now." (Distribution, defaults and lessons) for assessment results.
+  - It also allows a new use of an LLM beside "No LLM in the app": scoring
+    consented, name-removed answer text with Claude on a staff computer,
+    after the lawyer's review. The app itself stays LLM-free.
+  - The design reads "results" as including answer text and transcripts,
+    which the teacher scores on the dashboard, but not audio; and "teacher-
+    scored only" as also ruling out the local model. Both readings wait for
+    the owner's confirmation (design Q43).
+- **Exports through the dashboard (Q14):** accepted as proposed. Student
+  computers export to the facilitator's dashboard, which checks consent and
+  removes names before anything reaches the staff computer. Whether the
+  facilitator and staff computers are one machine is still open (Q31).
+- **Speaking measures (Q15):** accepted. Speed and pause measures for open
+  speaking answers are calculated on the student computer, with no score
+  shown there.
+- **Saving and resuming limits (Q24):** accepted. After two interruptions
+  in one section a facilitator confirms before it continues; once a
+  sitting's window closes, an unfinished section is kept but gets no level.
+- **Roll numbers (Q33):** every student gets a Hikmat roll number before
+  their first test.
+- **Change: a monthly check and a quarterly full test.** The monthly
+  two-hour test is replaced by a short monthly check (30–40 minutes, two
+  skills, rotating) plus the full four-skill test every three months. The
+  design, the form rotation and the costs are updated (§4.2, §4.6, §7).
+  The design proposes, for the owner to confirm (Q18, Q20, Q39–Q41):
+  - the full test in months 1, 4, 7 and 10, still in two sittings of about
+    an hour; Listening and Speaking checks in months 2, 5, 8 and 11;
+    Reading and Writing checks in months 3, 6, 9 and 12;
+  - checks at about half length, showing a score and its error band but no
+    level; Speaking and Writing checks reuse full-test tasks;
+  - three full forms and three check forms per skill, given to three random
+    groups, so no student repeats a form within nine months, and a second
+    set of forms from month 10.
+- **Still open (Q25, Q26, Q28, Q29):** the answers arrived with blanks
+  where the figures and names go: the EF SET levels, the judges and their
+  days, the number of Macs and Ubuntu PCs, and who holds the administrator
+  passwords.
+
+### Choices made while revising the design
+
+- **What the change costs and saves.** Computer time drops from about 300
+  hours a month to about 160 on average. AI scoring, once allowed, would be
+  about $2.30 a month on Sonnet 5.5 instead of $4. While teachers score
+  every open answer, they need about 30–45 hours in a full-test month,
+  15–23 in a Listening and Speaking month and 8–10 in a Reading and Writing
+  month (design §7.1).
+- **Item writing:** about 160 items per receptive skill for nine months,
+  where the monthly design needed about 120 for three months and 210 for
+  six. Each check form shares 6 items with one full form, paired so that no
+  student meets a shared item again sooner than four months later.
+- **Calibration** moves from after month 3 to after month 4, when every
+  item has enough answers. The full forms share no items, so they are
+  joined by the random groups alone, with an error stated beside any
+  individual change. The two-form agreement study moves out of the cohort,
+  to the trial students before month 1 (in the cohort it would break the
+  rotation).
+- **Consent:** the design proposes that the first consent forms carry the
+  local scopes plus a new `benchmark_local` (answers used as benchmarks by
+  the teacher panel), and that the AI scopes come later, depending on when
+  the lawyer reviews (Q44, Q50).
+- **The first AI study** runs on the first full test after families give
+  the AI consent. The design proposes that teachers keep scoring every
+  answer that month, so the AI is compared with them on all consented
+  answers (Q16, reworded).
+- **New questions** raised by these answers are Q39–Q50 in the design:
+  the check pairing and length, starting with a full test, where the
+  teacher listens to speaking answers, the two readings of Q1, the scope
+  and timing of the lawyer's review, AI consent and earlier answers, double
+  scoring, roll-number logistics, make-up tests, blind scoring and
+  benchmark consent. The design's §13.1 groups every open question by the
+  milestone it blocks.
 
 ## Desktop screens: owner answers (2026-10-21)
 
