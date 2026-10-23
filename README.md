@@ -2,8 +2,8 @@
 
 Package ID `net.bodhya.speak`.
 
-Offline Android app that helps Hindi speakers in rural Bihar practise spoken
-English. A learner says a sentence; the app finds the words that went wrong
+Offline app (macOS first; Android paused) that helps Hindi speakers in rural
+Bihar practise spoken English. A learner says a sentence; the app finds the words that went wrong
 and walks them through fixing them.
 
 **Status:** students will practise on a shared macOS laptop first, so the

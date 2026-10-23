@@ -15,8 +15,9 @@ setup guide (`docs/setup-guide.pdf`, also on the `.dmg`).
 
 - [ ] Plug the MacBook into power and close other apps.
 - [ ] Apple menu › About This Mac: macOS version ________, processor Intel
-      i7 or i9 ________, memory 16 GB. Is the staff account an
-      administrator (System Settings › Users & Groups)? ________
+      i7 or i9 ________, memory 16 GB. (Every Hikmat account is an
+      administrator, `docs/decisions.md`.) Needs macOS 13 to 26 for the
+      guide's steps; note any of the 20 Macs on an older version: ________
 - [ ] Voices: System Settings › Accessibility › Read & Speak (Spoken Content
       on older macOS) › System voice › ⓘ or Manage Voices. Note which English
       (India) and Hindi voices are already installed: ________. Don't
@@ -46,7 +47,10 @@ in the guide that didn't match the screen: ________
       about missing voices may appear: note it ________ (newer macOS has
       basic Rishi and Lekha voices built in).
 - [ ] Quit (⌘Q) and open the app again from Applications: it opens at once,
-      with no Open Anyway and no microphone prompt.
+      with no Open Anyway and no microphone prompt. With a stopwatch:
+      seconds from double-click to **Who is practising?** ____; then pick a
+      student and **Start practice**: seconds until the first sentence can
+      be heard and recorded ____.
 
 ## C. Voices (5 minutes, needs internet)
 

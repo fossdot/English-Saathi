@@ -3,8 +3,9 @@
 Agreed with the owner on 2026-10-20. The answers behind it are in
 `docs/decisions.md` ("Desktop app: owner answers"). Target: a 2019 16-inch
 Intel MacBook Pro (16 GB, macOS up to Tahoe 26), shared by students taking
-turns with a facilitator present. Fully offline, no LLM, run from Gradle
-for now (no signing or notarization).
+turns with a facilitator present. Fully offline, no LLM. At first run from
+Gradle; since 2026-10-22 packaged as a normal Mac app, signed ad hoc and not
+notarized (`docs/packaging.md`).
 
 **Go-ahead:** D1–D4 now. D5–D9 wait until this week's student pilots are
 done, because the pilots may change the practice and feedback screens.
@@ -244,8 +245,8 @@ pure silence. Corretto 17 and Microsoft's OpenJDK 17 have the entitlement
    shares it.
 10. **Running from Gradle needs setup.** The first run on each MacBook
     needs internet (Gradle, libraries, models: about 1 GB) and Terminal
-    stays open while the app runs. Packaging as a .app comes after D9
-    (`docs/later.md`).
+    stays open while the app runs. Resolved: the app was packaged as a
+    `.dmg` before D9, on 2026-10-22 (`docs/packaging.md`).
 11. **Shared laptop.** All progress and recordings are in one macOS
     account, visible to anyone at the Mac. Every new Hindi message needs
     teacher review.
